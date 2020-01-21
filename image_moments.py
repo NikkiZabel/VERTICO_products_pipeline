@@ -106,7 +106,7 @@ class create_images:
         plt.tight_layout()
 
         if self.tosave:
-            plt.savefig(self.savepath + 'mom0.png', bbox_inches='tight')
+            plt.savefig(self.savepath + 'moment0.pdf', bbox_inches='tight')
 
         return
 
@@ -210,9 +210,9 @@ class create_images:
 
         if self.tosave:
             if moment == 2:
-                plt.savefig(self.savepath+'moment2.png', bbox_inches='tight',)
+                plt.savefig(self.savepath+'moment2.pdf', bbox_inches='tight',)
             else:
-                plt.savefig(self.savepath+'moment1.png', bbox_inches='tight')
+                plt.savefig(self.savepath+'moment1.pdf', bbox_inches='tight')
 
         return
 
@@ -361,7 +361,7 @@ class create_images:
         plt.plot(x, zeroline, linestyle=':', c='r', linewidth=1)
 
         # Set various parameters
-        ax.set_xlim(velocity[0] - 5, velocity[len(velocity) - 1] + 5)
+        ax.set_xlim(velocity[len(velocity) - 1] + 5, velocity[0] - 5)
         ax.set_xlabel(r'Velocity [km s$^{-1}$]')
         ax.set_ylabel('Flux density [mJy]')
 
