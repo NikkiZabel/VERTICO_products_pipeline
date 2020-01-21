@@ -1,20 +1,14 @@
 from astropy.io import fits
 import numpy as np
 import scipy.ndimage as ndimage
-from gal_params import *
+from targets import galaxies
 
 class moment_maps:
 
-    def __init__(self, galaxy, path, pbcor, dv, cliplevel, stokes=False, tosave=False):
-        self.galaxy = galaxy
+    def __init__(self, galname, path, tosave=False):
+        self.galaxy = galaxies(galname)
         self.path = path
-        self.pbcor = pbcor
-        self.stokes = stokes
         self.tosave = tosave
-        self.start = 33
-        self.stop = 73
-        self.cliplevel = cliplevel
-        self.dv = dv
 
     def makebeam(self, xpixels, ypixels, header, rot=0, cent=0):
 
@@ -54,20 +48,20 @@ class moment_maps:
         return np.sum(psf)
 
     def readfits(self):
-        '''
+        """
         Read in cube HDU and get rid of nans
         :param path: path to fits file
         :param pbcor: use pb corrected cube or not?
         :return: cube HDU with nans set to zero
-        '''
-        if self.pbcor:
-            fitsfile = self.path + self.galaxy + '.co.image.pbcor.fits'
+        """
+        if self.galaxy.pbcor:
+            fitsfile = self.path + '.co.image.pbcor.fits'
         else:
-            fitsfile = self.path + self.galaxy + '/' + self.galaxy + '_7m+tp_co21_flat_round_k.fits'
+            fitsfile = self.path + '/' + self.galaxy.name + '_7m+tp_co21_flat_round_k.fits'
 
         cube = fits.open(fitsfile)[0]
 
-        if self.stokes:
+        if self.galaxy.stokes:
             cube.data = np.squeeze(cube.data)
             try:
                 cube.header.pop('PC01_04')
@@ -85,6 +79,7 @@ class moment_maps:
                 cube.header.pop('PC4_1')
                 cube.header.pop('PC4_2')
                 cube.header.pop('PC4_3')
+
             cube.header.pop('CTYPE4')
             cube.header.pop('CRVAL4')
             cube.header.pop('CRPIX4')
@@ -109,6 +104,7 @@ class moment_maps:
             header.pop('PC03_02')
             header.pop('PC01_03')
             header.pop('PC02_03')
+
         header.pop('CTYPE3')
         header.pop('CRVAL3')
         header.pop('CDELT3')
@@ -124,8 +120,8 @@ class moment_maps:
         :param cube: data cube
         :return: two cubes, one containing the channels with the line, and one containing the line-free channels
         '''
-        emiscube = cube.data[self.start:self.stop, :, :]
-        noisecube = np.concatenate((cube.data[:self.start, :, :], cube.data[self.stop:, :, :]), axis=0)
+        emiscube = cube.data[self.galaxy.start:self.galaxy.stop, :, :]
+        noisecube = np.concatenate((cube.data[:self.galaxy.start, :, :], cube.data[self.galaxy.stop:, :, :]), axis=0)
 
         emiscube_hdu = fits.PrimaryHDU(emiscube, cube.header)
         emiscube_hdu.header['NAXIS3'] = emiscube.shape[0]
@@ -167,7 +163,7 @@ class moment_maps:
         '''
         emiscube, noisecube = self.splitCube(cube)
         sigma = self.get_rms(cube)
-        emiscube.data[emiscube.data < self.cliplevel * sigma] = 0
+        emiscube.data[emiscube.data < self.galaxy.cliplevel * sigma] = 0
 
         return emiscube.data
 
@@ -207,38 +203,36 @@ class moment_maps:
         return clipped_hdu
 
     def create_vel_array(self, cube):
-
         v_val = cube.header['CRVAL3'] / 1000.  # velocity in the reference channel, m/s to km/s
         v_step = cube.header['CDELT3'] / 1000.  # velocity step in each channel, m/s to km/s
         v_ref = cube.header['CRPIX3']  # location of the reference channel
 
         # Construct the velocity array
-        vel_array = ((np.arange(0, len(cube.data[:, 0, 0])) - v_ref - 1 + self.start) * v_step + v_val)  # fits index starts from 1, start at the beginning of the emission cube
+        vel_array = ((np.arange(0, len(cube.data[:, 0, 0])) - v_ref - 1 + self.galaxy.start) * v_step + v_val)  # fits index starts from 1, start at the beginning of the emission cube
         vel_narray = np.tile(vel_array, (len(cube.data[0, 0, :]), len(cube.data[0, :, 0]), 1)).transpose()
 
         return vel_array, vel_narray
 
     def calc_moms(self):
-        '''
+        """
         Calculate the moments 0,1, and 2 by calculating sum(I), sum(v*I)/sum(I), and sum(v*I^2)/sum(I)
         :param cube: raw data cube
         :param sigma: rms in raw data cube
         :param dV: channel width in km/s
         :return:
-        '''
+        """
         rawcube = self.readfits()
         cube = self.smoothclip(rawcube)
         rms = self.get_rms(cube)
 
-        sigma = rms * self.dv
+        sigma = rms * self.galaxy.dv
 
         vel_array, vel_narray = self.create_vel_array(cube)
-        np.savetxt(self.path + 'vel_array.txt', vel_array)
 
         beamsize = self.get_beamsize(cube)
 
         # calculate moment 0
-        zeroth = np.sum((cube.data * self.dv), axis=0)
+        zeroth = np.sum((cube.data * self.galaxy.dv), axis=0)
 
         # calculate moment 1
         first = np.sum(cube.data * vel_narray, axis=0) / np.sum(cube.data, axis=0)
@@ -257,8 +251,37 @@ class moment_maps:
         mom2_hdu = fits.PrimaryHDU(second, self.new_header(rawcube.header))
 
         if self.tosave:
+            cube.writeto(self.path + 'clipped_cube.fits', overwrite=True)
             mom0_hdu.writeto(self.path + 'moment0.fits', overwrite=True)
             mom1_hdu.writeto(self.path + 'moment1.fits', overwrite=True)
             mom2_hdu.writeto(self.path + 'moment2.fits', overwrite=True)
 
-        return mom0_hdu, mom1_hdu, mom2_hdu
+        return cube, mom0_hdu, mom1_hdu, mom2_hdu
+
+    def spectrum(self):
+
+        cube = self.readfits()
+        #cube = self.smoothclip(rawcube)
+
+        # convert from Jy/beam to Jy using by calculating the integral of the psf
+        psf = self.makebeam(cube.shape[1], cube.shape[2], cube.header)
+        beamsize = np.sum(psf)
+
+        cutout = cube.data[:, self.galaxy.centre_y - self.galaxy.size:self.galaxy.centre_y + self.galaxy.size,
+                 self.galaxy.centre_x - self.galaxy.size:self.galaxy.centre_x + self.galaxy.size]
+
+        # Make this work if necessary
+        #if custom_region:
+            #region = pyregion.open(path + 'ds9.reg')
+            #mask = region.get_mask(hdu=mom0_hdu)
+            #mask_3d = np.tile(mask, (len(cube[:, 0, 0]), 1, 1))
+            #cutout = np.where(mask_3d, cube, 0)
+
+        spectrum = np.sum(cutout, axis=(1, 2))
+
+        # Estimate the rms in the spectrum
+        #emis, noise = self.splitCube(cutout, self.galaxy.start, self.galaxy.stop)
+        #rms = np.std(np.sum(noise, axis=(1, 2)))
+        #np.savetxt(path + 'specnoise.txt', [rms / beamsize])
+
+        return spectrum / beamsize
