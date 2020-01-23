@@ -12,9 +12,10 @@ from create_moments import moment_maps
 
 class create_images:
 
-    def __init__(self, galname, path, savepath=None, refresh=False, overwrite=True, make_cutout=False, tosave=False):
+    def __init__(self, galname, path_pbcorr, path_uncorr, savepath=None, refresh=False, overwrite=True, make_cutout=False, tosave=False):
         self.galaxy = galaxies(galname)
-        self.path = path
+        self.path_pbcorr = path_pbcorr
+        self.path_uncorr = path_uncorr
         self.refresh = refresh
         self.overwrite = overwrite
         self.savepath = savepath
@@ -25,9 +26,9 @@ class create_images:
 
         if self.refresh:
             if self.overwrite:
-                _, image, _, _ = moment_maps(self.galaxy.name, self.path, tosave=True).calc_moms()
+                _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, tosave=True).calc_moms()
             else:
-                _, image, _, _ = moment_maps(self.galaxy.name, self.path, tosave=False).calc_moms()
+                _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, tosave=False).calc_moms()
         else:
             image = fits.open(self.path + 'moment0.fits')[0]
 
@@ -115,23 +116,24 @@ class create_images:
         if moment == 1:
             if self.refresh:
                 if self.overwrite:
-                    _, _, image, _ = moment_maps(self.galaxy.name, self.path, tosave=True).calc_moms()
+                    _, _, image, _, sysvel = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, tosave=True).calc_moms()
                 else:
-                    _, _, image, _ = moment_maps(self.galaxy.name, self.path, tosave=False).calc_moms()
+                    _, _, image, _, sysvel = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, tosave=False).calc_moms()
             else:
                 image = fits.open(self.path + 'moment1.fits')[0]
 
         elif moment == 2:
             if self.refresh:
                 if self.overwrite:
-                    _, _, _, image = moment_maps(self.galaxy.name, self.path, tosave=True).calc_moms()
+                    _, _, _, image, sysvel = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, tosave=True).calc_moms()
                 else:
-                    _, _, _, image = moment_maps(self.galaxy.name, self.path, tosave=False).calc_moms()
+                    _, _, _, image, sysvel = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, tosave=False).calc_moms()
             else:
                 image = fits.open(self.path + 'moment2.fits')[0]
 
-        vel_array = np.loadtxt(self.path + 'vel_array.txt')
-        sysvel = np.loadtxt(self.path + 'sysvel.txt')
+        cube_pbcorr, cube_uncorr = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                                               tosave=False).readfits()
+        vel_array, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, tosave=False).create_vel_array(cube_pbcorr)
         sysvel = (sysvel+5)//10*10
 
         f = plt.figure(figsize=(10, 8))
@@ -229,9 +231,9 @@ class create_images:
 
         if self.refresh:
             if self.overwrite:
-                clipped_cube, _, _, _ = moment_maps(self.galaxy.name, self.path, tosave=True).calc_moms()
+                clipped_cube, _, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, tosave=True).calc_moms()
             else:
-                clipped_cube, _, _, _ = moment_maps(self.galaxy.name, self.path, tosave=False).calc_moms()
+                clipped_cube, _, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, tosave=False).calc_moms()
         else:
             clipped_cube = fits.open(self.path + 'clipped_cube.fits')[0]
 
@@ -345,9 +347,9 @@ class create_images:
 
     def spectrum(self):
 
-        spectrum = moment_maps(self.galaxy.name, self.path, tosave=False).spectrum()
-        cube = moment_maps(self.galaxy.name, self.path, tosave=False).readfits()
-        velocity, _ = moment_maps(self.galaxy.name, self.path, tosave=False).create_vel_array(cube)
+        spectrum = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, tosave=False).spectrum()
+        cube_pbcorr, cube_uncorr = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, tosave=False).readfits()
+        _, _, velocity = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, tosave=False).create_vel_array(cube_pbcorr)
 
         spectrum = spectrum[self.galaxy.start - 5:self.galaxy.stop + 5]
         velocity = velocity[self.galaxy.start - 5:self.galaxy.stop + 5]

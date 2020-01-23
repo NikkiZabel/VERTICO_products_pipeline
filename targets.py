@@ -3,7 +3,7 @@ import gal_params
 class galaxies:
     def __init__(self, galname):
 
-        name, centre_x, centre_y, size, vrange, vrange_2, pbcor, cliplevel, stokes, start, stop, dv, angle, centre_pvd, \
+        name, centre_x, centre_y, size, vrange, vrange_2, cliplevel, stokes, start, stop, angle, centre_pvd, \
         sysvel, distance = gal_params.parameters(galname)
 
         self.name = name
@@ -12,12 +12,10 @@ class galaxies:
         self.size = size
         self.vrange = vrange
         self.vrange2 = vrange_2
-        self.pbcor = pbcor
         self.cliplevel = cliplevel
         self.stokes = stokes
         self.start = start
         self.stop = stop
-        self.dv = dv
         self.angle = angle
         self.centre_pvd = centre_pvd
         self.sysvel = sysvel
