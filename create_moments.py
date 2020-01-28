@@ -204,9 +204,9 @@ class moment_maps:
         """
         Mask structures in the spectral cube that are smaller than the desired size specified by "prune_by_npix" or
         "prune_by_fracbeam" in the galaxy parameters.
-        :param cube:
-        :param mask:
-        :return:
+        :param cube (HDU file): the cube we are working on, to extract relevant information about the beam
+        :param mask (3D array): the mask we have created thus far using the SUn clipping method
+        :return: updated mask with the small detections masked out
         """
 
         if self.galaxy.prune_by_npix:
@@ -226,6 +226,13 @@ class moment_maps:
         return mask
 
     def expand_along_spatial(self, cube, mask):
+        """
+        Expand the mask along spatial dimensions by an amount provided by either "expand_by_npix" or
+        "expand_by_fracbeam" in the galaxy parameters.
+        :param cube (HDU file): cube that we are working on, to extract the relevant information from its header
+        :param mask (3D array): mask that we have created so far with the Sun clipping method
+        :return: updated, expanded mask
+        """
 
         if self.galaxy.expand_by_npix:
             expand_by_npix = int(self.galaxy.expand_by_npix)
@@ -245,6 +252,11 @@ class moment_maps:
         return mask
 
     def expand_along_spectral(self, mask):
+        """
+        Expand the mask along the velocity direction as provided by "expand_by_nchan" in the galaxy parameters.
+        :param mask: mask that we have created so far with the Sun clipping method
+        :return: updated, expanded mask
+        """
         for i in range(self.galaxy.expand_by_nchan):
             tempmask = np.roll(mask, shift=1, axis=0)
             tempmask[0, :] = False
@@ -256,13 +268,25 @@ class moment_maps:
         return mask
 
     def sun_method(self, emiscube, noisecube):
+        """
+        Apply the clipping method from Sun, possibly prune detections with small areas on the sky and/or expand the
+        mask in the spatial/velocity directions.
+        :param emiscube (HDU file): HDU containing the cube with only the channels with emission in them, from which
+        the mask will be created
+        :param noisecube (HDU file): HDU containing the cube with line-free channels, from which the rms will be
+        estimated
+        :return: mask with the same shape as "emiscube" where spaxels with a too low SNR are set to 0 according to the
+        Sun method, and spaxels with a high enough SNR are set to 1.
+        """
 
+        # Check if the necessary parameters are provided
         if not (
                 self.galaxy.nchan_low and self.galaxy.cliplevel_low and self.galaxy.nchan_high and
                 self.galaxy.cliplevel_high):
             raise AttributeError('If you want to use Sun\'s method, please provide "nchan_low", "cliplevel_low", '
                                  '"nchan_high", and "cliplevel_high".')
 
+        # Estimate the rms from the spatial inner part of the cube
         inner = self.innersquare(noisecube.data)
         rms = np.nanstd(inner)
 
@@ -319,10 +343,13 @@ class moment_maps:
         return mask
 
     def do_clip(self, cube_pbcorr, cube_uncorr):
-        '''
-        :param cube: data cube
-        :return: smooth-clipped version of the part of the data cube containing the emission line
-        '''
+        """
+        Clip the array, either according to the Sun method (if self.sun == True, which is default) or the smooth
+        clipping method from Dame.
+        :param cube_pbcorr (HDU file): primary beam corrected spectral cube, which we want to clip
+        :param cube_uncorr (HDU file): primary beam UNcorrected spectral cube, from which we want to make the mask
+        :return: HDU file with the clipped, primary beam corrected spectral cube
+        """
         # copy the non-PB corrected datacube
         cube_uncorr_copy = cube_uncorr.copy()
 
@@ -341,12 +368,20 @@ class moment_maps:
         return clipped_hdu
 
     def create_vel_array(self, cube):
-        v_val = cube.header['CRVAL3'] / 1000.  # velocity in the reference channel, m/s to km/s
-        v_step = cube.header['CDELT3'] / 1000.  # velocity step in each channel, m/s to km/s
-        v_ref = cube.header['CRPIX3']  # location of the reference channel
+        """
+        From the relevant header keywords, create an array with the velocities in km/s corresponding to the spectral
+        axis of the spectral cube
+        :param cube (HDU file): HDU file of the spectral cube for which we want to make the velocity array
+        :return: three arrays: the velocity array in one dimension, the length equals the numbers of channels that
+        contain emission, the same velocity array but in the shape of the spectral cube, and the one-dimensional
+        velocity array corresponding to the entire velocity axis of the cube (including line-free channels)
+        """
+        v_val = cube.header['CRVAL3'] / 1000.  # Velocity in the reference channel, m/s to km/s
+        v_step = cube.header['CDELT3'] / 1000.  # Velocity step in each channel, m/s to km/s
+        v_ref = cube.header['CRPIX3']  # Location of the reference channel
 
-        # Construct the velocity array
-        vel_array = ((np.arange(0, len(cube.data[:, 0, 0])) - v_ref - 1 + self.galaxy.start) * v_step + v_val)  # fits index starts from 1, start at the beginning of the emission cube
+        # Construct the velocity arrays (keep in mind that fits-files are 1 indexed)
+        vel_array = ((np.arange(0, len(cube.data[:, 0, 0])) - v_ref - 1 + self.galaxy.start) * v_step + v_val)
         vel_narray = np.tile(vel_array, (len(cube.data[0, 0, :]), len(cube.data[0, :, 0]), 1)).transpose()
         vel_array_full = ((np.arange(0, len(cube.data[:, 0, 0])) - v_ref - 1) * v_step + v_val)
 
@@ -354,27 +389,26 @@ class moment_maps:
 
     def calc_moms(self):
         """
-        Calculate the moments 0,1, and 2 by calculating sum(I), sum(v*I)/sum(I), and sum(v*I^2)/sum(I)
-        :param cube: raw data cube
-        :param sigma: rms in raw data cube
-        :return:
+        Clip the spectral cube according to the desired method, and create moment 0, 1, and 2 maps. Save them as fits
+        files if so desired. Also calculate the systemic velocity from the moment 1 map.
+        :return: clipped spectral cube, HDUs of the moment 0, 1, and 2 maps, and the systemic velocity in km/s
         """
         cube_pbcorr, cube_uncorr = self.readfits()
         cube = self.do_clip(cube_pbcorr, cube_uncorr)
         vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
 
-        zeroth = np.sum((cube.data * abs(cube.header['CDELT3']) / 1000), axis=0)
-        first = np.sum(cube.data * vel_narray, axis=0) / np.sum(cube.data, axis=0)
-        second = np.sqrt(np.sum(abs(cube.data) * (vel_narray - first) ** 2., axis=0) / np.sum(abs(cube.data), axis=0))
+        mom0 = np.sum((cube.data * abs(cube.header['CDELT3']) / 1000), axis=0)
+        mom1 = np.sum(cube.data * vel_narray, axis=0) / np.sum(cube.data, axis=0)
+        mom2 = np.sqrt(np.sum(abs(cube.data) * (vel_narray - mom1) ** 2., axis=0) / np.sum(abs(cube.data), axis=0))
 
-        # calculate the systemic velocity from the spatial inner part of the cube (to avoid PB effects)
-        inner_cube = self.innersquare(first)
-        sysvel = np.mean(inner_cube[np.isfinite(inner_cube)])
-        first -= sysvel
+        # Calculate the systemic velocity from the spatial inner part of the cube (to avoid PB effects)
+        inner_cube = self.innersquare(mom1)
+        sysvel = np.nanmean(inner_cube)
+        mom1 -= sysvel
 
-        mom0_hdu = fits.PrimaryHDU(zeroth, self.new_header(cube_pbcorr.header))
-        mom1_hdu = fits.PrimaryHDU(first, self.new_header(cube_pbcorr.header))
-        mom2_hdu = fits.PrimaryHDU(second, self.new_header(cube_pbcorr.header))
+        mom0_hdu = fits.PrimaryHDU(mom0, self.new_header(cube_pbcorr.header))
+        mom1_hdu = fits.PrimaryHDU(mom1, self.new_header(cube_pbcorr.header))
+        mom2_hdu = fits.PrimaryHDU(mom2, self.new_header(cube_pbcorr.header))
 
         if self.tosave:
             cube.writeto(self.savepath + 'clipped_cube.fits', overwrite=True)
@@ -385,17 +419,25 @@ class moment_maps:
         return cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel
 
     def spectrum(self):
+        """
+        Calculate the spectrum from the spectral cube.
+        :return: array containing the spectrum in whatever units the cube is in, without the beam^-1 (so probably K or
+        (m)Jy)
+        """
 
         cube_pbcorr, cube_uncorr = self.readfits()
 
-        # convert from Jy/beam to Jy using by calculating the integral of the psf
+        # Calculate the beam size, so we can divide by this to get rid of the beam^-1 in the units.
         psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
         beamsize = np.sum(psf)
 
+        # Make a cutout around the emission in the spatial direction, to reduce noise
         cutout = cube_pbcorr.data[:, self.galaxy.centre_y - self.galaxy.size:self.galaxy.centre_y + self.galaxy.size,
                  self.galaxy.centre_x - self.galaxy.size:self.galaxy.centre_x + self.galaxy.size]
 
-        cutout = cube_pbcorr.data
+        ### THIS OVERWRITES THE CUTOUT TO USE THE ENTIRE CUBE ###
+        cutout = cube_pbcorr.data                       # <----------------------------------------------------------
+        ### REMOVE IF WE DO WANT TO USE THE CUTOUT ###
 
         # Make this work if necessary
         #if custom_region:
