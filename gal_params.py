@@ -14,6 +14,15 @@ def parameters(galaxy):
         centre_pvd = 25
         sysvel = 25
         distance = 16.5
+        nchan_low = None
+        cliplevel_low = None
+        nchan_high = None
+        cliplevel_high = None
+        prune_by_npix = None
+        prune_by_fracbeam = None
+        expand_by_fracbeam = None
+        expand_by_npix = None
+        expand_by_nchan = None
 
     elif galaxy == 'NGC4568':
         centre_y = 23
@@ -29,6 +38,15 @@ def parameters(galaxy):
         centre_pvd = 32
         sysvel = 19
         distance = 16.5
+        nchan_low = None
+        cliplevel_low = None
+        nchan_high = None
+        cliplevel_high = None
+        prune_by_npix = None
+        prune_by_fracbeam = None
+        expand_by_fracbeam = None
+        expand_by_npix = None
+        expand_by_nchan = None
 
     elif galaxy == 'NGC4189':
         centre_y = 32
@@ -44,8 +62,18 @@ def parameters(galaxy):
         centre_pvd = 33
         sysvel = 14
         distance = 16.5
+        nchan_low = 2
+        cliplevel_low = 3
+        nchan_high = 3
+        cliplevel_high = 5
+        prune_by_npix = None
+        prune_by_fracbeam = None
+        expand_by_fracbeam = None
+        expand_by_npix = None
+        expand_by_nchan = None
 
     name = galaxy
 
     return name, centre_x, centre_y, size, vrange, vrange_2, cliplevel, stokes, start, stop, angle, \
-           centre_pvd, sysvel, distance
+           centre_pvd, sysvel, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \
+           prune_by_fracbeam, expand_by_fracbeam, expand_by_npix, expand_by_nchan
