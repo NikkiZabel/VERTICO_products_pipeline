@@ -4,6 +4,7 @@ import scipy.ndimage as ndimage
 from targets import galaxies
 from scipy.ndimage import binary_dilation, label
 
+
 class moment_maps:
 
     def __init__(self, galname, path_pbcorr, path_uncorr, savepath='./', sun=True, tosave=False):
@@ -29,7 +30,7 @@ class moment_maps:
         res = header['CDELT2']  # degrees per pixel
         bmaj = header['BMAJ']  # degrees
         bmin = header['BMIN']  # degrees
-        beam = np.average([bmaj, bmin]) / res  # Average beam FWHM in pixels
+        beam = np.array([bmaj, bmin]) / res  # Beam FWHM in pixels
 
         # Convert the FWHM of the beam to the std dev in the Gaussian distribution
         sigma = beam / np.sqrt(8. * np.log(2.))
@@ -336,7 +337,7 @@ class moment_maps:
         bmaj = cube.header['BMAJ']  # degrees
         beam = bmaj / res  # beam size in pixels, use the major axis
         sigma = 1.5 * beam / np.sqrt(8. * np.log(2.))
-        smooth_cube = ndimage.filters.gaussian_filter(cube, (4., sigma, sigma), order=0, mode='nearest')
+        smooth_cube = ndimage.filters.gaussian_filter(cube.data, (4., sigma, sigma), order=0, mode='nearest')
         smooth_hdu = fits.PrimaryHDU(smooth_cube, cube.header)
         mask = self.clip(smooth_hdu)
 
@@ -381,9 +382,9 @@ class moment_maps:
         v_ref = cube.header['CRPIX3']  # Location of the reference channel
 
         # Construct the velocity arrays (keep in mind that fits-files are 1 indexed)
-        vel_array = ((np.arange(0, len(cube.data[:, 0, 0])) - v_ref - 1 + self.galaxy.start) * v_step + v_val)
+        vel_array = (np.arange(0, len(cube.data[:, 0, 0])) - v_ref + 1 + self.galaxy.start) * v_step + v_val
         vel_narray = np.tile(vel_array, (len(cube.data[0, 0, :]), len(cube.data[0, :, 0]), 1)).transpose()
-        vel_array_full = ((np.arange(0, len(cube.data[:, 0, 0])) - v_ref - 1) * v_step + v_val)
+        vel_array_full = (np.arange(0, len(cube.data[:, 0, 0])) - v_ref + 1) * v_step + v_val
 
         return vel_array, vel_narray, vel_array_full
 
@@ -428,8 +429,8 @@ class moment_maps:
         cube_pbcorr, cube_uncorr = self.readfits()
 
         # Calculate the beam size, so we can divide by this to get rid of the beam^-1 in the units.
-        psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
-        beamsize = np.sum(psf)
+        #psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
+        #beamsize = np.sum(psf)
 
         # Make a cutout around the emission in the spatial direction, to reduce noise
         cutout = cube_pbcorr.data[:, self.galaxy.centre_y - self.galaxy.size:self.galaxy.centre_y + self.galaxy.size,
@@ -453,4 +454,4 @@ class moment_maps:
         #rms = np.std(np.sum(noise, axis=(1, 2)))
         #np.savetxt(path + 'specnoise.txt', [rms / beamsize])
 
-        return spectrum / beamsize
+        return spectrum # / beamsize

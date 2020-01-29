@@ -36,7 +36,7 @@ class create_images:
         else:
             image = fits.open(self.path + 'moment0.fits')[0]
 
-        f = plt.figure(figsize=(10, 8))
+        f = plt.figure(figsize=(12, 7))
 
         if self.make_cutout:
             # make a smaller cutout of the CO emission
@@ -52,7 +52,7 @@ class create_images:
         fig.set_theme('publication')
 
         # add the galaxy name in the upper right corner
-        fig.add_label(0.8, 0.9, self.galaxy.name, relative=True)
+        fig.add_label(0.88, 0.9, self.galaxy.name, relative=True)
 
         fig.show_contour(image, cmap='magma_r', levels=np.linspace(0, np.amax(image.data), 20), filled=True,
                          overlap=True)
@@ -106,7 +106,6 @@ class create_images:
         fig.add_scalebar(length=length, label='1 kpc', frame=False)
         fig.scalebar.set_linewidth(5)
 
-        # Make sure the axis labels don't fall off the figure
         plt.tight_layout()
 
         if self.tosave:
@@ -142,9 +141,10 @@ class create_images:
                                                sun=self.sun, tosave=False).readfits()
         vel_array, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                       tosave=False).create_vel_array(cube_pbcorr)
-        sysvel = (sysvel+5)//10*10
 
-        f = plt.figure(figsize=(10, 8))
+        sysvel = (sysvel + 5) // 10 * 10
+
+        f = plt.figure(figsize=(12, 7))
 
         if self.make_cutout:
             #make a smaller cutout of the CO emission
@@ -253,7 +253,7 @@ class create_images:
         slitsize = np.ceil(beampix / 2)
 
         # Rotate the cube along the spatial axes, so that the galaxy lies horizontal
-        cube_rot = ndimage.interpolation.rotate(clipped_cube.data, self.galaxy.angle, axes=(1, 2))
+        cube_rot = ndimage.interpolation.rotate(clipped_cube.data, self.galaxy.angle, axes=(1, 2), reshape=True)
 
         # If you still have to determine where the slit should be, show a projection of the rotated cube, and return
         if findcentre:
@@ -328,16 +328,23 @@ class create_images:
         ax.callbacks.connect("ylim_changed", absolute_yax)
         ax.callbacks.connect("xlim_changed", x_kpc)
 
-        # The actual contour plots of the PV diagram
-        ax.contour(PV,
-                   extent=[np.amin(offset), np.amax(offset), -self.galaxy.vrange, self.galaxy.vrange],
-                   colors='k', levels=list(np.linspace(np.amin(PV), np.amax(PV), 20)),
-                   linewidths=1)  # contours in black
+        velocity, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                     tosave=False).create_vel_array(clipped_cube)
 
+        levels = list(np.linspace(np.amin(PV), np.amax(PV), 20))
+        levels = 20
+
+        # Contours in black
+        ax.contour(PV,
+                   extent=[np.amin(offset), np.amax(offset), velocity[0] - self.galaxy.sysvel, velocity[-1] - self.galaxy.sysvel],
+                   colors='k', levels=levels,
+                   linewidths=1)
+
+        # Filling with coloured contours
         ax.contourf(PV,
-                    extent=[np.amin(offset), np.amax(offset), -self.galaxy.vrange, self.galaxy.vrange],
+                    extent=[np.amin(offset), np.amax(offset), velocity[0] - self.galaxy.sysvel, velocity[-1] - self.galaxy.sysvel],
                     cmap='afmhot_r', vmin=0.1 * np.amax(PV), vmax=0.8 * np.amax(PV),
-                    levels=list(np.linspace(np.amin(PV), np.amax(PV), 20)))  # filling with colours
+                    levels=levels)
 
         # Make the plot pretty
         #ax.set_xlim(-1.5 * self.galaxy.size * res * 3600, 1.5 * self.galaxy.size * res * 3600)
@@ -348,8 +355,8 @@ class create_images:
         ax_rel.set_ylabel(r'Velocity [km s$^{-1}$]')
         x1, x2 = ax.get_xlim()
         y1, y2 = ax.get_ylim()
-        ax.errorbar(0.8 * x2, 0.8 * y2, xerr=clipped_cube.header['BMAJ'] * 3600 / 2., yerr=vres / 2., ecolor='k', capsize=2.5)
-        ax.annotate('PA = ' + str(self.galaxy.angle) + '$^o$', xy=(-0.9 * x2, -0.7 * y2), fontsize=30)
+        ax.errorbar(0.8 * x2, 0.7 * y2, xerr=clipped_cube.header['BMAJ'] * 3600 / 2., yerr=vres / 2., ecolor='k', capsize=2.5)
+        ax.annotate('PA = ' + str(self.galaxy.angle) + '$^o$', xy=(-0.4 * x2, -0.7 * y2), fontsize=20)
         plt.tight_layout()
 
         if self.tosave:
@@ -368,7 +375,7 @@ class create_images:
         velocity = velocity[self.galaxy.start - 5:self.galaxy.stop + 5]
 
         fig, ax = plt.subplots(figsize=(7, 7))
-        ax.plot(velocity, spectrum * 1000., color='k', drawstyle='steps')
+        ax.plot(velocity, spectrum, color='k', drawstyle='steps')
 
         # Line through zero
         x = np.arange(np.amin(velocity) - 100, np.amax(velocity) + 100, 1)
@@ -378,7 +385,8 @@ class create_images:
         # Set various parameters
         ax.set_xlim(velocity[len(velocity) - 1] + 5, velocity[0] - 5)
         ax.set_xlabel(r'Velocity [km s$^{-1}$]')
-        ax.set_ylabel('Flux density [mJy]')
+        #ax.set_ylabel('Flux density [mJy]')
+        ax.set_ylabel('Flux density [K]')
 
         plt.tight_layout()
 
