@@ -388,17 +388,28 @@ class moment_maps:
 
         return vel_array, vel_narray, vel_array_full
 
-    def calc_moms(self):
+    def calc_moms(self, units='M_Sun/pc^2', alpha_co=6.25):
         """
         Clip the spectral cube according to the desired method, and create moment 0, 1, and 2 maps. Save them as fits
         files if so desired. Also calculate the systemic velocity from the moment 1 map.
+        :param units (string): desired units for the moment 0 map. Default is M_Sun/pc^2, the alternative is K km/s.
+        :param alpha_co (float): in case units == 'M_Sun/pc^2', multiply by alpha_co to obtain these units. Default
+        value for CO(2-1) from https://arxiv.org/pdf/1805.00937.pdf.
         :return: clipped spectral cube, HDUs of the moment 0, 1, and 2 maps, and the systemic velocity in km/s
         """
+
         cube_pbcorr, cube_uncorr = self.readfits()
         cube = self.do_clip(cube_pbcorr, cube_uncorr)
         vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
 
         mom0 = np.sum((cube.data * abs(cube.header['CDELT3']) / 1000), axis=0)
+        if units == 'M_Sun/pc^2':
+            mom0 *= alpha_co
+        elif units == 'K km/s':
+            pass
+        else:
+            raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
+
         mom1 = np.sum(cube.data * vel_narray, axis=0) / np.sum(cube.data, axis=0)
         mom2 = np.sqrt(np.sum(abs(cube.data) * (vel_narray - mom1) ** 2., axis=0) / np.sum(abs(cube.data), axis=0))
 

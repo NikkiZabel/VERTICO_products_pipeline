@@ -24,17 +24,27 @@ class create_images:
         self.sun = sun
         self.tosave = tosave
 
-    def moment_zero(self):
+    def moment_zero(self, units='M_Sun/pc^2', path=''):
 
         if self.refresh:
-            if self.overwrite:
-                _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                                tosave=True).calc_moms()
+            if units == 'M_Sun/pc^2':
+                if self.overwrite:
+                    _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                                    tosave=True).calc_moms(units='M_Sun/pc^2')
+                else:
+                    _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                                    tosave=False).calc_moms(units='M_Sun/pc^2')
+            elif units == 'K km/s':
+                if self.overwrite:
+                    _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                                    tosave=True).calc_moms(units='K km/s')
+                else:
+                    _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                                    tosave=False).calc_moms(units='K km/s')
             else:
-                _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                                tosave=False).calc_moms()
+                raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
         else:
-            image = fits.open(self.path + 'moment0.fits')[0]
+            image = fits.open(path + 'moment0.fits')[0]
 
         f = plt.figure(figsize=(12, 7))
 
@@ -93,7 +103,12 @@ class create_images:
 
         cbar = f.colorbar(colors, ticks=ticks)
         #cbar.set_label(r'Surface brightness [Jy beam$^{-1}$ km s$^{-1}$]')
-        cbar.set_label(r'Surface brightness [K]')
+        if units == 'K km/s':
+            cbar.set_label(r'Surface brightness [K km s$^{-1}$]')
+        elif units == 'M_Sun/pc^2':
+            cbar.set_label(r'Surface brightness [M$_\odot$ pc$^{-2}$]')
+        else:
+            raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
 
         # show the beam of the observations
         fig.add_beam(frame=False)  # automatically imports BMAJ, BMIN, and BPA

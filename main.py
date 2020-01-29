@@ -21,16 +21,16 @@ tosave = True
 #plt.plot(np.sum(cube.data, axis=(1, 2)))
 
 # Call this to creates fits files of the moment maps, or use the "refresh" and "overwrite" options below
-#clipped_cube, mom0, mom1, mom2 = moment_maps(galaxy, path, dv=10, pbcor=pbcor, cliplevel=cliplevel, stokes=stokes, sun=True, tosave=True).calc_moms()
+#clipped_cube, mom0, mom1, mom2 = moment_maps(galaxy, path, dv=10, pbcor=pbcor, cliplevel=cliplevel, stokes=stokes, sun=True, tosave=True).calc_moms(units='M_Sun/pc^2', alpha_co=6.25)
 
 # Call these to create images of the moment maps
-#create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-#              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_zero()
+create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_zero(units='M_Sun/pc^2')
 #create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
 #              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2()
 #create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
 #              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2(moment=2)
-create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-              make_cutout=make_cutout, sun=sun, tosave=tosave).PVD(findcentre=False, find_velcentre=False, full_width=False)
+#create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+#              make_cutout=make_cutout, sun=sun, tosave=tosave).PVD(findcentre=False, find_velcentre=False, full_width=False)
 #create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
 #              make_cutout=make_cutout, sun=sun, tosave=tosave).spectrum()
