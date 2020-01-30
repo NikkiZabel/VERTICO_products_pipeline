@@ -2,10 +2,10 @@ from astropy.io import fits
 import numpy as np
 import scipy.ndimage as ndimage
 from targets import galaxies
-from scipy.ndimage import binary_dilation, label
+from clip_cube import ClipCube
 
 
-class moment_maps:
+class MomentMaps:
 
     def __init__(self, galname, path_pbcorr, path_uncorr, savepath=None, sun=True, tosave=False):
         self.galaxy = galaxies(galname)
@@ -60,41 +60,6 @@ class moment_maps:
 
         return psf
 
-    def remove_stokes(self, cube):
-        """
-        If the fits file containing the spectral cube has a Stokes axis, remove it and remove the corresponding
-        header keywords.
-        :param cube (HDU file): HDU file containing the spectral cube and its header
-        :return (HDU file): the input HDU file with the Stokes axis and corresponding header keywords removed.
-        """
-
-        cube.data = np.squeeze(cube.data)
-
-        try:
-            cube.header.pop('PC01_04')
-            cube.header.pop('PC02_04')
-            cube.header.pop('PC03_04')
-            cube.header.pop('PC04_04')
-            cube.header.pop('PC04_01')
-            cube.header.pop('PC04_02')
-            cube.header.pop('PC04_03')
-        except:
-            cube.header.pop('PC1_4')
-            cube.header.pop('PC2_4')
-            cube.header.pop('PC3_4')
-            cube.header.pop('PC4_4')
-            cube.header.pop('PC4_1')
-            cube.header.pop('PC4_2')
-            cube.header.pop('PC4_3')
-
-        cube.header.pop('CTYPE4')
-        cube.header.pop('CRVAL4')
-        cube.header.pop('CRPIX4')
-        cube.header.pop('CUNIT4')
-        cube.header.pop('CDELT4')
-
-        return cube
-
     def new_header(self, header):
         """
         Remove the velocity axis from a HDU header, so it corresponds to the 2D version of the corresponding data cube.
@@ -128,245 +93,6 @@ class moment_maps:
         header['NAXIS'] = 2
 
         return header
-
-    def readfits(self):
-        """
-        Read in the fits files containing the primary beam corrected and uncorrected specral cubes.
-        :return: Two HDU files containing the spectral cube with and without primary beam correction applied,
-        respectively, and their headers.
-        """
-
-        cube_pbcorr = fits.open(self.path_pbcorr)[0]
-        cube_uncorr = fits.open(self.path_uncorr)[0]
-
-        if self.galaxy.stokes:
-            cube_pbcorr = self.remove_stokes(cube_pbcorr)
-            cube_uncorr = self.remove_stokes(cube_uncorr)
-
-        # Get rid of nans
-        cube_pbcorr.data[~np.isfinite(cube_pbcorr.data)] = 0
-        cube_uncorr.data[~np.isfinite(cube_uncorr.data)] = 0
-
-        return cube_pbcorr, cube_uncorr
-
-    def splitCube(self, cube):
-        """
-        Split a cube into a cube containing the channels with emission and a cube containing the channels without.
-        :param cube (HDU file): input HDU file containing the spectral cube and its header
-        :return: two HDU files containing the cube channels with emission and the line-free channels, respectively
-        """
-        emiscube = cube.data[self.galaxy.start:self.galaxy.stop, :, :]
-        noisecube = np.concatenate((cube.data[:self.galaxy.start, :, :], cube.data[self.galaxy.stop:, :, :]), axis=0)
-
-        emiscube_hdu = fits.PrimaryHDU(emiscube, cube.header)
-        emiscube_hdu.header['NAXIS3'] = emiscube.shape[0]
-
-        noisecube_hdu = fits.PrimaryHDU(noisecube, cube.header)
-        noisecube_hdu.header['NAXIS3'] = noisecube.shape[0]
-
-        return emiscube_hdu, noisecube_hdu
-
-    def innersquare(self, cube):
-        """
-        Get the central square (in spatial directions) of the spectral cube (useful for calculating the rms in a PB
-        corrected spectral cube). Can be used for 2 and 3 dimensions, in the latter case the velocity axis is left
-        unchanged.
-        :param cube (2D or 3D array): input cube or 2D image
-        :return: 2D or 3D array of the inner 1/8 of the cube in the spatial directions
-        """
-
-        start = int(len(cube[1]) * (7 / 16))
-        stop = int(len(cube[1]) * (9 / 16))
-
-        if len(cube.shape) == 3:
-            return cube[:, start:stop, start:stop]
-        elif len(cube.shape) == 2:
-            return cube[start:stop, start:stop]
-        else:
-            raise AttributeError('Please provide a 2D or 3D array.')
-
-
-    def clip(self, cube):
-        """
-        Creates a mask of the input cube where spaxels above the desired SNR are 1 and spaxels below the desired SNR
-        are 0.
-        :param cube (HDU file): spectral cube with which to create the mask
-        :return: boolean mask with the spaxels above the provided level set to 1 and the spaxels below to 0
-        """
-        emiscube, noisecube = self.splitCube(cube)
-        inner_noisecube = self.innersquare(noisecube.data)
-        rms = np.nanstd(inner_noisecube)
-        emiscube.data[emiscube.data < self.galaxy.cliplevel * rms] = 0
-        emiscube.data[emiscube.data > self.galaxy.cliplevel * rms] = 1
-
-        return emiscube.data.astype(bool)
-
-    def prune_small_detections(self, cube, mask):
-        """
-        Mask structures in the spectral cube that are smaller than the desired size specified by "prune_by_npix" or
-        "prune_by_fracbeam" in the galaxy parameters.
-        :param cube (HDU file): the cube we are working on, to extract relevant information about the beam
-        :param mask (3D array): the mask we have created thus far using the SUn clipping method
-        :return: updated mask with the small detections masked out
-        """
-
-        if self.galaxy.prune_by_npix:
-            prune_by_npix = self.galaxy.prune_by_npix
-        else:
-            res = cube.header['CDELT2']  # deg. / pix.
-            bmaj_pix = cube.header['BMAJ'] / res  # deg. / (deg. / pix.)
-            bmin_pix = cube.header['BMIN'] / res  # deg. / (deg. / pix.)
-            beam_area_pix = np.pi * bmaj_pix * bmin_pix
-            prune_by_npix = beam_area_pix * self.galaxy.prune_by_fracbeam
-
-        labels, count = label(mask)
-        for idx in np.arange(count) + 1:
-            if (labels == idx).any(axis=0).sum() / idx < prune_by_npix:
-                mask[labels == idx] = False
-
-        return mask
-
-    def expand_along_spatial(self, cube, mask):
-        """
-        Expand the mask along spatial dimensions by an amount provided by either "expand_by_npix" or
-        "expand_by_fracbeam" in the galaxy parameters.
-        :param cube (HDU file): cube that we are working on, to extract the relevant information from its header
-        :param mask (3D array): mask that we have created so far with the Sun clipping method
-        :return: updated, expanded mask
-        """
-
-        if self.galaxy.expand_by_npix:
-            expand_by_npix = int(self.galaxy.expand_by_npix)
-        else:
-            res = cube.header['CDELT2']  # deg. / pix.
-            bmaj = cube.header['BMAJ']  # deg.
-            bmin = cube.header['BMIN']  # deg.
-            beam_hwhm_pix = np.average([bmaj, bmin]) / res / 2  # deg. / (deg. / pix.)
-            expand_by_npix = int(beam_hwhm_pix * self.galaxy.expand_by_fracbeam)
-
-        structure = np.zeros([3, expand_by_npix * 2 + 1, expand_by_npix * 2 + 1])
-        Y, X = np.ogrid[:expand_by_npix * 2 + 1, :expand_by_npix * 2 + 1]
-        R = np.sqrt((X - expand_by_npix) ** 2 + (Y - expand_by_npix) ** 2)
-        structure[1, :] = R <= expand_by_npix
-        mask = binary_dilation(mask, iterations=1, structure=structure)
-
-        return mask
-
-    def expand_along_spectral(self, mask):
-        """
-        Expand the mask along the velocity direction as provided by "expand_by_nchan" in the galaxy parameters.
-        :param mask: mask that we have created so far with the Sun clipping method
-        :return: updated, expanded mask
-        """
-        for i in range(self.galaxy.expand_by_nchan):
-            tempmask = np.roll(mask, shift=1, axis=0)
-            tempmask[0, :] = False
-            mask |= tempmask
-            tempmask = np.roll(mask, shift=-1, axis=0)
-            tempmask[-1, :] = False
-            mask |= tempmask
-
-        return mask
-
-    def sun_method(self, emiscube, noisecube):
-        """
-        Apply the clipping method from Sun, possibly prune detections with small areas on the sky and/or expand the
-        mask in the spatial/velocity directions.
-        :param emiscube (HDU file): HDU containing the cube with only the channels with emission in them, from which
-        the mask will be created
-        :param noisecube (HDU file): HDU containing the cube with line-free channels, from which the rms will be
-        estimated
-        :return: mask with the same shape as "emiscube" where spaxels with a too low SNR are set to 0 according to the
-        Sun method, and spaxels with a high enough SNR are set to 1.
-        """
-
-        # Check if the necessary parameters are provided
-        if not (
-                self.galaxy.nchan_low and self.galaxy.cliplevel_low and self.galaxy.nchan_high and
-                self.galaxy.cliplevel_high):
-            raise AttributeError('If you want to use Sun\'s method, please provide "nchan_low", "cliplevel_low", '
-                                 '"nchan_high", and "cliplevel_high".')
-
-        # Estimate the rms from the spatial inner part of the cube
-        inner = self.innersquare(noisecube.data)
-        rms = np.nanstd(inner)
-
-        snr = emiscube.data / rms
-
-        # Generate core mask
-        mask_core = (snr > self.galaxy.cliplevel_high).astype(bool)
-        for i in range(self.galaxy.nchan_high - 1):
-            mask_core &= np.roll(mask_core, shift=1, axis=0)
-        mask_core[:self.galaxy.nchan_high - 1] = False
-        for i in range(self.galaxy.nchan_high - 1):
-            mask_core |= np.roll(mask_core, shift=-1, axis=0)
-
-        # Generate wing mask
-        mask_wing = (snr > self.galaxy.cliplevel_low).astype(bool)
-        for i in range(self.galaxy.nchan_low - 1):
-            mask_wing &= np.roll(mask_wing, shift=1, axis=0)
-        mask_wing[:self.galaxy.nchan_low - 1] = False
-        for i in range(self.galaxy.nchan_low - 1):
-            mask_wing |= np.roll(mask_wing, shift=-1, axis=0)
-
-        # Dilate core mask inside wing mask
-        mask = binary_dilation(mask_core, iterations=0, mask=mask_wing)
-
-        # Prune detections with small projected areas on the sky
-        if self.galaxy.prune_by_fracbeam or self.galaxy.prune_by_npix:
-            mask = self.prune_small_detections(emiscube, mask)
-
-        # Expand along spatial dimensions by a fraction of the beam FWHM
-        if self.galaxy.expand_by_fracbeam or self.galaxy.expand_by_npix:
-            mask = self.expand_along_spatial(emiscube, mask)
-
-        # Expand along spectral dimension by a number of channels
-        if self.galaxy.expand_by_nchan:
-            mask = self.expand_along_spectral(mask)
-
-        return mask
-
-    def smooth_clip(self, cube):
-        """
-        Apply a Gaussian blur, using sigma = 4 in the velocity direction (seems to work best), to the uncorrected cube.
-        The mode 'nearest' seems to give the best results.
-        :return: (ndarray) mask to apply to the un-clipped cube
-        """
-
-        res = cube.header['CDELT2']  # deg/pixel
-        bmaj = cube.header['BMAJ']  # degrees
-        beam = bmaj / res  # beam size in pixels, use the major axis
-        sigma = 1.5 * beam / np.sqrt(8. * np.log(2.))
-        smooth_cube = ndimage.filters.gaussian_filter(cube.data, (4., sigma, sigma), order=0, mode='nearest')
-        smooth_hdu = fits.PrimaryHDU(smooth_cube, cube.header)
-        mask = self.clip(smooth_hdu)
-
-        return mask
-
-    def do_clip(self, cube_pbcorr, cube_uncorr):
-        """
-        Clip the array, either according to the Sun method (if self.sun == True, which is default) or the smooth
-        clipping method from Dame.
-        :param cube_pbcorr (HDU file): primary beam corrected spectral cube, which we want to clip
-        :param cube_uncorr (HDU file): primary beam UNcorrected spectral cube, from which we want to make the mask
-        :return: HDU file with the clipped, primary beam corrected spectral cube
-        """
-        # copy the non-PB corrected datacube
-        cube_uncorr_copy = cube_uncorr.copy()
-
-        # get part of the cube that has emission from the PB corrected datacube
-        emiscube_pbcorr, noisecube_pbcorr = self.splitCube(cube_pbcorr)
-        emiscube_uncorr, noisecube_uncorr = self.splitCube(cube_uncorr_copy)
-
-        if self.sun:
-            mask = self.sun_method(emiscube_uncorr, noisecube_pbcorr)
-        else:
-            mask = self.smooth_clip(cube_uncorr_copy)
-
-        emiscube_pbcorr.data *= mask
-        clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr.data, cube_pbcorr.header)
-
-        return clipped_hdu
 
     def create_vel_array(self, cube):
         """
@@ -405,7 +131,6 @@ class moment_maps:
 
         return header
 
-
     def calc_moms(self, units='M_Sun/pc^2', alpha_co=6.25):
         """
         Clip the spectral cube according to the desired method, and create moment 0, 1, and 2 maps. Save them as fits
@@ -416,8 +141,9 @@ class moment_maps:
         :return: clipped spectral cube, HDUs of the moment 0, 1, and 2 maps, and the systemic velocity in km/s
         """
 
-        cube_pbcorr, cube_uncorr = self.readfits()
-        cube = self.do_clip(cube_pbcorr, cube_uncorr)
+        cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
+                        tosave=self.tosave).do_clip()
+
         vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
 
         mom0 = np.sum((cube.data * abs(cube.header['CDELT3']) / 1000), axis=0)
@@ -432,15 +158,16 @@ class moment_maps:
         mom2 = np.sqrt(np.sum(abs(cube.data) * (vel_narray - mom1) ** 2., axis=0) / np.sum(abs(cube.data), axis=0))
 
         # Calculate the systemic velocity from the spatial inner part of the cube (to avoid PB effects)
-        inner_cube = self.innersquare(mom1)
+        inner_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, savepath=self.savepath,
+                              tosave=self.tosave).innersquare(mom1)
 
         if not self.galaxy.sysvel:
             sysvel = np.nanmean(inner_cube)
         mom1 -= sysvel
 
-        mom0_hdu = fits.PrimaryHDU(mom0, self.new_header(cube_pbcorr.header))
-        mom1_hdu = fits.PrimaryHDU(mom1, self.new_header(cube_pbcorr.header))
-        mom2_hdu = fits.PrimaryHDU(mom2, self.new_header(cube_pbcorr.header))
+        mom0_hdu = fits.PrimaryHDU(mom0, self.new_header(cube.header))
+        mom1_hdu = fits.PrimaryHDU(mom1, self.new_header(cube.header))
+        mom2_hdu = fits.PrimaryHDU(mom2, self.new_header(cube.header))
 
         # Change or add any (additional) keywords to the headers
         if units == 'M_Sun/pc^2': mom0_hdu.header['BTYPE'] = 'Column density'
@@ -576,7 +303,8 @@ class moment_maps:
         (m)Jy)
         """
 
-        cube_pbcorr, cube_uncorr = self.readfits()
+        cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
+                        tosave=self.tosave).readfits()
 
         # Calculate the beam size, so we can divide by this to get rid of the beam^-1 in the units.
         #psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)

@@ -1,4 +1,4 @@
-from image_moments import create_images
+from image_moments import CreateImages
 from create_moments import *
 
 galaxy = 'NGC4713'; galtemp = 'ngc4713'
@@ -11,7 +11,7 @@ file_uncorr = path + galtemp + '_7m+tp_co21_flat_round_k.fits'
 refresh = True
 overwrite = True
 make_cutout = False
-sun = True
+sun = False
 tosave = True
 
 # Have a first look at the cube to figure out some parameters
@@ -24,14 +24,14 @@ tosave = True
 #clipped_cube, mom0, mom1, mom2 = moment_maps(galaxy, path, dv=10, pbcor=pbcor, cliplevel=cliplevel, stokes=stokes, sun=True, tosave=True).calc_moms(units='M_Sun/pc^2', alpha_co=6.25)
 
 # Call these to create images of the moment maps
-#create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-#              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_zero(units='M_Sun/pc^2')
-#create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-#              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2()
-#create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-#              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2(moment=2)
-#create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-#              make_cutout=make_cutout, sun=sun, tosave=tosave).\
-#    PVD(axis='major', findcentre=False, find_velcentre=False, full_width=False)
-create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_zero(units='M_Sun/pc^2')
+CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2()
+CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2(moment=2)
+CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+              make_cutout=make_cutout, sun=sun, tosave=tosave).\
+    PVD(axis='major', findcentre=False, find_velcentre=False, full_width=False)
+CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
               make_cutout=make_cutout, sun=sun, tosave=tosave).spectrum(x_axis='frequency')

@@ -4,13 +4,14 @@ from astropy import wcs
 from astropy.nddata.utils import Cutout2D
 from astropy.io import fits
 import numpy as np
-from scipy import ndimage
 import config_figs
 from sauron_colormap import register_sauron_colormap; register_sauron_colormap()
 from targets import galaxies
-from create_moments import moment_maps
+from create_moments import MomentMaps
+from clip_cube import ClipCube
 
-class create_images:
+
+class CreateImages:
 
     def __init__(self, galname, path_pbcorr, path_uncorr, savepath=None, refresh=False, overwrite=True,
                  make_cutout=False, sun=True, tosave=False):
@@ -29,17 +30,17 @@ class create_images:
         if self.refresh:
             if units == 'M_Sun/pc^2':
                 if self.overwrite:
-                    _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                    _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                                     savepath=self.savepath, tosave=True).calc_moms(units='M_Sun/pc^2')
                 else:
-                    _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                    _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                                     tosave=False).calc_moms(units='M_Sun/pc^2')
             elif units == 'K km/s':
                 if self.overwrite:
-                    _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                    _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                                     savepath=self.savepath, tosave=True).calc_moms(units='K km/s')
                 else:
-                    _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                    _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                                     tosave=False).calc_moms(units='K km/s')
             else:
                 raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
@@ -64,8 +65,8 @@ class create_images:
         # add the galaxy name in the upper right corner
         fig.add_label(0.88, 0.9, self.galaxy.name, relative=True)
 
-        fig.show_contour(image, cmap='magma_r', levels=np.linspace(0, np.amax(image.data), 20), filled=True,
-                         overlap=True)
+        fig.show_contour(image, cmap='magma_r', levels=np.linspace(np.amax(image.data)*1e-9, np.amax(image.data), 20),
+                         filled=True, overlap=True)
 
         # axes and ticks
         fig.ticks.set_color('black')
@@ -133,10 +134,10 @@ class create_images:
         if moment == 1:
             if self.refresh:
                 if self.overwrite:
-                    _, _, image, _, sysvel = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                    _, _, image, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                          savepath=self.savepath, sun=self.sun, tosave=True).calc_moms()
                 else:
-                    _, _, image, _, sysvel = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                    _, _, image, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                          sun=self.sun, tosave=False).calc_moms()
             else:
                 image = fits.open(self.path + 'moment1.fits')[0]
@@ -144,17 +145,17 @@ class create_images:
         elif moment == 2:
             if self.refresh:
                 if self.overwrite:
-                    _, _, _, image, sysvel = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                    _, _, _, image, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                          savepath=self.savepath, sun=self.sun, tosave=True).calc_moms()
                 else:
-                    _, _, _, image, sysvel = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                    _, _, _, image, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                          sun=self.sun, tosave=False).calc_moms()
             else:
                 image = fits.open(self.path + 'moment2.fits')[0]
 
-        cube_pbcorr, cube_uncorr = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+        cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                sun=self.sun, tosave=False).readfits()
-        vel_array, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+        vel_array, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                       tosave=False).create_vel_array(cube_pbcorr)
 
         sysvel = (sysvel + 5) // 10 * 10
@@ -254,16 +255,16 @@ class create_images:
 
         if self.refresh:
             if self.overwrite:
-                PV = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                PV = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                  savepath=self.savepath, tosave=True).\
                     PVD(axis=axis, findcentre=findcentre, find_velcentre=find_velcentre, full_width=full_width)
             else:
-                PV = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False).\
+                PV = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False).\
                     PVD(axis=axis, findcentre=findcentre, find_velcentre=find_velcentre, full_width=full_width)
         else:
             PV = fits.open(self.path + 'PVD.fits')[0]
 
-        clipped_cube, _, _, _, sysvel = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+        clipped_cube, _, _, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                sun=self.sun, tosave=False).calc_moms()
 
         # OR DO THIS??
@@ -319,7 +320,7 @@ class create_images:
         ax.callbacks.connect("ylim_changed", absolute_yax)
         ax.callbacks.connect("xlim_changed", x_kpc)
 
-        velocity, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+        velocity, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                      tosave=False).create_vel_array(clipped_cube)
 
         levels = list(np.linspace(np.amin(PV.data), np.amax(PV.data), 20))
@@ -358,10 +359,10 @@ class create_images:
 
         if self.refresh:
             if self.tosave:
-                spectrum, velocity, frequency = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                spectrum, velocity, frequency = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                             sun=self.sun, savepath=self.savepath, tosave=True).spectrum()
             else:
-                spectrum, velocity, frequency = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                spectrum, velocity, frequency = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                             sun=self.sun, tosave=False).spectrum()
         else:
             spectrum = np.loadtxt(self.path + 'spectrum.txt')
