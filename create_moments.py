@@ -430,6 +430,109 @@ class moment_maps:
 
         return cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel
 
+    def PVD(self, axis='major', findcentre=False, find_velcentre=False, full_width=False):
+
+        clipped_cube, _, _, _, _ = self.calc_moms()
+
+        res = clipped_cube.header['CDELT2']  # degrees per pixel
+        beampix = clipped_cube.header['BMAJ'] / res  # beam size in pixels
+        slitsize = np.ceil(beampix / 2)
+
+        # Rotate the cube along the spatial axes, so that the galaxy lies horizontal
+        if axis == 'major':
+            rot_angle = self.galaxy.angle
+        elif axis == 'minor':
+            rot_angle = self.galaxy.angle + 90
+        else:
+            raise AttributeError('Please choose between "major" and "minor" for the "axis" keyword')
+
+        cube_rot = ndimage.interpolation.rotate(clipped_cube.data, rot_angle, axes=(1, 2), reshape=True)
+
+        # If you still have to determine where the slit should be, show a projection of the rotated cube, and return
+        if findcentre:
+            from matplotlib import pyplot as plt
+            plt.imshow(np.sum(cube_rot, axis=0))
+            return
+
+        # Define a slit around the centre of the galaxy with a width of the beam size (or use the full width of the galaxy)
+        if full_width:
+            slit = cube_rot[:, self.galaxy.centre_pvd - self.galaxy.size / 2:self.galaxy.centre_pvd + self.galaxy.size / 2,
+                   :]
+        else:
+            slit = cube_rot[:, int(self.galaxy.centre_pvd - slitsize):int(self.galaxy.centre_pvd + slitsize), :]
+
+        # Collapse along the slit to create the PV diagram
+        PV = np.sum(slit, axis=1)
+
+        # There is a lot of garbage because of the interpolation used by the rotation function, define a lower limit to get rid of that
+        PV[PV < 0.001] = 0
+
+        # Show the PVD to determine where the velocity centre is by eye
+        if find_velcentre:
+            from matplotlib import pyplot as plt
+            plt.imshow(PV)
+            return
+
+        # Create an appropriate header
+        pvd_header = fits.Header()
+        pvd_header['SIMPLE'] = clipped_cube.header['SIMPLE']
+        pvd_header.comments['SIMPLE'] = clipped_cube.header.comments['SIMPLE']
+        pvd_header['BITPIX'] = clipped_cube.header['BITPIX']
+        pvd_header.comments['BITPIX'] = clipped_cube.header.comments['BITPIX']
+        pvd_header['NAXIS'] = 2
+        pvd_header.comments['NAXIS'] = clipped_cube.header.comments['NAXIS']
+        pvd_header['NAXIS1'] = PV.shape[0]
+        pvd_header['NAXIS2'] = PV.shape[1]
+        pvd_header['BMAJ'] = clipped_cube.header['BMAJ']
+        pvd_header['BMIN'] = clipped_cube.header['BMIN']
+        pvd_header['BPA'] = clipped_cube.header['BPA']
+        pvd_header['OBJECT'] = clipped_cube.header['OBJECT']
+        pvd_header['EQUINOX'] = 2000
+        pvd_header['RADESYS'] = 'FK5'
+
+        # I'M NOT SURE WHAT HAPPENS TO THESE ???
+        pvd_header['LONPOLE'] = clipped_cube.header['LONPOLE']
+        pvd_header['LATPOLE'] = clipped_cube.header['LATPOLE']
+        pvd_header['PC1_1'] = clipped_cube.header['PC1_1']
+        pvd_header['PC2_1'] = clipped_cube.header['PC2_1']
+        pvd_header['PC1_2'] = clipped_cube.header['PC1_2']
+        pvd_header['PC2_2'] = clipped_cube.header['PC2_2']
+        pvd_header['CTYPE1'] = '?????'
+        pvd_header['CRVAL1'] = '?????'
+        pvd_header['CDELT1'] = '?????'
+        pvd_header['CRPIX'] = '?????'
+        pvd_header['CUNIT1'] = '?????'
+        pvd_header['CTYPE2'] = 'VRAD'
+        pvd_header['CRVAL2'] = '????'
+        pvd_header['CDELT2'] = '????'
+        pvd_header['CRPIX2'] = '????'
+        pvd_header['CUNIT2'] = 'km/s'
+
+        pvd_header['RESTFRQ'] = clipped_cube.header['RESTFRQ']
+        pvd_header.comments['RESTFRQ'] = clipped_cube.header.comments['RESTFRQ']
+        pvd_header['SPECSYS'] = clipped_cube.header['SPECSYS']
+        pvd_header.comments['SPECSYS'] = clipped_cube.header.comments['SPECSYS']
+
+
+        ### WHAT ARE ALTRVAL AND ALTRPIX AND VELREF AND USEWEIGH AND JTOK???
+
+
+        pvd_header['OBSRA'] = clipped_cube.header['OBSRA']
+        pvd_header['OBSDEC'] = clipped_cube.header['OBSDEC']
+        pvd_header['OBSGEO-X'] = clipped_cube.header['OBSGEO-X']
+        pvd_header['OBSGEO-Y'] = clipped_cube.header['OBSGEO-Y']
+        pvd_header['OBSGEO-Z'] = clipped_cube.header['OBSGEO-Z']
+        pvd_header['DISTANCE'] = self.galaxy.distance
+        pvd_header.comments['DISTANCE'] = 'Mpc'
+        pvd_header['ORIGIN'] = clipped_cube.header['ORIGIN']
+
+        pvd_hdu = fits.PrimaryHDU(PV, pvd_header)
+
+        if self.tosave:
+            pvd_hdu.writeto(self.savepath + 'PVD.fits', overwrite=True)
+
+        return pvd_hdu
+
     def spectrum(self):
         """
         Calculate the spectrum from the spectral cube.

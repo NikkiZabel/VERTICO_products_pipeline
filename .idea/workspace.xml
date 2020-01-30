@@ -86,7 +86,14 @@
       <option name="project" value="LOCAL" />
       <updated>1580312499270</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Implemented unit options for moment 0 map.">
+      <created>1580320996907</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1580320996907</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -94,13 +101,14 @@
     <MESSAGE value="Implemented Sun clipping method, halfway writing docstrings." />
     <MESSAGE value="Finished the docstrings." />
     <MESSAGE value="Some small bugs." />
-    <option name="LAST_COMMIT_MESSAGE" value="Some small bugs." />
+    <MESSAGE value="Implemented unit options for moment 0 map." />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented unit options for moment 0 map." />
   </component>
   <component name="WindowStateProjectService">
-    <state x="600" y="147" width="777" height="819" key="CommitChangelistDialog2" timestamp="1580312499205">
+    <state x="600" y="147" width="777" height="819" key="CommitChangelistDialog2" timestamp="1580320996850">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="600" y="147" width="777" height="819" key="CommitChangelistDialog2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1580312499205" />
+    <state x="600" y="147" width="777" height="819" key="CommitChangelistDialog2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1580320996850" />
     <state x="776" y="311" width="424" height="491" key="FileChooserDialogImpl" timestamp="1580319751934">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
@@ -110,10 +118,10 @@
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053@67.27.1853.1053" timestamp="1579877369983" />
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1580312500974">
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1580320997810">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1580312500974" />
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1580320997810" />
     <state x="648" y="379" key="com.intellij.ide.util.TipDialog" timestamp="1580204679957">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>

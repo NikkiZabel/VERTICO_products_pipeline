@@ -241,7 +241,7 @@ class create_images:
 
         return
 
-    def PVD(self, findcentre=False, find_velcentre=False, full_width=False):
+    def PVD(self, axis='major', findcentre=False, find_velcentre=False, full_width=False):
         """
         Plot a position-velocity diagram of the galaxy
         :param mom0: moment 0 image of the galaxy
@@ -254,43 +254,16 @@ class create_images:
 
         if self.refresh:
             if self.overwrite:
-                clipped_cube, _, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                                       sun=self.sun, tosave=True).calc_moms()
+                PV = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=True).\
+                    PVD(axis=axis, findcentre=findcentre, find_velcentre=find_velcentre, full_width=full_width)
             else:
-                clipped_cube, _, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                                       sun=self.sun, tosave=False).calc_moms()
+                PV = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False).\
+                    PVD(axis=axis, findcentre=findcentre, find_velcentre=find_velcentre, full_width=full_width)
         else:
-            clipped_cube = fits.open(self.path + 'clipped_cube.fits')[0]
+            PV = fits.open(self.path + 'PVD.fits')[0]
 
-        vres = clipped_cube.header['CDELT3'] / 1000.  # velocity resolution
-        res = clipped_cube.header['CDELT2']  # degrees per pixel
-        beampix = clipped_cube.header['BMAJ'] / res  # beam size in pixels
-        slitsize = np.ceil(beampix / 2)
-
-        # Rotate the cube along the spatial axes, so that the galaxy lies horizontal
-        cube_rot = ndimage.interpolation.rotate(clipped_cube.data, self.galaxy.angle, axes=(1, 2), reshape=True)
-
-        # If you still have to determine where the slit should be, show a projection of the rotated cube, and return
-        if findcentre:
-            plt.imshow(np.sum(cube_rot, axis=0))
-            return
-
-        # Define a slit around the centre of the galaxy with a width of the beam size (or use the full width of the galaxy)
-        if full_width:
-            slit = cube_rot[:, self.galaxy.centre_pvd - self.galaxy.size/2:self.galaxy.centre_pvd + self.galaxy.size/2, :]
-        else:
-            slit = cube_rot[:, int(self.galaxy.centre_pvd - slitsize):int(self.galaxy.centre_pvd + slitsize), :]
-
-        # Collapse along the slit to create the PV diagram
-        PV = np.sum(slit, axis=1)
-
-        # There is a lot of garbage because of the interpolation used by the rotation function, define a lower limit to get rid of that
-        PV[PV < 0.001] = 0
-
-        # Show the PVD to determine where the velocity centre is by eye
-        if find_velcentre:
-            plt.imshow(PV)
-            return
+        clipped_cube, _, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                                               sun=self.sun, tosave=False).calc_moms()
 
         # OR DO THIS??
         # find the middle of the galaxy, where the relative velocity is closest to zero
@@ -301,6 +274,8 @@ class create_images:
         #middle_PV = np.where(PV[mid_v, :] == mid_emis)[0]  # index of the middle of the chunck with emission
 
         # Create a physical position axis using the middle found and the spatial resolution, in arc seconds
+        res = clipped_cube.header['CDELT2']
+        vres = clipped_cube.header['CDELT3'] / 1000.  # velocity resolution
         position = np.arange(0, PV.shape[1], 1)
         offset = (position - self.galaxy.centre_pvd) * res * 3600
 
@@ -346,19 +321,19 @@ class create_images:
         velocity, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                      tosave=False).create_vel_array(clipped_cube)
 
-        levels = list(np.linspace(np.amin(PV), np.amax(PV), 20))
+        levels = list(np.linspace(np.amin(PV.data), np.amax(PV.data), 20))
         levels = 20
 
         # Contours in black
-        ax.contour(PV,
+        ax.contour(PV.data,
                    extent=[np.amin(offset), np.amax(offset), velocity[0] - self.galaxy.sysvel, velocity[-1] - self.galaxy.sysvel],
                    colors='k', levels=levels,
                    linewidths=1)
 
         # Filling with coloured contours
-        ax.contourf(PV,
+        ax.contourf(PV.data,
                     extent=[np.amin(offset), np.amax(offset), velocity[0] - self.galaxy.sysvel, velocity[-1] - self.galaxy.sysvel],
-                    cmap='afmhot_r', vmin=0.1 * np.amax(PV), vmax=0.8 * np.amax(PV),
+                    cmap='afmhot_r', vmin=0.1 * np.amax(PV.data), vmax=0.8 * np.amax(PV.data),
                     levels=levels)
 
         # Make the plot pretty
