@@ -30,14 +30,14 @@ class create_images:
             if units == 'M_Sun/pc^2':
                 if self.overwrite:
                     _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                                    tosave=True).calc_moms(units='M_Sun/pc^2')
+                                                    savepath=self.savepath, tosave=True).calc_moms(units='M_Sun/pc^2')
                 else:
                     _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                                     tosave=False).calc_moms(units='M_Sun/pc^2')
             elif units == 'K km/s':
                 if self.overwrite:
                     _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                                    tosave=True).calc_moms(units='K km/s')
+                                                    savepath=self.savepath, tosave=True).calc_moms(units='K km/s')
                 else:
                     _, image, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                                     tosave=False).calc_moms(units='K km/s')
@@ -134,7 +134,7 @@ class create_images:
             if self.refresh:
                 if self.overwrite:
                     _, _, image, _, sysvel = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                                         sun=self.sun, tosave=True).calc_moms()
+                                                         savepath=self.savepath, sun=self.sun, tosave=True).calc_moms()
                 else:
                     _, _, image, _, sysvel = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                          sun=self.sun, tosave=False).calc_moms()
@@ -145,7 +145,7 @@ class create_images:
             if self.refresh:
                 if self.overwrite:
                     _, _, _, image, sysvel = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                                         sun=self.sun, tosave=True).calc_moms()
+                                                         savepath=self.savepath, sun=self.sun, tosave=True).calc_moms()
                 else:
                     _, _, _, image, sysvel = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                          sun=self.sun, tosave=False).calc_moms()
@@ -254,7 +254,8 @@ class create_images:
 
         if self.refresh:
             if self.overwrite:
-                PV = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=True).\
+                PV = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                 savepath=self.savepath, tosave=True).\
                     PVD(axis=axis, findcentre=findcentre, find_velcentre=find_velcentre, full_width=full_width)
             else:
                 PV = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False).\
@@ -262,7 +263,7 @@ class create_images:
         else:
             PV = fits.open(self.path + 'PVD.fits')[0]
 
-        clipped_cube, _, _, _, _ = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+        clipped_cube, _, _, _, sysvel = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                sun=self.sun, tosave=False).calc_moms()
 
         # OR DO THIS??
@@ -326,13 +327,13 @@ class create_images:
 
         # Contours in black
         ax.contour(PV.data,
-                   extent=[np.amin(offset), np.amax(offset), velocity[0] - self.galaxy.sysvel, velocity[-1] - self.galaxy.sysvel],
+                   extent=[np.amin(offset), np.amax(offset), velocity[0] - sysvel, velocity[-1] - sysvel],
                    colors='k', levels=levels,
                    linewidths=1)
 
         # Filling with coloured contours
         ax.contourf(PV.data,
-                    extent=[np.amin(offset), np.amax(offset), velocity[0] - self.galaxy.sysvel, velocity[-1] - self.galaxy.sysvel],
+                    extent=[np.amin(offset), np.amax(offset), velocity[0] - sysvel, velocity[-1] - sysvel],
                     cmap='afmhot_r', vmin=0.1 * np.amax(PV.data), vmax=0.8 * np.amax(PV.data),
                     levels=levels)
 
@@ -346,36 +347,46 @@ class create_images:
         x1, x2 = ax.get_xlim()
         y1, y2 = ax.get_ylim()
         ax.errorbar(0.8 * x2, 0.7 * y2, xerr=clipped_cube.header['BMAJ'] * 3600 / 2., yerr=vres / 2., ecolor='k', capsize=2.5)
-        ax.annotate('PA = ' + str(self.galaxy.angle) + '$^o$', xy=(-0.4 * x2, -0.7 * y2), fontsize=20)
+        ax.annotate('PA = ' + str(-(self.galaxy.angle - 360 - 90)) + '$^o$', xy=(-0.4 * x2, -0.7 * y2), fontsize=20)
+
         plt.tight_layout()
 
         if self.tosave:
             plt.savefig(self.savepath + 'PVD.pdf', bbox_inches='tight')
 
-    def spectrum(self):
+    def spectrum(self, x_axis='velocity'):
 
-        spectrum = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                               tosave=False).spectrum()
-        cube_pbcorr, cube_uncorr = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                               sun=self.sun, tosave=False).readfits()
-        _, _, velocity = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                     tosave=False).create_vel_array(cube_pbcorr)
-
-        spectrum = spectrum[self.galaxy.start - 5:self.galaxy.stop + 5]
-        velocity = velocity[self.galaxy.start - 5:self.galaxy.stop + 5]
+        if self.refresh:
+            if self.tosave:
+                spectrum, velocity, frequency = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                                                            sun=self.sun, savepath=self.savepath, tosave=True).spectrum()
+            else:
+                spectrum, velocity, frequency = moment_maps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                                                            sun=self.sun, tosave=False).spectrum()
+        else:
+            spectrum = np.loadtxt(self.path + 'spectrum.txt')
+            velocity = np.loadtxt(self.path + 'spectrum_velocities.txt')
+            frequency = np.loadtxt(self.path + 'spectrum_frequencies.txt')
 
         fig, ax = plt.subplots(figsize=(7, 7))
-        ax.plot(velocity, spectrum, color='k', drawstyle='steps')
+
+        if x_axis == 'velocity':
+            ax.plot(velocity, spectrum, color='k', drawstyle='steps')
+            x = np.arange(np.amin(velocity) - 100, np.amax(velocity) + 100, 1)
+            ax.set_xlim(velocity[len(velocity) - 1] + 5, velocity[0] - 5)
+            ax.set_xlabel(r'Velocity [km s$^{-1}$]')
+        elif x_axis == 'frequency':
+            ax.plot(frequency, spectrum, color='k', drawstyle='steps')
+            x = np.arange(np.amin(frequency) - 5, np.amax(frequency) + 5, 1)
+            ax.set_xlim(frequency[len(frequency) - 1], frequency[0])
+            ax.set_xlabel(r'Frequency [GHz]')
+        else:
+            raise AttributeError('Please choose between "velocity" and "frequency" for "x-axis"')
 
         # Line through zero
-        x = np.arange(np.amin(velocity) - 100, np.amax(velocity) + 100, 1)
         zeroline = np.zeros(len(x))
         plt.plot(x, zeroline, linestyle=':', c='r', linewidth=1)
 
-        # Set various parameters
-        ax.set_xlim(velocity[len(velocity) - 1] + 5, velocity[0] - 5)
-        ax.set_xlabel(r'Velocity [km s$^{-1}$]')
-        #ax.set_ylabel('Flux density [mJy]')
         ax.set_ylabel('Flux density [K]')
 
         plt.tight_layout()

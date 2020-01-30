@@ -30,8 +30,8 @@ tosave = True
 #              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2()
 #create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
 #              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2(moment=2)
-create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-              make_cutout=make_cutout, sun=sun, tosave=tosave).\
-    PVD(axis='major', findcentre=False, find_velcentre=False, full_width=False)
 #create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-#              make_cutout=make_cutout, sun=sun, tosave=tosave).spectrum()
+#              make_cutout=make_cutout, sun=sun, tosave=tosave).\
+#    PVD(axis='major', findcentre=False, find_velcentre=False, full_width=False)
+create_images(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+              make_cutout=make_cutout, sun=sun, tosave=tosave).spectrum(x_axis='frequency')

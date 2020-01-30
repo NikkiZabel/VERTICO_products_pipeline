@@ -7,11 +7,11 @@ from scipy.ndimage import binary_dilation, label
 
 class moment_maps:
 
-    def __init__(self, galname, path_pbcorr, path_uncorr, savepath='./', sun=True, tosave=False):
+    def __init__(self, galname, path_pbcorr, path_uncorr, savepath=None, sun=True, tosave=False):
         self.galaxy = galaxies(galname)
         self.path_pbcorr = path_pbcorr
         self.path_uncorr = path_uncorr
-        self.savepath = savepath
+        self.savepath = savepath or './'
         self.sun = sun
         self.tosave = tosave
 
@@ -388,6 +388,24 @@ class moment_maps:
 
         return vel_array, vel_narray, vel_array_full
 
+    def add_clipping_keywords(self, header):
+        if self.sun:
+            header['CLIPLEVEL_LOW'] = self.galaxy.cliplevel_low
+            header.comments['CLIPLEVEL_LOW'] = 'Lower clip level using the Sun clipping method'
+            header['CLIPLEVEL_HIGH'] = self.galaxy.cliplevel_high
+            header.comments['CLIPLEVEL_HIGH'] = 'Higher clip level using the Sun clipping method'
+            header['NCHAN_LOW'] = self.galaxy.cliplevel_low
+            header.comments['NCHAN_LOW'] = 'Lower number of consecutive channels using the Sun clipping method'
+            header['NCHAN_HIGH'] = self.galaxy.cliplevel_high
+            header.comments['NCHAN_HIGH'] = 'Higher number of consecutive channels using the Sun clipping method'
+        else:
+            header['CLIPLEVEL'] = self.galaxy.cliplevel
+            header.comments['CLIPLEVEL'] = 'SNR to which the spectral cube was smooth clipped using the method of' \
+                                           'Dame 2011'
+
+        return header
+
+
     def calc_moms(self, units='M_Sun/pc^2', alpha_co=6.25):
         """
         Clip the spectral cube according to the desired method, and create moment 0, 1, and 2 maps. Save them as fits
@@ -415,12 +433,28 @@ class moment_maps:
 
         # Calculate the systemic velocity from the spatial inner part of the cube (to avoid PB effects)
         inner_cube = self.innersquare(mom1)
-        sysvel = np.nanmean(inner_cube)
+
+        if not self.galaxy.sysvel:
+            sysvel = np.nanmean(inner_cube)
         mom1 -= sysvel
 
         mom0_hdu = fits.PrimaryHDU(mom0, self.new_header(cube_pbcorr.header))
         mom1_hdu = fits.PrimaryHDU(mom1, self.new_header(cube_pbcorr.header))
         mom2_hdu = fits.PrimaryHDU(mom2, self.new_header(cube_pbcorr.header))
+
+        # Change or add any (additional) keywords to the headers
+        if units == 'M_Sun/pc^2': mom0_hdu.header['BTYPE'] = 'Column density'
+        else: mom0_hdu.header['BTYPE'] = 'Surface brightness'
+        mom1_hdu.header['BTYPE'] = 'Velocity'
+        mom2_hdu.header['BTYPE'] = 'Linewidth'
+        mom0_hdu.header['BUNIT'] = units; mom0_hdu.header.comments['BUNIT'] = ''
+        mom1_hdu.header['BUNIT'] = 'km/s'; mom1_hdu.header.comments['BUNIT'] = ''
+        mom2_hdu.header['BUNIT'] = 'km/s'; mom2_hdu.header.comments['BUNIT'] = ''
+        mom0_hdu.header['ALPHA_CO'] = alpha_co
+        mom1_hdu.header['SYSVEL'] = sysvel; mom1_hdu.header.comments['SYSVEL'] = 'km/s'
+        self.add_clipping_keywords(mom0_hdu.header)
+        self.add_clipping_keywords(mom1_hdu.header)
+        self.add_clipping_keywords(mom2_hdu.header)
 
         if self.tosave:
             cube.writeto(self.savepath + 'clipped_cube.fits', overwrite=True)
@@ -483,6 +517,8 @@ class moment_maps:
         pvd_header.comments['NAXIS'] = clipped_cube.header.comments['NAXIS']
         pvd_header['NAXIS1'] = PV.shape[0]
         pvd_header['NAXIS2'] = PV.shape[1]
+        pvd_header['PVD_AXIS'] = axis
+        pvd_header['PA'] = -(self.galaxy.angle - 360 - 90)
         pvd_header['BMAJ'] = clipped_cube.header['BMAJ']
         pvd_header['BMIN'] = clipped_cube.header['BMIN']
         pvd_header['BPA'] = clipped_cube.header['BPA']
@@ -562,10 +598,20 @@ class moment_maps:
             #cutout = np.where(mask_3d, cube, 0)
 
         spectrum = np.nansum(cutout, axis=(1, 2))
+        _, _, vel_array_full = self.create_vel_array(cube_pbcorr)
+
+        spectrum_velocities = vel_array_full[self.galaxy.start - 5:self.galaxy.stop + 5]
+        spectrum = spectrum[self.galaxy.start - 5:self.galaxy.stop + 5]
+        spectrum_frequencies = cube_pbcorr.header['RESTFRQ'] * (1 - spectrum_velocities / 299792.458) / 1e9
+
+        if self.tosave:
+            np.savetxt(self.savepath + 'spectrum.txt', spectrum)
+            np.savetxt(self.savepath + 'spectrum_velocities.txt', spectrum_velocities)
+            np.savetxt(self.savepath + 'spectrum_frequencies.txt', spectrum_frequencies)
 
         # Estimate the rms in the spectrum
         #emis, noise = self.splitCube(cutout, self.galaxy.start, self.galaxy.stop)
         #rms = np.std(np.sum(noise, axis=(1, 2)))
         #np.savetxt(path + 'specnoise.txt', [rms / beamsize])
 
-        return spectrum # / beamsize
+        return spectrum, spectrum_velocities, spectrum_frequencies # / beamsize

@@ -4,6 +4,7 @@
     <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/image_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_moments.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -93,7 +94,14 @@
       <option name="project" value="LOCAL" />
       <updated>1580320996907</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Split up the PVD into creating it (+ saving it as a fits-file) and plotting it. Added the option to use the minor axis instead.">
+      <created>1580394656174</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1580394656174</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -102,13 +110,14 @@
     <MESSAGE value="Finished the docstrings." />
     <MESSAGE value="Some small bugs." />
     <MESSAGE value="Implemented unit options for moment 0 map." />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented unit options for moment 0 map." />
+    <MESSAGE value="Split up the PVD into creating it (+ saving it as a fits-file) and plotting it. Added the option to use the minor axis instead." />
+    <option name="LAST_COMMIT_MESSAGE" value="Split up the PVD into creating it (+ saving it as a fits-file) and plotting it. Added the option to use the minor axis instead." />
   </component>
   <component name="WindowStateProjectService">
-    <state x="600" y="147" width="777" height="819" key="CommitChangelistDialog2" timestamp="1580320996850">
+    <state x="600" y="147" width="777" height="819" key="CommitChangelistDialog2" timestamp="1580394656092">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="600" y="147" width="777" height="819" key="CommitChangelistDialog2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1580320996850" />
+    <state x="600" y="147" width="777" height="819" key="CommitChangelistDialog2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1580394656092" />
     <state x="776" y="311" width="424" height="491" key="FileChooserDialogImpl" timestamp="1580319751934">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
@@ -118,10 +127,10 @@
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053@67.27.1853.1053" timestamp="1579877369983" />
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1580320997810">
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1580394657363">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1580320997810" />
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1580394657363" />
     <state x="648" y="379" key="com.intellij.ide.util.TipDialog" timestamp="1580204679957">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
