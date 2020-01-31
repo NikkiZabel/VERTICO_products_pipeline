@@ -3,6 +3,7 @@ import numpy as np
 from scipy import ndimage
 from scipy.ndimage import binary_dilation, label
 from targets import galaxies
+from astropy.convolution import convolve_fft
 
 
 class ClipCube:
@@ -255,11 +256,34 @@ class ClipCube:
         :return: (ndarray) mask to apply to the un-clipped cube
         """
 
-        res = cube.header['CDELT2']  # deg/pixel
-        bmaj = cube.header['BMAJ']  # degrees
-        beam = bmaj / res  # beam size in pixels, use the major axis
+        beam = np.array([cube.header['BMAJ'], cube.header['BMIN']]) / cube.header['CDELT2']
         sigma = 1.5 * beam / np.sqrt(8. * np.log(2.))
-        smooth_cube = ndimage.filters.gaussian_filter(cube.data, (4., sigma, sigma), order=0, mode='nearest')
+        xpixels = cube.shape[1]
+        ypixels = cube.shape[2]
+        cent = [xpixels / 2, ypixels / 2]
+        rot = 0
+        dirfac = 1
+
+        # Convolve with 1.5 the beam in the spatial direction
+        # Calculate the psf
+        x, y = np.indices((int(xpixels), int(ypixels)), dtype='float')
+        x -= cent[0]
+        y -= cent[1]
+
+        a = (np.cos(np.radians(rot)) ** 2) / (2.0 * (sigma[0] ** 2)) + (np.sin(np.radians(rot)) ** 2) / (
+        2.0 * (sigma[1] ** 2))
+        b = ((dirfac) * (np.sin(2.0 * np.radians(rot)) ** 2) / (4.0 * (sigma[0] ** 2))) + (
+        (-1 * dirfac) * (np.sin(2.0 * np.radians(rot)) ** 2) / (4.0 * (sigma[1] ** 2)))
+        c = (np.sin(np.radians(rot)) ** 2) / (2.0 * (sigma[0] ** 2)) + (np.cos(np.radians(rot)) ** 2) / (
+        2.0 * (sigma[1] ** 2))
+
+        psf = np.exp(-1 * (a * (x ** 2) - 2.0 * b * (x * y) + c * (y ** 2)))
+
+        cube_spatial_smooth = np.empty(cube.shape)
+        for i in range(cube.shape[0]):
+            cube_spatial_smooth[i, :, :] = convolve_fft(cube.data[i, :, :], psf)
+
+        smooth_cube = ndimage.filters.gaussian_filter1d(cube_spatial_smooth, 4, axis=0, order=0, mode='nearest')
         smooth_hdu = fits.PrimaryHDU(smooth_cube, cube.header)
         mask = self.clip(smooth_hdu)
 

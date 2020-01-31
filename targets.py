@@ -5,7 +5,7 @@ class galaxies:
 
         name, centre_x, centre_y, size, vrange, vrange_2, cliplevel, stokes, start, stop, sysvel, angle, centre_pvd, \
         vel_centre_pvd, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, prune_by_fracbeam, \
-            expand_by_fracbeam, expand_by_npix, expand_by_nchan = gal_params.parameters(galname)
+            expand_by_fracbeam, expand_by_npix, expand_by_nchan, eccentricity = gal_params.parameters(galname)
 
         self.name = name
         self.centre_x = centre_x
@@ -31,3 +31,4 @@ class galaxies:
         self.expand_by_fracbeam = expand_by_fracbeam
         self.expand_by_npix = expand_by_npix
         self.expand_by_nchan = expand_by_nchan
+        self.eccentricity = eccentricity

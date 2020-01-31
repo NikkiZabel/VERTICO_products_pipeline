@@ -358,12 +358,13 @@ class CreateImages:
     def spectrum(self, x_axis='velocity'):
 
         if self.refresh:
-            if self.tosave:
+            if self.overwrite:
                 spectrum, velocity, frequency = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                                            sun=self.sun, savepath=self.savepath, tosave=True).spectrum()
+                                                    sun=self.sun, savepath=self.savepath, tosave=True).spectrum()
             else:
                 spectrum, velocity, frequency = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                                            sun=self.sun, tosave=False).spectrum()
+                                                    sun=self.sun, savepath=self.savepath, tosave=False).spectrum()
+
         else:
             spectrum = np.loadtxt(self.path + 'spectrum.txt')
             velocity = np.loadtxt(self.path + 'spectrum_velocities.txt')
@@ -394,3 +395,33 @@ class CreateImages:
 
         if self.tosave:
             plt.savefig(self.savepath + 'spectrum.pdf', bbox_inches='tight')
+
+    def radial_profile(self, units='kpc', alpha_co=6.25, check_aperture=False):
+
+        if self.refresh:
+            if self.overwrite:
+                rad_prof, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                           sun=self.sun, savepath=self.savepath, tosave=True).\
+                    radial_profile(alpha_co=alpha_co, check_aperture=check_aperture)
+            else:
+                rad_prof, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                           sun=self.sun, savepath=self.savepath, tosave=False).\
+                    radial_profile(alpha_co=alpha_co, check_aperture=check_aperture)
+
+        else:
+            rad_prof = np.loadtxt(self.path + 'radial_profile.txt')
+            radii_arcsec = np.loadtxt(self.path + 'radii_arcsec.txt')
+            radii_kpc = np.loadtxt(self.path + 'radii_kpc.txt')
+
+        plt.figure(figsize=(10, 7))
+
+        if units == 'kpc':
+            plt.plot(radii_kpc, rad_prof, c='k', linewidth=3)
+            plt.xlabel('Radius [kpc]')
+        elif units == 'arcsec':
+            plt.plot(radii_arcsec, rad_prof, c='k', linewidth=3)
+            plt.xlabel(r'Radius [$^{\prime\prime}$]')
+        else:
+            raise AttributeError('Please choose between "kpc" and "arcsec" for the keyword "units".')
+
+        plt.ylabel(r'M$_{H_2}$ [M$_\odot$]')

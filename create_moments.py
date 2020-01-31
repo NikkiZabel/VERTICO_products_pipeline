@@ -3,6 +3,8 @@ import numpy as np
 import scipy.ndimage as ndimage
 from targets import galaxies
 from clip_cube import ClipCube
+from photutils import EllipticalAnnulus
+from photutils import aperture_photometry
 
 
 class MomentMaps:
@@ -343,3 +345,49 @@ class MomentMaps:
         #np.savetxt(path + 'specnoise.txt', [rms / beamsize])
 
         return spectrum, spectrum_velocities, spectrum_frequencies # / beamsize
+
+    def radial_profile(self, alpha_co=6.25, check_aperture=False):
+
+        _, mom0_hdu, _, _, _ = self.calc_moms(units='M_Sun/pc^2', alpha_co=alpha_co)
+
+        centre = (self.galaxy.centre_y, self.galaxy.centre_x)
+        e = self.galaxy.eccentricity
+        a_in = -0.99999999
+        a_out = 0
+        theta = self.galaxy.angle - 180
+
+        rad_prof = []
+        emission = 666
+
+        if check_aperture:
+            from matplotlib import pyplot as plt
+            plt.figure()
+            plt.imshow(mom0_hdu.data)
+
+        while emission > 1e-5:
+            a_in += 1
+            a_out += 1
+
+            if e == 1:
+                b_out = a_out
+            else:
+                b_out = a_out * np.sqrt(1 - e ** 2)
+
+            aperture = EllipticalAnnulus(centre, a_in, a_out, b_out, theta)
+
+            if check_aperture:
+                aperture.plot(color='red')
+
+            emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0]
+            rad_prof.append(emission)
+
+        rad_prof = np.cumsum(rad_prof)
+        radii_deg = (np.arange(len(rad_prof)) + 1) * mom0_hdu.header['CDELT2']
+        radii_kpc = np.deg2rad(radii_deg) * self.galaxy.distance * 1000
+
+        if self.tosave:
+            np.savetxt(self.savepath + 'radial_profile.txt', rad_prof)
+            np.savetxt(self.savepath + 'radii_arcsec.txt', radii_deg * 3600)
+            np.savetxt(self.savepath + 'radii_kpc.txt', radii_kpc)
+
+        return rad_prof, radii_deg * 3600, radii_kpc

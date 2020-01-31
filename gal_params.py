@@ -1,8 +1,8 @@
 def parameters(galaxy):
 
     if galaxy == 'NGC4713':
-        centre_y = 25
-        centre_x = 32
+        centre_y = 26
+        centre_x = 25
         size = 70
         vrange = 150
         vrange_2 = 50
@@ -24,6 +24,7 @@ def parameters(galaxy):
         expand_by_fracbeam = None
         expand_by_npix = None
         expand_by_nchan = 2
+        eccentricity = 1
 
     elif galaxy == 'NGC4568':
         centre_y = 23
@@ -49,6 +50,7 @@ def parameters(galaxy):
         expand_by_fracbeam = None
         expand_by_npix = None
         expand_by_nchan = 2
+        eccentricity = 1
 
     elif galaxy == 'NGC4189':
         centre_y = 32
@@ -74,9 +76,10 @@ def parameters(galaxy):
         expand_by_fracbeam = None
         expand_by_npix = None
         expand_by_nchan = 2
+        eccentricity = 1
 
     name = galaxy
 
     return name, centre_x, centre_y, size, vrange, vrange_2, cliplevel, stokes, start, stop, sysvel, angle, \
            centre_pvd, vel_centre_pvd, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \
-           prune_by_fracbeam, expand_by_fracbeam, expand_by_npix, expand_by_nchan
+           prune_by_fracbeam, expand_by_fracbeam, expand_by_npix, expand_by_nchan, eccentricity
