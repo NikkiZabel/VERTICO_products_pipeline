@@ -296,7 +296,7 @@ class CreateImages:
                 """
                 Convert the relative velocities to absolute velocities
                 """
-                return v + self.galaxy.sysvel
+                return v + sysvel
 
             y1, y2 = ax.get_ylim()
             ax_rel.set_ylim(absolute_vel(y1), absolute_vel(y2))
