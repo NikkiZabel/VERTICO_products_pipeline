@@ -26,15 +26,15 @@ tosave = True
 # Call these to create images of the moment maps
 CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
               make_cutout=make_cutout, sun=sun, tosave=tosave).moment_zero(units='M_Sun/pc^2')
-CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2()
-CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2(moment=2)
-CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-              make_cutout=make_cutout, sun=sun, tosave=tosave).\
-    PVD(axis='major', findcentre=False, find_velcentre=False, full_width=False)
-CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-              make_cutout=make_cutout, sun=sun, tosave=tosave).spectrum(x_axis='frequency')
-CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-             make_cutout=make_cutout, sun=sun, tosave=tosave).radial_profile(units='kpc',
-                                    alpha_co=6.25, check_aperture=True)
+#CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+#              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2()
+#CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+#              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2(moment=2)
+#CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+#              make_cutout=make_cutout, sun=sun, tosave=tosave).\
+#    PVD(axis='major', findcentre=False, find_velcentre=False, full_width=False)
+#CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+#              make_cutout=make_cutout, sun=sun, tosave=tosave).spectrum(x_axis='frequency')
+#CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+#             make_cutout=make_cutout, sun=sun, tosave=tosave).radial_profile(units='kpc',
+#                                    alpha_co=6.25, check_aperture=True)

@@ -90,7 +90,7 @@ class MomentMaps:
         header.pop('CRPIX3')
         header.pop('CUNIT3')
         header.pop('NAXIS3')
-        #header.pop('OBSGEO-Z')
+        header.pop('OBSGEO-Z')
 
         header['NAXIS'] = 2
 
@@ -118,18 +118,17 @@ class MomentMaps:
 
     def add_clipping_keywords(self, header):
         if self.sun:
-            header['CLIPLEVEL_LOW'] = self.galaxy.cliplevel_low
-            header.comments['CLIPLEVEL_LOW'] = 'Lower clip level using the Sun clipping method'
-            header['CLIPLEVEL_HIGH'] = self.galaxy.cliplevel_high
-            header.comments['CLIPLEVEL_HIGH'] = 'Higher clip level using the Sun clipping method'
-            header['NCHAN_LOW'] = self.galaxy.cliplevel_low
-            header.comments['NCHAN_LOW'] = 'Lower number of consecutive channels using the Sun clipping method'
-            header['NCHAN_HIGH'] = self.galaxy.cliplevel_high
-            header.comments['NCHAN_HIGH'] = 'Higher number of consecutive channels using the Sun clipping method'
+            header['CLIPL_L'] = self.galaxy.cliplevel_low
+            header.comments['CLIPL_L'] = 'Lower clip level (Sun method)'
+            header['CLIPL_H'] = self.galaxy.cliplevel_high
+            header.comments['CLIPL_H'] = 'Higher clip level (Sun method)'
+            header['NCHAN_L'] = self.galaxy.cliplevel_low
+            header.comments['NCHAN_L'] = 'Lower number of consec. chans (Sun method)'
+            header['NCHAN_H'] = self.galaxy.cliplevel_high
+            header.comments['NCHAN_H'] = 'Higher number of consec. chans (Sun method)'
         else:
-            header['CLIPLEVEL'] = self.galaxy.cliplevel
-            header.comments['CLIPLEVEL'] = 'SNR to which the spectral cube was smooth clipped using the method of' \
-                                           'Dame 2011'
+            header['CLIPL'] = self.galaxy.cliplevel
+            header.comments['CLIPL'] = 'SNR for smooth clip (Dame11)' \
 
         return header
 

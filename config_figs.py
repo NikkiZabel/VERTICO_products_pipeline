@@ -1,5 +1,6 @@
 import matplotlib
 
+matplotlib.rcParams['text.usetex'] = True
 matplotlib.rcParams['font.family'] = 'Latin Modern Roman'
 matplotlib.rcParams.update({'font.size': 20})
 matplotlib.rcParams['legend.fontsize'] = 17.5
