@@ -58,7 +58,7 @@ def parameters(galaxy):
         size = 60
         vrange = 200
         vrange_2 = 50
-        cliplevel = 6
+        cliplevel = 1
         stokes = False
         start = 22
         stop = 61

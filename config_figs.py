@@ -13,6 +13,6 @@ matplotlib.rcParams['xtick.minor.width'] = 1; matplotlib.rcParams['ytick.minor.w
 matplotlib.rcParams['xtick.direction'] = 'in'; matplotlib.rcParams['ytick.direction'] = 'in'
 matplotlib.rcParams['xtick.bottom'] = True
 matplotlib.rcParams['ytick.left'] = True
-params = {'mathtext.default': 'regular' }
+params = {'mathtext.default': 'regular'}
 matplotlib.rcParams.update(params)
 matplotlib.rcParams['axes.labelsize'] = 30

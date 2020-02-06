@@ -424,4 +424,9 @@ class CreateImages:
         else:
             raise AttributeError('Please choose between "kpc" and "arcsec" for the keyword "units".')
 
-        plt.ylabel(r'M$_{H_2}$ [M$_\odot$]')
+        plt.ylabel(r'M$_{H_2}$ [$M_\odot$]')
+
+        plt.tight_layout()
+
+        if self.tosave:
+            plt.savefig(self.savepath + 'radial_profile.pdf', bbox_inches='tight')

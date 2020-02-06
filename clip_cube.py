@@ -109,20 +109,26 @@ class ClipCube:
 
         return emiscube_hdu, noisecube_hdu
 
-    def clip(self, cube):
+    def clip(self, smooth_cube):
         """
         Creates a mask of the input cube where spaxels above the desired SNR are 1 and spaxels below the desired SNR
         are 0.
         :param cube (HDU file): spectral cube with which to create the mask
         :return: boolean mask with the spaxels above the provided level set to 1 and the spaxels below to 0
         """
-        emiscube, noisecube = self.split_cube(cube)
+
+        cube_pbcorr, cube_uncorr = self.readfits()
+
+        emiscube, noisecube = self.split_cube(cube_pbcorr)
         inner_noisecube = self.innersquare(noisecube.data)
         rms = np.nanstd(inner_noisecube)
-        emiscube.data[emiscube.data < self.galaxy.cliplevel * rms] = 0
-        emiscube.data[emiscube.data > self.galaxy.cliplevel * rms] = 1
 
-        return emiscube.data.astype(bool)
+        emiscube_smooth, noisecube_smooth = self.split_cube(smooth_cube)
+
+        emiscube_smooth.data[emiscube_smooth.data < self.galaxy.cliplevel * rms] = 0
+        emiscube_smooth.data[emiscube_smooth.data > self.galaxy.cliplevel * rms] = 1
+
+        return emiscube_smooth.data.astype(bool)
 
     def prune_small_detections(self, cube, mask):
         """
@@ -144,7 +150,7 @@ class ClipCube:
 
         labels, count = label(mask)
         for idx in np.arange(count) + 1:
-            if (labels == idx).any(axis=0).sum() / idx < prune_by_npix:
+            if (labels == idx).any(axis=0).sum() < prune_by_npix:
                 mask[labels == idx] = False
 
         return mask
@@ -257,7 +263,10 @@ class ClipCube:
         """
 
         beam = np.array([cube.header['BMAJ'], cube.header['BMIN']]) / cube.header['CDELT2']
-        sigma = 1.5 * beam / np.sqrt(8. * np.log(2.))
+        sigma = 1.5 * beam# / np.sqrt(8. * np.log(2.))
+        sigma = 1.5 * cube.header['BMAJ'] / cube.header['CDELT2'] / np.sqrt(8. * np.log(2.))
+
+        '''
         xpixels = cube.shape[1]
         ypixels = cube.shape[2]
         cent = [xpixels / 2, ypixels / 2]
@@ -278,12 +287,15 @@ class ClipCube:
         2.0 * (sigma[1] ** 2))
 
         psf = np.exp(-1 * (a * (x ** 2) - 2.0 * b * (x * y) + c * (y ** 2)))
+        '''
+        #cube_spatial_smooth = np.empty(cube.shape)
+        #for i in range(cube.shape[0]):
+        #    cube_spatial_smooth[i, :, :] = convolve_fft(cube.data[i, :, :], psf)
 
-        cube_spatial_smooth = np.empty(cube.shape)
-        for i in range(cube.shape[0]):
-            cube_spatial_smooth[i, :, :] = convolve_fft(cube.data[i, :, :], psf)
+        #smooth_cube = ndimage.filters.gaussian_filter1d(cube_spatial_smooth, 4, axis=0, order=0, mode='nearest')
 
-        smooth_cube = ndimage.filters.gaussian_filter1d(cube_spatial_smooth, 4, axis=0, order=0, mode='nearest')
+        smooth_cube = ndimage.filters.gaussian_filter(cube.data, (4, sigma, sigma), order=0, mode='nearest')
+
         smooth_hdu = fits.PrimaryHDU(smooth_cube, cube.header)
         mask = self.clip(smooth_hdu)
 
@@ -311,6 +323,9 @@ class ClipCube:
             mask = self.sun_method(emiscube_uncorr, noisecube_pbcorr)
         else:
             mask = self.smooth_clip(cube_uncorr_copy)
+            mask_hdu = fits.PrimaryHDU(mask.astype(int), cube_pbcorr.header)
+            mask_hdu.writeto(self.savepath + 'mask.fits', overwrite=True)
+
 
         emiscube_pbcorr.data *= mask
         clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr.data, cube_pbcorr.header)

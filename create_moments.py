@@ -179,7 +179,7 @@ class MomentMaps:
         mom1_hdu.header['BUNIT'] = 'km/s'; mom1_hdu.header.comments['BUNIT'] = ''
         mom2_hdu.header['BUNIT'] = 'km/s'; mom2_hdu.header.comments['BUNIT'] = ''
         mom0_hdu.header['ALPHA_CO'] = alpha_co
-        mom1_hdu.header['SYSVEL'] = sysvel; mom1_hdu.header.comments['SYSVEL'] = 'km/s'
+        #mom1_hdu.header['SYSVEL'] = sysvel; mom1_hdu.header.comments['SYSVEL'] = 'km/s'
         self.add_clipping_keywords(mom0_hdu.header)
         self.add_clipping_keywords(mom1_hdu.header)
         self.add_clipping_keywords(mom2_hdu.header)
@@ -343,6 +343,8 @@ class MomentMaps:
         #rms = np.std(np.sum(noise, axis=(1, 2)))
         #np.savetxt(path + 'specnoise.txt', [rms / beamsize])
 
+        print(np.trapz(spectrum) * 6.25 * 16.5 ** 2 * 4 * np.pi)
+
         return spectrum, spectrum_velocities, spectrum_frequencies # / beamsize
 
     def radial_profile(self, alpha_co=6.25, check_aperture=False):
@@ -377,7 +379,8 @@ class MomentMaps:
             if check_aperture:
                 aperture.plot(color='red')
 
-            emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0]
+            emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0] * \
+                       (np.deg2rad(mom0_hdu.header['CDELT2']) * self.galaxy.distance * 1e6) ** 2
             rad_prof.append(emission)
 
         rad_prof = np.cumsum(rad_prof)
