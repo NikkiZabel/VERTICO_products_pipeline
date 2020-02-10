@@ -178,8 +178,8 @@ class MomentMaps:
         mom0_hdu.header['BUNIT'] = units; mom0_hdu.header.comments['BUNIT'] = ''
         mom1_hdu.header['BUNIT'] = 'km/s'; mom1_hdu.header.comments['BUNIT'] = ''
         mom2_hdu.header['BUNIT'] = 'km/s'; mom2_hdu.header.comments['BUNIT'] = ''
-        mom0_hdu.header['ALPHA_CO'] = alpha_co
-        #mom1_hdu.header['SYSVEL'] = sysvel; mom1_hdu.header.comments['SYSVEL'] = 'km/s'
+        mom0_hdu.header['ALPHA_CO'] = alpha_co; mom0_hdu.header.comments['ALPHA_CO'] = 'Assuming a line ratio of 0.7'
+        mom1_hdu.header['SYSVEL'] = sysvel; mom1_hdu.header.comments['SYSVEL'] = 'km/s'
         self.add_clipping_keywords(mom0_hdu.header)
         self.add_clipping_keywords(mom1_hdu.header)
         self.add_clipping_keywords(mom2_hdu.header)
@@ -192,13 +192,15 @@ class MomentMaps:
 
         return cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel
 
-    def PVD(self, axis='major', findcentre=False, find_velcentre=False, full_width=False):
+    def PVD(self, axis='major', find_velcentre=False, full_width=False):
 
         clipped_cube, _, _, _, _ = self.calc_moms()
 
         res = clipped_cube.header['CDELT2']  # degrees per pixel
         beampix = clipped_cube.header['BMAJ'] / res  # beam size in pixels
         slitsize = np.ceil(beampix / 2)
+        shift_x = self.galaxy.centre_x - clipped_cube.shape[1] / 2
+        shift_y = self.galaxy.centre_y - clipped_cube.shape[2] / 2
 
         # Rotate the cube along the spatial axes, so that the galaxy lies horizontal
         if axis == 'major':
@@ -208,20 +210,32 @@ class MomentMaps:
         else:
             raise AttributeError('Please choose between "major" and "minor" for the "axis" keyword')
 
-        cube_rot = ndimage.interpolation.rotate(clipped_cube.data, rot_angle, axes=(1, 2), reshape=True)
+        if shift_x > 0:
+            temp = np.zeros((clipped_cube.shape[0], clipped_cube.shape[1] + int(abs(shift_x)), clipped_cube.shape[2]))
+            temp[:, :-int(abs(shift_x)), :] = clipped_cube.data
+        elif shift_x < 0:
+            temp = np.zeros((clipped_cube.shape[0], clipped_cube.shape[1] + int(abs(shift_x)), clipped_cube.shape[2]))
+            temp[:, int(abs(shift_x)):, :] = clipped_cube.data
+        else:
+            temp = clipped_cube.data
 
-        # If you still have to determine where the slit should be, show a projection of the rotated cube, and return
-        if findcentre:
-            from matplotlib import pyplot as plt
-            plt.imshow(np.sum(cube_rot, axis=0))
-            return
+        if shift_y > 0:
+            pvdcube = np.zeros((temp.shape[0], temp.shape[1], temp.shape[2] + int(abs(shift_y))))
+            pvdcube[:, :, :-int(abs(shift_y))] = temp
+        elif shift_y < 0:
+            pvdcube = np.zeros((temp.shape[0], temp.shape[1], temp.shape[2] + int(abs(shift_y))))
+            pvdcube[:, :, int(abs(shift_y)):] = temp
+        else:
+            pvdcube = temp
+
+        cube_rot = ndimage.interpolation.rotate(pvdcube, rot_angle, axes=(1, 2), reshape=True)
 
         # Define a slit around the centre of the galaxy with a width of the beam size (or use the full width of the galaxy)
         if full_width:
-            slit = cube_rot[:, self.galaxy.centre_pvd - self.galaxy.size / 2:self.galaxy.centre_pvd + self.galaxy.size / 2,
-                   :]
+            slit = cube_rot[:, cube_rot.shape[1] / 2 - self.galaxy.size / 2:cube_rot.shape[1] / 2 +
+                                                                                self.galaxy.size / 2, :]
         else:
-            slit = cube_rot[:, int(self.galaxy.centre_pvd - slitsize):int(self.galaxy.centre_pvd + slitsize), :]
+            slit = cube_rot[:, int(cube_rot.shape[1] / 2 - slitsize):int(cube_rot.shape[1] / 2 + slitsize), :]
 
         # Collapse along the slit to create the PV diagram
         PV = np.sum(slit, axis=1)
@@ -253,8 +267,6 @@ class MomentMaps:
         pvd_header['OBJECT'] = clipped_cube.header['OBJECT']
         pvd_header['EQUINOX'] = 2000
         pvd_header['RADESYS'] = 'FK5'
-
-        # I'M NOT SURE WHAT HAPPENS TO THESE ???
         pvd_header['LONPOLE'] = clipped_cube.header['LONPOLE']
         pvd_header['LATPOLE'] = clipped_cube.header['LATPOLE']
         pvd_header['PC1_1'] = clipped_cube.header['PC1_1']
@@ -262,25 +274,24 @@ class MomentMaps:
         pvd_header['PC1_2'] = clipped_cube.header['PC1_2']
         pvd_header['PC2_2'] = clipped_cube.header['PC2_2']
         pvd_header['CTYPE1'] = '?????'
-        pvd_header['CRVAL1'] = '?????'
-        pvd_header['CDELT1'] = '?????'
-        pvd_header['CRPIX'] = '?????'
+        pvd_header['CRVAL1'] = clipped_cube.header['CRVAL1']
+        pvd_header['CDELT1'] = clipped_cube.header['CDELT1'] / (cube_rot.shape[2] / pvdcube.shape[2])
+        pvd_header['CRPIX'] = clipped_cube.header['CRPIX']
         pvd_header['CUNIT1'] = '?????'
         pvd_header['CTYPE2'] = 'VRAD'
-        pvd_header['CRVAL2'] = '????'
-        pvd_header['CDELT2'] = '????'
-        pvd_header['CRPIX2'] = '????'
+        pvd_header['CRVAL2'] = clipped_cube.header['CRVAL2']
+        pvd_header['CDELT2'] = clipped_cube.header['CDELT2']
+        pvd_header['CRPIX2'] = clipped_cube.header['CRPIX2']
         pvd_header['CUNIT2'] = 'km/s'
-
         pvd_header['RESTFRQ'] = clipped_cube.header['RESTFRQ']
         pvd_header.comments['RESTFRQ'] = clipped_cube.header.comments['RESTFRQ']
         pvd_header['SPECSYS'] = clipped_cube.header['SPECSYS']
         pvd_header.comments['SPECSYS'] = clipped_cube.header.comments['SPECSYS']
-
-
-        ### WHAT ARE ALTRVAL AND ALTRPIX AND VELREF AND USEWEIGH AND JTOK???
-
-
+        pvd_header['ALTRVAL'] = clipped_cube.header['ALTRVAL']
+        pvd_header['ALTRPIX'] = clipped_cube.header['ALTRPIX']
+        pvd_header['VELREF'] = clipped_cube.header['VELREF']
+        pvd_header['USEWEIGH'] = clipped_cube.header['USEWEIGH']
+        pvd_header['JTOK'] = clipped_cube.header['JTOK']
         pvd_header['OBSRA'] = clipped_cube.header['OBSRA']
         pvd_header['OBSDEC'] = clipped_cube.header['OBSDEC']
         pvd_header['OBSGEO-X'] = clipped_cube.header['OBSGEO-X']
@@ -343,22 +354,35 @@ class MomentMaps:
         #rms = np.std(np.sum(noise, axis=(1, 2)))
         #np.savetxt(path + 'specnoise.txt', [rms / beamsize])
 
-        print(np.trapz(spectrum) * 6.25 * 16.5 ** 2 * 4 * np.pi)
+        print(np.log10(np.trapz(spectrum) * 2.0e20 * 0.7 * (16.5 * 3.086e24) ** 2 * 2 * 8.4144035e-58))
 
         return spectrum, spectrum_velocities, spectrum_frequencies # / beamsize
 
-    def radial_profile(self, alpha_co=6.25, check_aperture=False):
+    def radial_profile(self, alpha_co=6.25, table_path=None, check_aperture=False):
 
         _, mom0_hdu, _, _, _ = self.calc_moms(units='M_Sun/pc^2', alpha_co=alpha_co)
+        beam_pix = mom0_hdu.header['BMAJ'] / mom0_hdu.header['CDELT2']
+
+        if self.galaxy.eccentricity:
+            e = self.galaxy.eccentricity
+        elif self.galaxy.inclination:
+            e = np.sin(np.deg2rad(self.galaxy.inclination))
+        elif not table_path:
+            raise AttributeError('Please provide the inclination of the galaxy or its projected eccentricity,'
+                                 'or provide the path to the VERTICO master table to read it from there.')
+        else:
+            print('Reading the inclination from the master table.')
+            table = fits.open(table_path)
+            inc = table[1].data['inclination'][table[1].data['Galaxy'] == self.galaxy.name]
+            e = np.sin(np.deg2rad(inc))[0]
 
         centre = (self.galaxy.centre_y, self.galaxy.centre_x)
-        e = self.galaxy.eccentricity
-        a_in = -0.99999999
-        a_out = 0
+        b_in = -beam_pix + 0.000000000001
+        b_out = 0
         theta = self.galaxy.angle - 180
 
         rad_prof = []
-        emission = 666
+        emission = 2112
 
         if check_aperture:
             from matplotlib import pyplot as plt
@@ -366,13 +390,17 @@ class MomentMaps:
             plt.imshow(mom0_hdu.data)
 
         while emission > 1e-5:
-            a_in += 1
-            a_out += 1
+            b_in += beam_pix
+            b_out += beam_pix
+            if emission == 2112:
+                a_in = 0.0000000000001
+            else:
+                a_in = a_out
 
             if e == 1:
-                b_out = a_out
+                a_out = b_out
             else:
-                b_out = a_out * np.sqrt(1 - e ** 2)
+                a_out = b_out / np.sqrt(1 - e ** 2)
 
             aperture = EllipticalAnnulus(centre, a_in, a_out, b_out, theta)
 
@@ -383,13 +411,15 @@ class MomentMaps:
                        (np.deg2rad(mom0_hdu.header['CDELT2']) * self.galaxy.distance * 1e6) ** 2
             rad_prof.append(emission)
 
-        rad_prof = np.cumsum(rad_prof)
+        rad_prof = np.insert(rad_prof, 0, 0)
+        rad_prof_cum = np.cumsum(rad_prof)
         radii_deg = (np.arange(len(rad_prof)) + 1) * mom0_hdu.header['CDELT2']
         radii_kpc = np.deg2rad(radii_deg) * self.galaxy.distance * 1000
 
         if self.tosave:
             np.savetxt(self.savepath + 'radial_profile.txt', rad_prof)
+            np.savetxt(self.savepath + 'radial_profile_cumulative.txt', rad_prof_cum)
             np.savetxt(self.savepath + 'radii_arcsec.txt', radii_deg * 3600)
             np.savetxt(self.savepath + 'radii_kpc.txt', radii_kpc)
 
-        return rad_prof, radii_deg * 3600, radii_kpc
+        return rad_prof, rad_prof_cum, radii_deg * 3600, radii_kpc

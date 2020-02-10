@@ -279,7 +279,7 @@ class CreateImages:
         res = clipped_cube.header['CDELT2']
         vres = clipped_cube.header['CDELT3'] / 1000.  # velocity resolution
         position = np.arange(0, PV.shape[1], 1)
-        offset = (position - self.galaxy.centre_pvd) * res * 3600
+        offset = (position - clipped_cube.shape[2] / 2) * res * 3600
 
         # Plot the PVD
         fig, ax = plt.subplots(figsize=(10, 7))
@@ -396,30 +396,36 @@ class CreateImages:
         if self.tosave:
             plt.savefig(self.savepath + 'spectrum.pdf', bbox_inches='tight')
 
-    def radial_profile(self, units='kpc', alpha_co=6.25, check_aperture=False):
+    def radial_profile(self, units='kpc', alpha_co=6.25, table_path=None, check_aperture=False, cumulative=True):
 
         if self.refresh:
             if self.overwrite:
-                rad_prof, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                           sun=self.sun, savepath=self.savepath, tosave=True).\
-                    radial_profile(alpha_co=alpha_co, check_aperture=check_aperture)
+                rad_prof, rad_prof_cum, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr,
+                        self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=True).\
+                    radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture)
             else:
-                rad_prof, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                           sun=self.sun, savepath=self.savepath, tosave=False).\
-                    radial_profile(alpha_co=alpha_co, check_aperture=check_aperture)
+                rad_prof, rad_prof_cum, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr,
+                        self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=False).\
+                    radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture)
 
         else:
             rad_prof = np.loadtxt(self.path + 'radial_profile.txt')
+            rad_prof_cum = np.loadtxt(self.path + 'radial_profile_cumulative.txt')
             radii_arcsec = np.loadtxt(self.path + 'radii_arcsec.txt')
             radii_kpc = np.loadtxt(self.path + 'radii_kpc.txt')
+
+        if cumulative:
+            rad_prof_plot = rad_prof_cum
+        else:
+            rad_prof_plot = rad_prof
 
         plt.figure(figsize=(10, 7))
 
         if units == 'kpc':
-            plt.plot(radii_kpc, rad_prof, c='k', linewidth=3)
+            plt.plot(radii_kpc, rad_prof_plot, c='k', linewidth=3)
             plt.xlabel('Radius [kpc]')
         elif units == 'arcsec':
-            plt.plot(radii_arcsec, rad_prof, c='k', linewidth=3)
+            plt.plot(radii_arcsec, rad_prof_plot, c='k', linewidth=3)
             plt.xlabel(r'Radius [$^{\prime\prime}$]')
         else:
             raise AttributeError('Please choose between "kpc" and "arcsec" for the keyword "units".')

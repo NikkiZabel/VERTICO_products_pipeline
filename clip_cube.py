@@ -255,7 +255,7 @@ class ClipCube:
 
         return mask
 
-    def smooth_clip(self, cube):
+    def smooth_mask(self, cube):
         """
         Apply a Gaussian blur, using sigma = 4 in the velocity direction (seems to work best), to the uncorrected cube.
         The mode 'nearest' seems to give the best results.
@@ -263,8 +263,7 @@ class ClipCube:
         """
 
         beam = np.array([cube.header['BMAJ'], cube.header['BMIN']]) / cube.header['CDELT2']
-        sigma = 1.5 * beam# / np.sqrt(8. * np.log(2.))
-        sigma = 1.5 * cube.header['BMAJ'] / cube.header['CDELT2'] / np.sqrt(8. * np.log(2.))
+        sigma = 1.5 * cube.header['BMAJ'] / cube.header['CDELT2']  # / np.sqrt(8. * np.log(2.))
 
         '''
         xpixels = cube.shape[1]
@@ -293,8 +292,7 @@ class ClipCube:
         #    cube_spatial_smooth[i, :, :] = convolve_fft(cube.data[i, :, :], psf)
 
         #smooth_cube = ndimage.filters.gaussian_filter1d(cube_spatial_smooth, 4, axis=0, order=0, mode='nearest')
-
-        smooth_cube = ndimage.filters.gaussian_filter(cube.data, (4, sigma, sigma), order=0, mode='nearest')
+        smooth_cube = ndimage.uniform_filter(cube.data, size=[4, sigma, sigma], mode='constant')  # mode='nearest'
 
         smooth_hdu = fits.PrimaryHDU(smooth_cube, cube.header)
         mask = self.clip(smooth_hdu)
@@ -322,7 +320,7 @@ class ClipCube:
         if self.sun:
             mask = self.sun_method(emiscube_uncorr, noisecube_pbcorr)
         else:
-            mask = self.smooth_clip(cube_uncorr_copy)
+            mask = self.smooth_mask(cube_uncorr_copy)
             mask_hdu = fits.PrimaryHDU(mask.astype(int), cube_pbcorr.header)
             mask_hdu.writeto(self.savepath + 'mask.fits', overwrite=True)
 

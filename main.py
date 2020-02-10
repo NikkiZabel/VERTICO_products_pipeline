@@ -1,7 +1,8 @@
 from image_moments import CreateImages
 from create_moments import *
+import warnings; warnings.filterwarnings("ignore")
 
-galaxy = 'NGC4189'; galtemp = 'ngc4189'
+galaxy = 'NGC4713'; galtemp = 'ngc4713'
 path = '/home/nikki/Documents/Data/VERTICO/' + galtemp + '/'
 
 file_pbcorr = path + galtemp + '_7m+tp_co21_pbcorr_round_k.fits'
@@ -11,7 +12,7 @@ file_uncorr = path + galtemp + '_7m+tp_co21_flat_round_k.fits'
 refresh = True
 overwrite = True
 make_cutout = False
-sun = False
+sun = True
 tosave = True
 
 # Have a first look at the cube to figure out some parameters
@@ -32,9 +33,10 @@ CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, o
               make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2(moment=2)
 #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
 #              make_cutout=make_cutout, sun=sun, tosave=tosave).\
-#    PVD(axis='major', findcentre=False, find_velcentre=False, full_width=False)
+#    PVD(axis='major', find_velcentre=False, full_width=False)
 #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-#              make_cutout=make_cutout, sun=sun, tosave=tosave).spectrum(x_axis='frequency')
+#              make_cutout=make_cutout, sun=sun, tosave=tosave).spectrum(x_axis='velocity')
 #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
 #             make_cutout=make_cutout, sun=sun, tosave=tosave).radial_profile(units='kpc',
-#                                    alpha_co=6.25, check_aperture=True)
+#                                    alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
+#                                                                        check_aperture=False, cumulative=True)
