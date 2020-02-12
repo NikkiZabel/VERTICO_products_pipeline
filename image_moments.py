@@ -285,7 +285,7 @@ class CreateImages:
         res = clipped_cube.header['CDELT2']
         vres = clipped_cube.header['CDELT3'] / 1000.  # velocity resolution
         position = np.arange(0, PV.shape[1], 1)
-        offset = (position - clipped_cube.shape[2] / 2 + shift_x) * res * 3600
+        offset = (position - len(position) / 2 + shift_x) * res * 3600
 
         # Plot the PVD
         fig, ax = plt.subplots(figsize=(10, 7))
@@ -354,7 +354,7 @@ class CreateImages:
         x1, x2 = ax.get_xlim()
         y1, y2 = ax.get_ylim()
         ax.errorbar(0.8 * x2, 0.7 * y2, xerr=clipped_cube.header['BMAJ'] * 3600 / 2., yerr=vres / 2., ecolor='k', capsize=2.5)
-        ax.annotate('PA = ' + str(-(self.galaxy.angle - 360 - 90)) + '$^o$', xy=(-0.4 * x2, -0.4 * y2), fontsize=20)
+        ax.annotate('PA = ' + str(-(self.galaxy.angle - 360 - 90)) + '$^o$', xy=(-0.8 * x2, -0.7 * y2), fontsize=20)
 
         plt.tight_layout()
 

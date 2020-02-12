@@ -3,11 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/image_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_moments.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/targets.py" beforeDir="false" afterPath="$PROJECT_DIR$/targets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -144,7 +141,14 @@
       <option name="project" value="LOCAL" />
       <updated>1581351482255</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Finished PVD headers, updated some galaxy parameters.">
+      <created>1581518753990</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1581518753990</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -160,14 +164,16 @@
     <MESSAGE value="Little bug in the PVD" />
     <MESSAGE value="Fixed bug in RMS estimate" />
     <MESSAGE value="Updated convolution kernel smooth masking, updated header keywords, implemented automatic rotation around galaxy centre PVD, and some other things." />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated convolution kernel smooth masking, updated header keywords, implemented automatic rotation around galaxy centre PVD, and some other things." />
+    <MESSAGE value="Finished PVD headers, updated some galaxy parameters." />
+    <option name="LAST_COMMIT_MESSAGE" value="Finished PVD headers, updated some galaxy parameters." />
   </component>
   <component name="WindowStateProjectService">
-    <state x="600" y="147" width="777" height="819" key="CommitChangelistDialog2" timestamp="1581351482095">
+    <state x="600" y="147" width="777" height="819" key="CommitChangelistDialog2" timestamp="1581518753884">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="552" y="1203" key="CommitChangelistDialog2/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1581007710807" />
     <state x="600" y="147" width="777" height="819" key="CommitChangelistDialog2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1581351482095" />
+    <state x="600" y="147" key="CommitChangelistDialog2/67.27.1853.1053@67.27.1853.1053" timestamp="1581518753884" />
     <state x="381" y="71" width="1102" height="751" key="FileChooserDialogImpl" timestamp="1581335857420">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
@@ -178,11 +184,12 @@
     </state>
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1581330209609" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053@67.27.1853.1053" timestamp="1579877369983" />
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1581351483713">
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1581518756174">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="540" y="1349" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1581007711900" />
     <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1581351483713" />
+    <state x="588" y="289" key="Vcs.Push.Dialog.v2/67.27.1853.1053@67.27.1853.1053" timestamp="1581518756174" />
     <state x="648" y="379" key="com.intellij.ide.util.TipDialog" timestamp="1581503804799">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
