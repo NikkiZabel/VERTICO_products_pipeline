@@ -99,8 +99,10 @@ class CreateImages:
             ticks = np.arange(0, np.amax(image.data) + 1, 2)
         elif np.amax(image.data) < 100:
             ticks = np.arange(0, np.amax(image.data) + 5, 10)
-        else:
+        elif np.amax(image.data) < 200:
             ticks = np.arange(0, np.amax(image.data) + 10, 20)
+        else:
+            ticks = np.arange(0, np.amax(image.data) + 20, 40)
 
         cbar = f.colorbar(colors, ticks=ticks)
         #cbar.set_label(r'Surface brightness [Jy beam$^{-1}$ km s$^{-1}$]')
@@ -125,8 +127,10 @@ class CreateImages:
         plt.tight_layout()
 
         if self.tosave:
-            plt.savefig(self.savepath + 'moment0.pdf', bbox_inches='tight')
-
+            if units == 'K km/s':
+                plt.savefig(self.savepath + 'moment0_K.pdf', bbox_inches='tight')
+            if units == 'M_Sun/pc^2':
+                plt.savefig(self.savepath + 'moment0_M_Sun.pdf', bbox_inches='tight')
         return
 
     def moment_1_2(self, moment=1):
@@ -255,13 +259,15 @@ class CreateImages:
 
         if self.refresh:
             if self.overwrite:
-                PV = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                PV, shift_x = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                  savepath=self.savepath, tosave=True).\
-                    PVD(axis=axis, findcentre=findcentre, find_velcentre=find_velcentre, full_width=full_width)
+                    PVD(axis=axis, full_width=full_width)
             else:
-                PV = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False).\
-                    PVD(axis=axis, findcentre=findcentre, find_velcentre=find_velcentre, full_width=full_width)
+                PV, shift_x = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False).\
+                    PVD(axis=axis, full_width=full_width)
         else:
+            _, shift_x = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False). \
+                PVD(axis=axis, full_width=full_width)
             PV = fits.open(self.path + 'PVD.fits')[0]
 
         clipped_cube, _, _, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
@@ -279,7 +285,7 @@ class CreateImages:
         res = clipped_cube.header['CDELT2']
         vres = clipped_cube.header['CDELT3'] / 1000.  # velocity resolution
         position = np.arange(0, PV.shape[1], 1)
-        offset = (position - clipped_cube.shape[2] / 2) * res * 3600
+        offset = (position - clipped_cube.shape[2] / 2 + shift_x) * res * 3600
 
         # Plot the PVD
         fig, ax = plt.subplots(figsize=(10, 7))
@@ -340,7 +346,7 @@ class CreateImages:
 
         # Make the plot pretty
         #ax.set_xlim(-1.5 * self.galaxy.size * res * 3600, 1.5 * self.galaxy.size * res * 3600)
-        ax.set_ylim(1.1 * -self.galaxy.vrange, 1.1 * self.galaxy.vrange)
+        ax.set_ylim(velocity[-1] - sysvel + 20, velocity[0] - sysvel - 20)
         ax.set_xlabel('Offset [arcsec]')
         ax_kpc.set_xlabel('Offset [kpc]')
         ax.set_ylabel(r'Relative velocity [km s$^{-1}$]')
@@ -348,7 +354,7 @@ class CreateImages:
         x1, x2 = ax.get_xlim()
         y1, y2 = ax.get_ylim()
         ax.errorbar(0.8 * x2, 0.7 * y2, xerr=clipped_cube.header['BMAJ'] * 3600 / 2., yerr=vres / 2., ecolor='k', capsize=2.5)
-        ax.annotate('PA = ' + str(-(self.galaxy.angle - 360 - 90)) + '$^o$', xy=(-0.4 * x2, -0.7 * y2), fontsize=20)
+        ax.annotate('PA = ' + str(-(self.galaxy.angle - 360 - 90)) + '$^o$', xy=(-0.4 * x2, -0.4 * y2), fontsize=20)
 
         plt.tight_layout()
 
@@ -394,7 +400,10 @@ class CreateImages:
         plt.tight_layout()
 
         if self.tosave:
-            plt.savefig(self.savepath + 'spectrum.pdf', bbox_inches='tight')
+            if x_axis == 'frequency':
+                plt.savefig(self.savepath + 'spectrum_frequency.pdf', bbox_inches='tight')
+            if x_axis == 'velocity':
+                plt.savefig(self.savepath + 'spectrum_velocity.pdf', bbox_inches='tight')
 
     def radial_profile(self, units='kpc', alpha_co=6.25, table_path=None, check_aperture=False, cumulative=True):
 
@@ -435,4 +444,13 @@ class CreateImages:
         plt.tight_layout()
 
         if self.tosave:
-            plt.savefig(self.savepath + 'radial_profile.pdf', bbox_inches='tight')
+            if units == 'kpc':
+                if cumulative:
+                    plt.savefig(self.savepath + 'radial_profile_kpc_cumulative.pdf', bbox_inches='tight')
+                else:
+                    plt.savefig(self.savepath + 'radial_profile_kpc.pdf', bbox_inches='tight')
+            if units == 'arcsec':
+                if cumulative:
+                    plt.savefig(self.savepath + 'radial_profile_arcsec_cumulative.pdf', bbox_inches='tight')
+                else:
+                    plt.savefig(self.savepath + 'radial_profile_arcsec.pdf', bbox_inches='tight')

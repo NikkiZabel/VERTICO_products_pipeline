@@ -4,13 +4,13 @@ def parameters(galaxy):
         centre_y = 26
         centre_x = 25
         size = 70
-        vrange = 150
-        vrange_2 = 50
+        vrange = 100
+        vrange_2 = 40
         cliplevel = 4
         stokes = False
-        start = 24
-        stop = 56
-        sysvel = None
+        start = 23
+        stop = 57
+        sysvel_offset = -20
         angle = 176
         vel_centre_pvd = 25
         distance = 16.5
@@ -36,8 +36,8 @@ def parameters(galaxy):
         stokes = False
         start = 15
         stop = 66
-        sysvel = None
-        angle = 110
+        sysvel_offset = 70
+        angle = 110 + 180
         vel_centre_pvd = 19
         distance = 16.5
         nchan_low = 2
@@ -62,8 +62,8 @@ def parameters(galaxy):
         stokes = False
         start = 22
         stop = 61
-        sysvel = None
-        angle = 335
+        sysvel_offset = 50
+        angle = 335 - 180
         vel_centre_pvd = 14
         distance = 16.5
         nchan_low = 2
@@ -80,6 +80,6 @@ def parameters(galaxy):
 
     name = galaxy
 
-    return name, centre_x, centre_y, size, vrange, vrange_2, cliplevel, stokes, start, stop, sysvel, angle, \
+    return name, centre_x, centre_y, size, vrange, vrange_2, cliplevel, stokes, start, stop, sysvel_offset, angle, \
            vel_centre_pvd, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \
            prune_by_fracbeam, expand_by_fracbeam, expand_by_npix, expand_by_nchan, inclination, eccentricity

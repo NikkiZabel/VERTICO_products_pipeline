@@ -162,8 +162,7 @@ class MomentMaps:
         inner_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, savepath=self.savepath,
                               tosave=self.tosave).innersquare(mom1)
 
-        if not self.galaxy.sysvel:
-            sysvel = np.nanmean(inner_cube)
+        sysvel = np.nanmean(inner_cube) + self.galaxy.sysvel_offset
         mom1 -= sysvel
 
         mom0_hdu = fits.PrimaryHDU(mom0, self.new_header(cube.header))
@@ -186,15 +185,18 @@ class MomentMaps:
 
         if self.tosave:
             cube.writeto(self.savepath + 'clipped_cube.fits', overwrite=True)
-            mom0_hdu.writeto(self.savepath + 'moment0.fits', overwrite=True)
+            if units == 'M_Sun/pc^2':
+                mom0_hdu.writeto(self.savepath + 'moment0_M_Sun.fits', overwrite=True)
+            if units == 'K km/s':
+                mom0_hdu.writeto(self.savepath + 'moment0_K.fits', overwrite=True)
             mom1_hdu.writeto(self.savepath + 'moment1.fits', overwrite=True)
             mom2_hdu.writeto(self.savepath + 'moment2.fits', overwrite=True)
 
         return cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel
 
-    def PVD(self, axis='major', find_velcentre=False, full_width=False):
+    def PVD(self, axis='major', full_width=False):
 
-        clipped_cube, _, _, _, _ = self.calc_moms()
+        clipped_cube, _, _, _, sysvel = self.calc_moms()
 
         res = clipped_cube.header['CDELT2']  # degrees per pixel
         beampix = clipped_cube.header['BMAJ'] / res  # beam size in pixels
@@ -243,12 +245,6 @@ class MomentMaps:
         # There is a lot of garbage because of the interpolation used by the rotation function, define a lower limit to get rid of that
         PV[PV < 0.001] = 0
 
-        # Show the PVD to determine where the velocity centre is by eye
-        if find_velcentre:
-            from matplotlib import pyplot as plt
-            plt.imshow(PV)
-            return
-
         # Create an appropriate header
         pvd_header = fits.Header()
         pvd_header['SIMPLE'] = clipped_cube.header['SIMPLE']
@@ -273,16 +269,17 @@ class MomentMaps:
         pvd_header['PC2_1'] = clipped_cube.header['PC2_1']
         pvd_header['PC1_2'] = clipped_cube.header['PC1_2']
         pvd_header['PC2_2'] = clipped_cube.header['PC2_2']
-        pvd_header['CTYPE1'] = '?????'
-        pvd_header['CRVAL1'] = clipped_cube.header['CRVAL1']
+        pvd_header['CTYPE1'] = 'OFFSET'
+        pvd_header['CRVAL1'] = 0
         pvd_header['CDELT1'] = clipped_cube.header['CDELT1'] / (cube_rot.shape[2] / pvdcube.shape[2])
-        pvd_header['CRPIX'] = clipped_cube.header['CRPIX']
-        pvd_header['CUNIT1'] = '?????'
+        pvd_header['CRPIX1'] = np.ceil(PV.shape[1] / 2)
+        pvd_header['CUNIT1'] = clipped_cube.header['CUNIT1']
         pvd_header['CTYPE2'] = 'VRAD'
-        pvd_header['CRVAL2'] = clipped_cube.header['CRVAL2']
-        pvd_header['CDELT2'] = clipped_cube.header['CDELT2']
-        pvd_header['CRPIX2'] = clipped_cube.header['CRPIX2']
+        pvd_header['CRVAL2'] = clipped_cube.header['CRVAL3']
+        pvd_header['CDELT2'] = clipped_cube.header['CDELT3']
+        pvd_header['CRPIX2'] = clipped_cube.header['CRPIX3']
         pvd_header['CUNIT2'] = 'km/s'
+        pvd_header['SYSVEL'] = sysvel + self.galaxy.sysvel_offset
         pvd_header['RESTFRQ'] = clipped_cube.header['RESTFRQ']
         pvd_header.comments['RESTFRQ'] = clipped_cube.header.comments['RESTFRQ']
         pvd_header['SPECSYS'] = clipped_cube.header['SPECSYS']
@@ -306,7 +303,7 @@ class MomentMaps:
         if self.tosave:
             pvd_hdu.writeto(self.savepath + 'PVD.fits', overwrite=True)
 
-        return pvd_hdu
+        return pvd_hdu, shift_x
 
     def spectrum(self):
         """
@@ -317,6 +314,9 @@ class MomentMaps:
 
         cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
                         tosave=self.tosave).readfits()
+
+        #clipped_cube, _, _, _, sysvel = self.calc_moms()
+        #cube_pbcorr = clipped_cube
 
         # Calculate the beam size, so we can divide by this to get rid of the beam^-1 in the units.
         #psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
@@ -354,7 +354,10 @@ class MomentMaps:
         #rms = np.std(np.sum(noise, axis=(1, 2)))
         #np.savetxt(path + 'specnoise.txt', [rms / beamsize])
 
-        print(np.log10(np.trapz(spectrum) * 2.0e20 * 0.7 * (16.5 * 3.086e24) ** 2 * 2 * 8.4144035e-58))
+        #psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
+        #beamsize = np.sum(psf)
+        #spectrum /= beamsize
+        #print(np.log10(3.93e-17 * 16.5 ** 2. * 2e20 / 0.7 * np.trapz(np.flip(spectrum), np.flip(spectrum_velocities)) / cube_pbcorr.header['JTOK']))
 
         return spectrum, spectrum_velocities, spectrum_frequencies # / beamsize
 
@@ -421,5 +424,7 @@ class MomentMaps:
             np.savetxt(self.savepath + 'radial_profile_cumulative.txt', rad_prof_cum)
             np.savetxt(self.savepath + 'radii_arcsec.txt', radii_deg * 3600)
             np.savetxt(self.savepath + 'radii_kpc.txt', radii_kpc)
+
+        #print(np.log10(np.amax(rad_prof_cum)))
 
         return rad_prof, rad_prof_cum, radii_deg * 3600, radii_kpc
