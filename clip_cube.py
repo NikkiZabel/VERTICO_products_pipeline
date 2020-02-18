@@ -319,10 +319,12 @@ class ClipCube:
 
         if self.sun:
             mask = self.sun_method(emiscube_uncorr, noisecube_pbcorr)
+            mask_hdu = fits.PrimaryHDU(mask.astype(int), cube_pbcorr.header)
+            mask_hdu.writeto(self.savepath + 'mask_sun.fits', overwrite=True)
         else:
             mask = self.smooth_mask(cube_uncorr_copy)
             mask_hdu = fits.PrimaryHDU(mask.astype(int), cube_pbcorr.header)
-            mask_hdu.writeto(self.savepath + 'mask.fits', overwrite=True)
+            mask_hdu.writeto(self.savepath + 'mask_smooth.fits', overwrite=True)
 
 
         emiscube_pbcorr.data *= mask

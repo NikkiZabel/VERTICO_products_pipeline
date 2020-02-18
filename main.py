@@ -25,8 +25,8 @@ tosave = True
 #clipped_cube, mom0, mom1, mom2 = moment_maps(galaxy, path, dv=10, pbcor=pbcor, cliplevel=cliplevel, stokes=stokes, sun=True, tosave=True).calc_moms(units='M_Sun/pc^2', alpha_co=6.25)
 
 # Call th#ese to create images of the moment maps
-#CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-#              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_zero(units='K km/s')
+CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_zero(units='K km/s')
 #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
 #             make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2()
 #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
