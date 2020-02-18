@@ -2,7 +2,7 @@ from image_moments import CreateImages
 from create_moments import *
 import warnings; warnings.filterwarnings("ignore")
 
-galaxy = 'NGC4713'; galtemp = 'ngc4713'
+galaxy = 'NGC4189'; galtemp = 'ngc4189'
 path = '/home/nikki/Documents/Data/VERTICO/' + galtemp + '/'
 
 file_pbcorr = path + galtemp + '_7m+tp_co21_pbcorr_round_k.fits'
@@ -26,17 +26,17 @@ tosave = True
 
 # Call th#ese to create images of the moment maps
 #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-#              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_zero(units='K km/s')
+#              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_zero()
 #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
 #             make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2()
 #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
 #              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2(moment=2)
+#CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+#              make_cutout=make_cutout, sun=sun, tosave=tosave).\
+#    PVD(axis='major', full_width=False)
 CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-              make_cutout=make_cutout, sun=sun, tosave=tosave).\
-    PVD(axis='major', full_width=False)
-#CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-#              make_cutout=make_cutout, sun=sun, tosave=tosave).spectrum(x_axis='velocity')
-#CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-#            make_cutout=make_cutout, sun=sun, tosave=tosave).radial_profile(units='arcsec',
-#                                    alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
-#                                                                        check_aperture=False, cumulative=True)
+              make_cutout=make_cutout, sun=sun, tosave=tosave).spectrum(x_axis='velocity')
+CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+            make_cutout=make_cutout, sun=sun, tosave=tosave).radial_profile(units='arcsec',
+                                    alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
+                                                                        check_aperture=False, cumulative=True)

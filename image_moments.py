@@ -20,7 +20,7 @@ class CreateImages:
         self.path_uncorr = path_uncorr
         self.refresh = refresh
         self.overwrite = overwrite
-        self.savepath = savepath
+        self.savepath = savepath + self.galaxy.name + '_' or './' + self.galaxy.name + '_'
         self.make_cutout = make_cutout
         self.sun = sun
         self.tosave = tosave
@@ -285,7 +285,7 @@ class CreateImages:
         res = clipped_cube.header['CDELT2']
         vres = clipped_cube.header['CDELT3'] / 1000.  # velocity resolution
         position = np.arange(0, PV.shape[1], 1)
-        offset = (position - len(position) / 2 + shift_x) * res * 3600
+        offset = (position - len(position) / 2 + shift_x) * res * 3600 + 13
 
         # Plot the PVD
         fig, ax = plt.subplots(figsize=(10, 7))
@@ -372,9 +372,10 @@ class CreateImages:
                                                     sun=self.sun, savepath=self.savepath, tosave=False).spectrum()
 
         else:
-            spectrum = np.loadtxt(self.path + 'spectrum.txt')
-            velocity = np.loadtxt(self.path + 'spectrum_velocities.txt')
-            frequency = np.loadtxt(self.path + 'spectrum_frequencies.txt')
+            temp = np.loadtxt(self.savepath + 'spectrum.csv', delimiter=',')
+            spectrum = temp[:, 0]
+            velocity = temp[:, 1]
+            frequency = temp[:, 2]
 
         fig, ax = plt.subplots(figsize=(7, 7))
 
@@ -395,7 +396,7 @@ class CreateImages:
         zeroline = np.zeros(len(x))
         plt.plot(x, zeroline, linestyle=':', c='r', linewidth=1)
 
-        ax.set_ylabel('Flux density [K]')
+        ax.set_ylabel('Brightness temperature [K]')
 
         plt.tight_layout()
 
@@ -418,28 +419,53 @@ class CreateImages:
                     radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture)
 
         else:
-            rad_prof = np.loadtxt(self.path + 'radial_profile.txt')
-            rad_prof_cum = np.loadtxt(self.path + 'radial_profile_cumulative.txt')
-            radii_arcsec = np.loadtxt(self.path + 'radii_arcsec.txt')
-            radii_kpc = np.loadtxt(self.path + 'radii_kpc.txt')
+            temp = np.loadtxt(self.savepath + 'radial_profile.csv', delimiter=',')
+            rad_prof = temp[:, 0]
+            rad_prof_cum = temp[:, 1]
+            radii_arcsec = temp[:, 2]
+            radii_kpc = temp[:, 3]
 
         if cumulative:
             rad_prof_plot = rad_prof_cum
         else:
             rad_prof_plot = rad_prof
 
+        cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                            savepath=self.savepath,
+                                            tosave=self.tosave).readfits()
+
+        # Estimate the rms from the spatial inner part of the cube
+        emiscube, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                            savepath=self.savepath,
+                                            tosave=self.tosave).split_cube(cube_pbcorr)
+        inner = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                            savepath=self.savepath,
+                                            tosave=self.tosave).innersquare(noisecube.data)
+        rms = np.nanstd(inner)
+        rms *= abs(cube_pbcorr.header['CDELT3']) / 1000
+        rms /= cube_pbcorr.header['JTOK'] * 91.9 * alpha_co * (cube_pbcorr.header['BMAJ'] * 3600 * cube_pbcorr.header[
+                'BMIN'] * 3600) ** (-1)
+        rms *= 0.434
+
         plt.figure(figsize=(10, 7))
 
         if units == 'kpc':
-            plt.plot(radii_kpc, rad_prof_plot, c='k', linewidth=3)
+            plt.errorbar(radii_kpc, np.log10(rad_prof_plot), c='k', linestyle='None', marker='o')
             plt.xlabel('Radius [kpc]')
         elif units == 'arcsec':
-            plt.plot(radii_arcsec, rad_prof_plot, c='k', linewidth=3)
+            plt.errorbar(radii_arcsec, np.log10(rad_prof_plot), c='k', linestyle='None', marker='o')
             plt.xlabel(r'Radius [$^{\prime\prime}$]')
         else:
             raise AttributeError('Please choose between "kpc" and "arcsec" for the keyword "units".')
 
-        plt.ylabel(r'M$_{H_2}$ [$M_\odot$]')
+        #axes = plt.gca()
+        #x1, x2 = axes.get_xlim()
+        #y1, y2 = axes.get_ylim()
+        #plt.errorbar(0.8 * x2, 0.9 * y2, xerr=cube_pbcorr.header['BMAJ'] * 3600 / 2, yerr=rms / 2, ecolor='k',
+        #            capsize=2.5)
+
+        plt.ylabel(r'log(M$_{H_2}$ [$M_\odot$])')
+        plt.xlim(-0.01)
 
         plt.tight_layout()
 

@@ -78,6 +78,32 @@ def parameters(galaxy):
         inclination = None
         eccentricity = 1
 
+    elif galaxy == 'NGC4299':
+        centre_y = 32
+        centre_x = 20
+        size = 60
+        vrange = 200
+        vrange_2 = 50
+        cliplevel = 1
+        stokes = False
+        start = 22
+        stop = 61
+        sysvel_offset = 50
+        angle = 335 - 180
+        vel_centre_pvd = 14
+        distance = 16.5
+        nchan_low = 2
+        cliplevel_low = 2
+        nchan_high = 3
+        cliplevel_high = 3.5
+        prune_by_npix = None
+        prune_by_fracbeam = 1
+        expand_by_fracbeam = None
+        expand_by_npix = None
+        expand_by_nchan = 2
+        inclination = None
+        eccentricity = 1
+
     name = galaxy
 
     return name, centre_x, centre_y, size, vrange, vrange_2, cliplevel, stokes, start, stop, sysvel_offset, angle, \

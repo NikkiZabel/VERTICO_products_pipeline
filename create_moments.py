@@ -13,7 +13,7 @@ class MomentMaps:
         self.galaxy = galaxies(galname)
         self.path_pbcorr = path_pbcorr
         self.path_uncorr = path_uncorr
-        self.savepath = savepath or './'
+        self.savepath = savepath + self.galaxy.name + '_' or './' + self.galaxy.name + '_'
         self.sun = sun
         self.tosave = tosave
 
@@ -149,7 +149,8 @@ class MomentMaps:
 
         mom0 = np.sum((cube.data * abs(cube.header['CDELT3']) / 1000), axis=0)
         if units == 'M_Sun/pc^2':
-            mom0 *= alpha_co
+            mom0 = mom0 / cube.header['JTOK'] * 91.9 * alpha_co * (cube.header['BMAJ'] * 3600 * cube.header[
+                'BMIN'] * 3600) ** (-1)
         elif units == 'K km/s':
             pass
         else:
@@ -171,7 +172,7 @@ class MomentMaps:
 
         # Change or add any (additional) keywords to the headers
         if units == 'M_Sun/pc^2': mom0_hdu.header['BTYPE'] = 'Column density'
-        else: mom0_hdu.header['BTYPE'] = 'Surface brightness'
+        else: mom0_hdu.header['BTYPE'] = 'Integrated intensity'
         mom1_hdu.header['BTYPE'] = 'Velocity'
         mom2_hdu.header['BTYPE'] = 'Linewidth'
         mom0_hdu.header['BUNIT'] = units; mom0_hdu.header.comments['BUNIT'] = ''
@@ -265,10 +266,6 @@ class MomentMaps:
         pvd_header['RADESYS'] = 'FK5'
         pvd_header['LONPOLE'] = clipped_cube.header['LONPOLE']
         pvd_header['LATPOLE'] = clipped_cube.header['LATPOLE']
-        pvd_header['PC1_1'] = clipped_cube.header['PC1_1']
-        pvd_header['PC2_1'] = clipped_cube.header['PC2_1']
-        pvd_header['PC1_2'] = clipped_cube.header['PC1_2']
-        pvd_header['PC2_2'] = clipped_cube.header['PC2_2']
         pvd_header['CTYPE1'] = 'OFFSET'
         pvd_header['CRVAL1'] = 0
         pvd_header['CDELT1'] = clipped_cube.header['CDELT1'] / (cube_rot.shape[2] / pvdcube.shape[2])
@@ -279,6 +276,10 @@ class MomentMaps:
         pvd_header['CDELT2'] = clipped_cube.header['CDELT3']
         pvd_header['CRPIX2'] = clipped_cube.header['CRPIX3']
         pvd_header['CUNIT2'] = 'km/s'
+        pvd_header['PC1_1'] = pvd_header['CDELT1']
+        pvd_header['PC2_1'] = clipped_cube.header['PC2_1']
+        pvd_header['PC1_2'] = clipped_cube.header['PC1_2']
+        pvd_header['PC2_2'] = pvd_header['CDELT2']
         pvd_header['SYSVEL'] = sysvel + self.galaxy.sysvel_offset
         pvd_header['RESTFRQ'] = clipped_cube.header['RESTFRQ']
         pvd_header.comments['RESTFRQ'] = clipped_cube.header.comments['RESTFRQ']
@@ -345,19 +346,19 @@ class MomentMaps:
         spectrum_frequencies = cube_pbcorr.header['RESTFRQ'] * (1 - spectrum_velocities / 299792.458) / 1e9
 
         if self.tosave:
-            np.savetxt(self.savepath + 'spectrum.txt', spectrum)
-            np.savetxt(self.savepath + 'spectrum_velocities.txt', spectrum_velocities)
-            np.savetxt(self.savepath + 'spectrum_frequencies.txt', spectrum_frequencies)
+            np.savetxt(self.savepath + 'spectrum.csv',
+                       np.column_stack((spectrum, spectrum_velocities, spectrum_frequencies)), delimiter=',',
+                       header='Spectrum (K), Velocity (km/s), Frequency (GHz)')
 
         # Estimate the rms in the spectrum
         #emis, noise = self.splitCube(cutout, self.galaxy.start, self.galaxy.stop)
         #rms = np.std(np.sum(noise, axis=(1, 2)))
         #np.savetxt(path + 'specnoise.txt', [rms / beamsize])
 
-        #psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
-        #beamsize = np.sum(psf)
-        #spectrum /= beamsize
-        #print(np.log10(3.93e-17 * 16.5 ** 2. * 2e20 / 0.7 * np.trapz(np.flip(spectrum), np.flip(spectrum_velocities)) / cube_pbcorr.header['JTOK']))
+        psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
+        beamsize = np.sum(psf)
+        spectrum /= beamsize
+        print(np.log10(3.93e-17 * 16.5 ** 2. * 2e20 / 0.7 * np.trapz(np.flip(spectrum), np.flip(spectrum_velocities)) / cube_pbcorr.header['JTOK']))
 
         return spectrum, spectrum_velocities, spectrum_frequencies # / beamsize
 
@@ -392,7 +393,7 @@ class MomentMaps:
             plt.figure()
             plt.imshow(mom0_hdu.data)
 
-        while emission > 1e-5:
+        while emission > 1:
             b_in += beam_pix
             b_out += beam_pix
             if emission == 2112:
@@ -412,6 +413,12 @@ class MomentMaps:
 
             emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0] * \
                        (np.deg2rad(mom0_hdu.header['CDELT2']) * self.galaxy.distance * 1e6) ** 2
+
+            #psf = self.makebeam(mom0_hdu.shape[0], mom0_hdu.shape[1], mom0_hdu.header)
+            #beamsize = np.sum(psf)
+            #emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0] * 3.93e-17 * 16.5 ** 2. * 2e20 \
+            #/ 0.7 / mom0_hdu.header['JTOK'] / beamsize
+
             rad_prof.append(emission)
 
         rad_prof = np.insert(rad_prof, 0, 0)
@@ -420,10 +427,9 @@ class MomentMaps:
         radii_kpc = np.deg2rad(radii_deg) * self.galaxy.distance * 1000
 
         if self.tosave:
-            np.savetxt(self.savepath + 'radial_profile.txt', rad_prof)
-            np.savetxt(self.savepath + 'radial_profile_cumulative.txt', rad_prof_cum)
-            np.savetxt(self.savepath + 'radii_arcsec.txt', radii_deg * 3600)
-            np.savetxt(self.savepath + 'radii_kpc.txt', radii_kpc)
+            np.savetxt(self.savepath + 'radial_profile.csv',
+                       np.column_stack((rad_prof, rad_prof_cum, radii_deg * 3600, radii_kpc)), delimiter=',',
+                       header='M_H_2 (M_Sun), M_H_2 (M_Sun, cumulative), Radii (arcsec), Radii (kpc)')
 
         #print(np.log10(np.amax(rad_prof_cum)))
 
