@@ -406,77 +406,42 @@ class CreateImages:
             if x_axis == 'velocity':
                 plt.savefig(self.savepath + 'spectrum_velocity.pdf', bbox_inches='tight')
 
-    def radial_profile(self, units='kpc', alpha_co=6.25, table_path=None, check_aperture=False, cumulative=True):
+    def radial_profile(self, units='kpc', alpha_co=6.25, table_path=None, check_aperture=False):
 
         if self.refresh:
             if self.overwrite:
-                rad_prof, rad_prof_cum, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr,
+                rad_prof, radii_arcsec, radii_kpc, error = MomentMaps(self.galaxy.name, self.path_pbcorr,
                         self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=True).\
                     radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture)
             else:
-                rad_prof, rad_prof_cum, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr,
+                rad_prof, radii_arcsec, radii_kpc, error = MomentMaps(self.galaxy.name, self.path_pbcorr,
                         self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=False).\
                     radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture)
 
         else:
             temp = np.loadtxt(self.savepath + 'radial_profile.csv', delimiter=',')
             rad_prof = temp[:, 0]
-            rad_prof_cum = temp[:, 1]
-            radii_arcsec = temp[:, 2]
-            radii_kpc = temp[:, 3]
-
-        if cumulative:
-            rad_prof_plot = rad_prof_cum
-        else:
-            rad_prof_plot = rad_prof
-
-        cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                            savepath=self.savepath,
-                                            tosave=self.tosave).readfits()
-
-        # Estimate the rms from the spatial inner part of the cube
-        emiscube, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                            savepath=self.savepath,
-                                            tosave=self.tosave).split_cube(cube_pbcorr)
-        inner = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                            savepath=self.savepath,
-                                            tosave=self.tosave).innersquare(noisecube.data)
-        rms = np.nanstd(inner)
-        rms *= abs(cube_pbcorr.header['CDELT3']) / 1000
-        rms /= cube_pbcorr.header['JTOK'] * 91.9 * alpha_co * (cube_pbcorr.header['BMAJ'] * 3600 * cube_pbcorr.header[
-                'BMIN'] * 3600) ** (-1)
-        rms *= 0.434
+            radii_arcsec = temp[:, 1]
+            radii_kpc = temp[:, 2]
 
         plt.figure(figsize=(10, 7))
 
         if units == 'kpc':
-            plt.errorbar(radii_kpc, np.log10(rad_prof_plot), c='k', linestyle='None', marker='o')
+            plt.errorbar(radii_kpc, np.log10(rad_prof), yerr=error/rad_prof * 0.434, c='k', linestyle='None', marker='o')
             plt.xlabel('Radius [kpc]')
         elif units == 'arcsec':
-            plt.errorbar(radii_arcsec, np.log10(rad_prof_plot), c='k', linestyle='None', marker='o')
+            plt.errorbar(radii_arcsec, np.log10(rad_prof), yerr=error/rad_prof * 0.434, c='k', linestyle='None', marker='o')
             plt.xlabel(r'Radius [$^{\prime\prime}$]')
         else:
             raise AttributeError('Please choose between "kpc" and "arcsec" for the keyword "units".')
 
-        #axes = plt.gca()
-        #x1, x2 = axes.get_xlim()
-        #y1, y2 = axes.get_ylim()
-        #plt.errorbar(0.8 * x2, 0.9 * y2, xerr=cube_pbcorr.header['BMAJ'] * 3600 / 2, yerr=rms / 2, ecolor='k',
-        #            capsize=2.5)
-
-        plt.ylabel(r'log(M$_{H_2}$ [$M_\odot$])')
+        plt.ylabel(r'log(Surface density [$M_\odot$ pc$^{-2}$])')
         plt.xlim(-0.01)
 
         plt.tight_layout()
 
         if self.tosave:
             if units == 'kpc':
-                if cumulative:
-                    plt.savefig(self.savepath + 'radial_profile_kpc_cumulative.pdf', bbox_inches='tight')
-                else:
-                    plt.savefig(self.savepath + 'radial_profile_kpc.pdf', bbox_inches='tight')
+                plt.savefig(self.savepath + 'radial_profile_kpc.pdf', bbox_inches='tight')
             if units == 'arcsec':
-                if cumulative:
-                    plt.savefig(self.savepath + 'radial_profile_arcsec_cumulative.pdf', bbox_inches='tight')
-                else:
-                    plt.savefig(self.savepath + 'radial_profile_arcsec.pdf', bbox_inches='tight')
+                plt.savefig(self.savepath + 'radial_profile_arcsec.pdf', bbox_inches='tight')

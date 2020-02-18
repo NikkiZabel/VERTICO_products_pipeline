@@ -26,7 +26,7 @@ tosave = True
 
 # Call th#ese to create images of the moment maps
 #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-#              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_zero()
+#              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_zero(units='K km/s')
 #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
 #             make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2()
 #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
@@ -34,9 +34,9 @@ tosave = True
 #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
 #              make_cutout=make_cutout, sun=sun, tosave=tosave).\
 #    PVD(axis='major', full_width=False)
-CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-              make_cutout=make_cutout, sun=sun, tosave=tosave).spectrum(x_axis='velocity')
-CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-            make_cutout=make_cutout, sun=sun, tosave=tosave).radial_profile(units='arcsec',
-                                    alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
-                                                                        check_aperture=False, cumulative=True)
+#CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+#              make_cutout=make_cutout, sun=sun, tosave=tosave).spectrum(x_axis='frequency')
+#CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
+#            make_cutout=make_cutout, sun=sun, tosave=tosave).radial_profile(units='arcsec',
+#                                    alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
+#                                                                        check_aperture=False)

@@ -13,7 +13,7 @@ class MomentMaps:
         self.galaxy = galaxies(galname)
         self.path_pbcorr = path_pbcorr
         self.path_uncorr = path_uncorr
-        self.savepath = savepath + self.galaxy.name + '_' or './' + self.galaxy.name + '_'
+        self.savepath = savepath or './'
         self.sun = sun
         self.tosave = tosave
 
@@ -367,6 +367,21 @@ class MomentMaps:
         _, mom0_hdu, _, _, _ = self.calc_moms(units='M_Sun/pc^2', alpha_co=alpha_co)
         beam_pix = mom0_hdu.header['BMAJ'] / mom0_hdu.header['CDELT2']
 
+        # Estimate the rms from the spatial inner part of the cube
+        cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                            savepath=self.savepath,
+                                            tosave=self.tosave).readfits()
+        emiscube, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                            savepath=self.savepath,
+                                            tosave=self.tosave).split_cube(cube_pbcorr)
+        inner = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                            savepath=self.savepath,
+                                            tosave=self.tosave).innersquare(noisecube.data)
+        rms = np.nanstd(inner)
+        rms = rms / cube_pbcorr.header['JTOK']
+        rms = rms * abs(cube_pbcorr.header['CDELT3']) / 1000 * 91.9 * alpha_co * (cube_pbcorr.header['BMAJ'] * 3600 *
+                cube_pbcorr.header['BMIN'] * 3600) ** (-1)
+
         if self.galaxy.eccentricity:
             e = self.galaxy.eccentricity
         elif self.galaxy.inclination:
@@ -386,14 +401,16 @@ class MomentMaps:
         theta = self.galaxy.angle - 180
 
         rad_prof = []
+        area = []
         emission = 2112
+        area_temp = 1
 
         if check_aperture:
             from matplotlib import pyplot as plt
             plt.figure()
             plt.imshow(mom0_hdu.data)
 
-        while emission > 1:
+        while emission / area_temp > 1:
             b_in += beam_pix
             b_out += beam_pix
             if emission == 2112:
@@ -411,26 +428,31 @@ class MomentMaps:
             if check_aperture:
                 aperture.plot(color='red')
 
-            emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0] * \
-                       (np.deg2rad(mom0_hdu.header['CDELT2']) * self.galaxy.distance * 1e6) ** 2
+            emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0] #* \
+                      # (np.deg2rad(mom0_hdu.header['CDELT2']) * self.galaxy.distance * 1e6) ** 2
 
             #psf = self.makebeam(mom0_hdu.shape[0], mom0_hdu.shape[1], mom0_hdu.header)
             #beamsize = np.sum(psf)
             #emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0] * 3.93e-17 * 16.5 ** 2. * 2e20 \
             #/ 0.7 / mom0_hdu.header['JTOK'] / beamsize
 
-            rad_prof.append(emission)
+            area_temp = aperture.area
+            area.append(area_temp)
+            rad_prof.append(emission / area_temp)
 
-        rad_prof = np.insert(rad_prof, 0, 0)
-        rad_prof_cum = np.cumsum(rad_prof)
+        rad_prof = rad_prof[:-1]
+        area = area[:-1]
         radii_deg = (np.arange(len(rad_prof)) + 1) * mom0_hdu.header['CDELT2']
         radii_kpc = np.deg2rad(radii_deg) * self.galaxy.distance * 1000
 
+        beam_area_pc = np.pi * np.deg2rad(mom0_hdu.header['BMAJ']) * np.deg2rad(mom0_hdu.header['BMIN']) * \
+                       (self.galaxy.distance * 1e6) ** 2
+
         if self.tosave:
             np.savetxt(self.savepath + 'radial_profile.csv',
-                       np.column_stack((rad_prof, rad_prof_cum, radii_deg * 3600, radii_kpc)), delimiter=',',
-                       header='M_H_2 (M_Sun), M_H_2 (M_Sun, cumulative), Radii (arcsec), Radii (kpc)')
+                       np.column_stack((rad_prof, np.ones(len(rad_prof)) * rms, radii_deg * 3600, radii_kpc)), delimiter=',',
+                       header='Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)')
 
         #print(np.log10(np.amax(rad_prof_cum)))
 
-        return rad_prof, rad_prof_cum, radii_deg * 3600, radii_kpc
+        return rad_prof, radii_deg * 3600, radii_kpc, rms
