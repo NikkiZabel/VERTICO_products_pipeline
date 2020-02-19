@@ -109,9 +109,9 @@ class CreateImages:
         cbar = f.colorbar(colors, ticks=ticks)
         #cbar.set_label(r'Surface brightness [Jy beam$^{-1}$ km s$^{-1}$]')
         if units == 'K km/s':
-            cbar.set_label(r'Surface brightness [K km s$^{-1}$]')
+            cbar.set_label(r'Integrated intensity [K km s$^{-1}$]')
         elif units == 'M_Sun/pc^2':
-            cbar.set_label(r'Surface brightness [M$_\odot$ pc$^{-2}$]')
+            cbar.set_label(r'Surface density [M$_\odot$ pc$^{-2}$]')
         else:
             raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
 
