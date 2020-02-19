@@ -101,8 +101,10 @@ class CreateImages:
             ticks = np.arange(0, np.amax(image.data) + 5, 10)
         elif np.amax(image.data) < 200:
             ticks = np.arange(0, np.amax(image.data) + 10, 20)
-        else:
+        elif np.amax(image.data) < 1000:
             ticks = np.arange(0, np.amax(image.data) + 20, 40)
+        else:
+            ticks = np.arange(0, np.amax(image.data) + 100, 200)
 
         cbar = f.colorbar(colors, ticks=ticks)
         #cbar.set_label(r'Surface brightness [Jy beam$^{-1}$ km s$^{-1}$]')
@@ -203,7 +205,7 @@ class CreateImages:
             else:
                 ticks = np.arange(0, self.galaxy.vrange2 + 20, 20)
             cbar = f.colorbar(colors, ticks=ticks)
-            cbar.set_label(r'Line width [km s$^{-1}$]')
+            cbar.set_label(r'Linewidth [km s$^{-1}$]')
 
         else:
             fig.show_contour(image, cmap='sauron', levels=np.linspace(-self.galaxy.vrange, self.galaxy.vrange,
@@ -285,8 +287,7 @@ class CreateImages:
         res = clipped_cube.header['CDELT2']
         vres = clipped_cube.header['CDELT3'] / 1000.  # velocity resolution
         position = np.arange(0, PV.shape[1], 1)
-        offset = (position - len(position) / 2 + shift_x) * res * 3600 + 13
-
+        offset = (position - len(position) / 2 + shift_x) * res * 3600
         # Plot the PVD
         fig, ax = plt.subplots(figsize=(10, 7))
         ax_kpc = ax.twiny()  # add second x-axis at the top of the figure (position in kpc)
@@ -354,12 +355,15 @@ class CreateImages:
         x1, x2 = ax.get_xlim()
         y1, y2 = ax.get_ylim()
         ax.errorbar(0.8 * x2, 0.7 * y2, xerr=clipped_cube.header['BMAJ'] * 3600 / 2., yerr=vres / 2., ecolor='k', capsize=2.5)
-        ax.annotate('PA = ' + str(-(self.galaxy.angle - 360 - 90)) + '$^o$', xy=(-0.8 * x2, -0.7 * y2), fontsize=20)
+        ax.annotate('PA = ' + str((self.galaxy.angle)) + '$^o$', xy=(-0.8 * x2, -0.7 * y2), fontsize=20)
 
         plt.tight_layout()
 
         if self.tosave:
-            plt.savefig(self.savepath + 'PVD.pdf', bbox_inches='tight')
+            if axis == 'major':
+                plt.savefig(self.savepath + 'PVD_major.pdf', bbox_inches='tight')
+            if axis == 'minor':
+                plt.savefig(self.savepath + 'PVD_minor.pdf', bbox_inches='tight')
 
     def spectrum(self, x_axis='velocity'):
 

@@ -11,7 +11,7 @@ def parameters(galaxy):
         start = 23
         stop = 57
         sysvel_offset = -20
-        angle = 176
+        angle = 274
         vel_centre_pvd = 25
         distance = 16.5
         nchan_low = 2
@@ -37,7 +37,7 @@ def parameters(galaxy):
         start = 15
         stop = 66
         sysvel_offset = 70
-        angle = 110 + 180
+        angle = 20
         vel_centre_pvd = 19
         distance = 16.5
         nchan_low = 2
@@ -63,7 +63,7 @@ def parameters(galaxy):
         start = 22
         stop = 61
         sysvel_offset = 50
-        angle = 335 - 180
+        angle = 245
         vel_centre_pvd = 14
         distance = 16.5
         nchan_low = 2

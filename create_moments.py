@@ -207,9 +207,9 @@ class MomentMaps:
 
         # Rotate the cube along the spatial axes, so that the galaxy lies horizontal
         if axis == 'major':
-            rot_angle = self.galaxy.angle
+            rot_angle = self.galaxy.angle + 90 + 180
         elif axis == 'minor':
-            rot_angle = self.galaxy.angle + 90
+            rot_angle = self.galaxy.angle + 180
         else:
             raise AttributeError('Please choose between "major" and "minor" for the "axis" keyword')
 
@@ -302,7 +302,10 @@ class MomentMaps:
         pvd_hdu = fits.PrimaryHDU(PV, pvd_header)
 
         if self.tosave:
-            pvd_hdu.writeto(self.savepath + 'PVD.fits', overwrite=True)
+            if axis == 'major':
+                pvd_hdu.writeto(self.savepath + 'PVD_major.fits', overwrite=True)
+            if axis == 'minor':
+                pvd_hdu.writeto(self.savepath + 'PVD_minor.fits', overwrite=True)
 
         return pvd_hdu, shift_x
 
