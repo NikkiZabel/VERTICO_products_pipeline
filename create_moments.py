@@ -445,12 +445,15 @@ class MomentMaps:
         radii_deg = (np.arange(len(rad_prof)) + 1) * mom0_hdu.header['CDELT2']
         radii_kpc = np.deg2rad(radii_deg) * self.galaxy.distance * 1000
 
+        N_beams = np.array(area) / (beam_pix ** 2 * np.pi)
+        error = np.sqrt(N_beams) * rms
+
         beam_area_pc = np.pi * np.deg2rad(mom0_hdu.header['BMAJ']) * np.deg2rad(mom0_hdu.header['BMIN']) * \
                        (self.galaxy.distance * 1e6) ** 2
 
         if self.tosave:
             np.savetxt(self.savepath + 'radial_profile.csv',
-                       np.column_stack((rad_prof, np.ones(len(rad_prof)) * rms, radii_deg * 3600, radii_kpc)), delimiter=',',
+                       np.column_stack((rad_prof, np.ones(len(rad_prof)) * error, radii_deg * 3600, radii_kpc)), delimiter=',',
                        header='Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)')
 
         #print(np.log10(np.amax(rad_prof_cum)))
