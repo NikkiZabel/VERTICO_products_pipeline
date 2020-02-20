@@ -52,8 +52,7 @@ class ClipCube:
 
         return cube
 
-    @staticmethod
-    def innersquare(cube):
+    def innersquare(self, cube):
         """
         Get the central square (in spatial directions) of the spectral cube (useful for calculating the rms in a PB
         corrected spectral cube). Can be used for 2 and 3 dimensions, in the latter case the velocity axis is left
@@ -62,13 +61,16 @@ class ClipCube:
         :return: 2D or 3D array of the inner 1/8 of the cube in the spatial directions
         """
 
-        start = int(len(cube[1]) * (7 / 16))
-        stop = int(len(cube[1]) * (9 / 16))
+        start_x = int(self.galaxy.centre_x - 10)
+        stop_x = int(self.galaxy.centre_x + 10)
+
+        start_y = int(self.galaxy.centre_y - 10)
+        stop_y = int(self.galaxy.centre_y + 10)
 
         if len(cube.shape) == 3:
-            return cube[:, start:stop, start:stop]
+            return cube[:, start_x:stop_x, start_y:stop_y]
         elif len(cube.shape) == 2:
-            return cube[start:stop, start:stop]
+            return cube[start_x:stop_x, start_y:stop_y]
         else:
             raise AttributeError('Please provide a 2D or 3D array.')
 
@@ -135,7 +137,7 @@ class ClipCube:
         Mask structures in the spectral cube that are smaller than the desired size specified by "prune_by_npix" or
         "prune_by_fracbeam" in the galaxy parameters.
         :param cube (HDU file): the cube we are working on, to extract relevant information about the beam
-        :param mask (3D array): the mask we have created thus far using the SUn clipping method
+        :param mask (3D array): the mask we have created thus far using the Sun clipping method
         :return: updated mask with the small detections masked out
         """
 

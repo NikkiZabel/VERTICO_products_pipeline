@@ -157,7 +157,7 @@ class MomentMaps:
             raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
 
         mom1 = np.sum(cube.data * vel_narray, axis=0) / np.sum(cube.data, axis=0)
-        mom2 = np.sqrt(np.sum(abs(cube.data) * (vel_narray - mom1) ** 2., axis=0) / np.sum(abs(cube.data), axis=0))
+        mom2 = np.sqrt(np.sum(abs(cube.data) * (vel_narray - mom1) ** 2, axis=0) / np.sum(abs(cube.data), axis=0))
 
         # Calculate the systemic velocity from the spatial inner part of the cube (to avoid PB effects)
         inner_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, savepath=self.savepath,
@@ -434,11 +434,6 @@ class MomentMaps:
             emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0] #* \
                       # (np.deg2rad(mom0_hdu.header['CDELT2']) * self.galaxy.distance * 1e6) ** 2
 
-            #psf = self.makebeam(mom0_hdu.shape[0], mom0_hdu.shape[1], mom0_hdu.header)
-            #beamsize = np.sum(psf)
-            #emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0] * 3.93e-17 * 16.5 ** 2. * 2e20 \
-            #/ 0.7 / mom0_hdu.header['JTOK'] / beamsize
-
             area_temp = aperture.area
             area.append(area_temp)
             rad_prof.append(emission / area_temp)
@@ -450,9 +445,6 @@ class MomentMaps:
 
         N_beams = np.array(area) / (beam_pix ** 2 * np.pi)
         error = np.sqrt(N_beams) * rms
-
-        beam_area_pc = np.pi * np.deg2rad(mom0_hdu.header['BMAJ']) * np.deg2rad(mom0_hdu.header['BMIN']) * \
-                       (self.galaxy.distance * 1e6) ** 2
 
         if self.tosave:
             np.savetxt(self.savepath + 'radial_profile.csv',

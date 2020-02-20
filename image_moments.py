@@ -20,7 +20,7 @@ class CreateImages:
         self.path_uncorr = path_uncorr
         self.refresh = refresh
         self.overwrite = overwrite
-        self.savepath = savepath + self.galaxy.name + '_' or './' + self.galaxy.name + '_'
+        self.savepath = savepath + self.galaxy.name or './' + self.galaxy.name
         self.make_cutout = make_cutout
         self.sun = sun
         self.tosave = tosave
@@ -47,7 +47,8 @@ class CreateImages:
         else:
             image = fits.open(path + 'moment0.fits')[0]
 
-        f = plt.figure(figsize=(12, 7))
+        #f = plt.figure(figsize=self.galaxy.figsize)
+        f = plt.figure(figsize=(10, 10))
 
         if self.make_cutout:
             # make a smaller cutout of the CO emission
@@ -63,7 +64,7 @@ class CreateImages:
         fig.set_theme('publication')
 
         # add the galaxy name in the upper right corner
-        fig.add_label(0.88, 0.9, self.galaxy.name, relative=True)
+        #fig.add_label(0.8, 0.9, self.galaxy.name, relative=True, fontsize=20)
 
         fig.show_contour(image, cmap='magma_r', levels=np.linspace(np.amax(image.data)*1e-9, np.amax(image.data), 20),
                          filled=True, overlap=True)
@@ -106,31 +107,32 @@ class CreateImages:
         else:
             ticks = np.arange(0, np.amax(image.data) + 100, 200)
 
-        cbar = f.colorbar(colors, ticks=ticks)
-        #cbar.set_label(r'Surface brightness [Jy beam$^{-1}$ km s$^{-1}$]')
-        if units == 'K km/s':
-            cbar.set_label(r'Integrated intensity [K km s$^{-1}$]')
-        elif units == 'M_Sun/pc^2':
-            cbar.set_label(r'Surface density [M$_\odot$ pc$^{-2}$]')
-        else:
-            raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
+        #cbar = f.colorbar(colors, ticks=ticks)
+        #if units == 'K km/s':
+        #    cbar.set_label(r'Integrated intensity [K km s$^{-1}$]')
+        #elif units == 'M_Sun/pc^2':
+        #    cbar.set_label(r'Surface density [M$_\odot$ pc$^{-2}$]')
+        #else:
+        #    raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
 
         # show the beam of the observations
-        fig.add_beam(frame=False)  # automatically imports BMAJ, BMIN, and BPA
-        fig.beam.set_edgecolor('k')
-        fig.beam.set_color('k')
-        fig.beam.set_borderpad(1)
+        #fig.add_beam(frame=False)  # automatically imports BMAJ, BMIN, and BPA
+        #fig.beam.set_edgecolor('k')
+        #fig.beam.set_color('k')
+        #fig.beam.set_borderpad(1)
 
         # show a scalebar
-        length = np.degrees(1.e-3 / self.galaxy.distance)  # length of the scalebar in degrees, corresponding to 1 kpc
-        fig.add_scalebar(length=length, label='1 kpc', frame=False)
-        fig.scalebar.set_linewidth(5)
+        #length = np.degrees(1.e-3 / self.galaxy.distance)  # length of the scalebar in degrees, corresponding to 1 kpc
+        #fig.add_scalebar(length=length, label='1 kpc', frame=False)
+        #fig.scalebar.set_linewidth(5)
+
+        plt.axis('off')
 
         plt.tight_layout()
 
         if self.tosave:
             if units == 'K km/s':
-                plt.savefig(self.savepath + 'moment0_K.pdf', bbox_inches='tight')
+                plt.savefig(self.savepath + 'moment0_K.png', bbox_inches='tight')
             if units == 'M_Sun/pc^2':
                 plt.savefig(self.savepath + 'moment0_M_Sun.pdf', bbox_inches='tight')
         return
@@ -166,7 +168,7 @@ class CreateImages:
 
         sysvel = (sysvel + 5) // 10 * 10
 
-        f = plt.figure(figsize=(12, 7))
+        f = plt.figure(figsize=self.galaxy.figsize)
 
         if self.make_cutout:
             #make a smaller cutout of the CO emission
@@ -205,7 +207,7 @@ class CreateImages:
             else:
                 ticks = np.arange(0, self.galaxy.vrange2 + 20, 20)
             cbar = f.colorbar(colors, ticks=ticks)
-            cbar.set_label(r'Linewidth [km s$^{-1}$]')
+            cbar.set_label(r'Observed $\sigma_v$ [km s$^{-1}$]')
 
         else:
             fig.show_contour(image, cmap='sauron', levels=np.linspace(-self.galaxy.vrange, self.galaxy.vrange,
