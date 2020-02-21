@@ -379,6 +379,9 @@ class CreateImages:
             velocity = temp[:, 1]
             frequency = temp[:, 2]
 
+        clipped_cube, _, _, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                                               sun=self.sun, tosave=False).calc_moms()
+
         fig, ax = plt.subplots(figsize=(7, 7))
 
         if x_axis == 'velocity':
@@ -386,13 +389,21 @@ class CreateImages:
             x = np.arange(np.amin(velocity) - 100, np.amax(velocity) + 100, 1)
             ax.set_xlim(velocity[len(velocity) - 1] + 5, velocity[0] - 5)
             ax.set_xlabel(r'Velocity [km s$^{-1}$]')
+
+        elif x_axis == 'vel_offset':
+            v_off = velocity - sysvel + self.galaxy.sysvel_offset
+            ax.plot(v_off, spectrum, color='k', drawstyle='steps')
+            x = np.arange(np.amin(v_off) - 100, np.amax(v_off) + 100, 1)
+            ax.set_xlim(v_off[len(v_off) - 1] + 5, v_off[0] - 5)
+            ax.set_xlabel(r'Velocity offset [km s$^{-1}$]')
+
         elif x_axis == 'frequency':
             ax.plot(frequency, spectrum, color='k', drawstyle='steps')
             x = np.arange(np.amin(frequency) - 5, np.amax(frequency) + 5, 1)
             ax.set_xlim(frequency[len(frequency) - 1], frequency[0])
             ax.set_xlabel(r'Frequency [GHz]')
         else:
-            raise AttributeError('Please choose between "velocity" and "frequency" for "x-axis"')
+            raise AttributeError('Please choose between "velocity" , "vel_offset", and "frequency" for "x-axis"')
 
         # Line through zero
         zeroline = np.zeros(len(x))
@@ -407,6 +418,8 @@ class CreateImages:
                 plt.savefig(self.savepath + 'spectrum_frequency.pdf', bbox_inches='tight')
             if x_axis == 'velocity':
                 plt.savefig(self.savepath + 'spectrum_velocity.pdf', bbox_inches='tight')
+            if x_axis == 'vel_offset':
+                plt.savefig(self.savepath + 'spectrum_vel_offset.pdf', bbox_inches='tight')
 
     def radial_profile(self, units='kpc', alpha_co=6.25, table_path=None, check_aperture=False):
 
