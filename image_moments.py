@@ -367,17 +367,18 @@ class CreateImages:
 
         if self.refresh:
             if self.overwrite:
-                spectrum, velocity, frequency = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                spectrum, velocity, v_off, frequency = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                     sun=self.sun, savepath=self.savepath, tosave=True).spectrum()
             else:
-                spectrum, velocity, frequency = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                spectrum, velocity, v_off, frequency = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                     sun=self.sun, savepath=self.savepath, tosave=False).spectrum()
 
         else:
             temp = np.loadtxt(self.savepath + 'spectrum.csv', delimiter=',')
             spectrum = temp[:, 0]
             velocity = temp[:, 1]
-            frequency = temp[:, 2]
+            v_off = temp[:, 2]
+            frequency = temp[:, 3]
 
         clipped_cube, _, _, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                sun=self.sun, tosave=False).calc_moms()
@@ -391,7 +392,6 @@ class CreateImages:
             ax.set_xlabel(r'Velocity [km s$^{-1}$]')
 
         elif x_axis == 'vel_offset':
-            v_off = velocity - sysvel + self.galaxy.sysvel_offset
             ax.plot(v_off, spectrum, color='k', drawstyle='steps')
             x = np.arange(np.amin(v_off) - 100, np.amax(v_off) + 100, 1)
             ax.set_xlim(v_off[len(v_off) - 1] + 5, v_off[0] - 5)

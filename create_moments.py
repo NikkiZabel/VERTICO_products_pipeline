@@ -319,7 +319,7 @@ class MomentMaps:
         cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
                         tosave=self.tosave).readfits()
 
-        #clipped_cube, _, _, _, sysvel = self.calc_moms()
+        clipped_cube, _, _, _, sysvel = self.calc_moms()
         #cube_pbcorr = clipped_cube
 
         # Calculate the beam size, so we can divide by this to get rid of the beam^-1 in the units.
@@ -346,12 +346,13 @@ class MomentMaps:
 
         spectrum_velocities = vel_array_full[self.galaxy.start - 5:self.galaxy.stop + 5]
         spectrum = spectrum[self.galaxy.start - 5:self.galaxy.stop + 5]
+        spectrum_vel_offset = spectrum_velocities - sysvel + self.galaxy.sysvel_offset
         spectrum_frequencies = cube_pbcorr.header['RESTFRQ'] * (1 - spectrum_velocities / 299792.458) / 1e9
 
         if self.tosave:
             np.savetxt(self.savepath + 'spectrum.csv',
-                       np.column_stack((spectrum, spectrum_velocities, spectrum_frequencies)), delimiter=',',
-                       header='Spectrum (K), Velocity (km/s), Frequency (GHz)')
+                       np.column_stack((spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies)),
+                       delimiter=',', header='Spectrum (K), Velocity (km/s), Velocity offset (km/s)Frequency (GHz)')
 
         # Estimate the rms in the spectrum
         #emis, noise = self.splitCube(cutout, self.galaxy.start, self.galaxy.stop)
@@ -363,7 +364,7 @@ class MomentMaps:
         spectrum /= beamsize
         print(np.log10(3.93e-17 * 16.5 ** 2. * 2e20 / 0.7 * np.trapz(np.flip(spectrum), np.flip(spectrum_velocities)) / cube_pbcorr.header['JTOK']))
 
-        return spectrum, spectrum_velocities, spectrum_frequencies # / beamsize
+        return spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies # / beamsize
 
     def radial_profile(self, alpha_co=6.25, table_path=None, check_aperture=False):
 
@@ -401,10 +402,11 @@ class MomentMaps:
         centre = (self.galaxy.centre_y, self.galaxy.centre_x)
         b_in = -beam_pix + 0.000000000001
         b_out = 0
-        theta = self.galaxy.angle - 180
+        theta = self.galaxy.angle + 45
 
         rad_prof = []
         area = []
+        radius = []
         emission = 2112
         area_temp = 1
 
@@ -414,8 +416,10 @@ class MomentMaps:
             plt.imshow(mom0_hdu.data)
 
         while emission / area_temp > 1:
+
             b_in += beam_pix
             b_out += beam_pix
+
             if emission == 2112:
                 a_in = 0.0000000000001
             else:
@@ -437,10 +441,12 @@ class MomentMaps:
             area_temp = aperture.area
             area.append(area_temp)
             rad_prof.append(emission / area_temp)
+            radius.append(b_out)
 
         rad_prof = rad_prof[:-1]
         area = area[:-1]
-        radii_deg = (np.arange(len(rad_prof)) + 1) * mom0_hdu.header['CDELT2']
+        radius = np.array(radius[:-1])
+        radii_deg = radius * mom0_hdu.header['CDELT2']
         radii_kpc = np.deg2rad(radii_deg) * self.galaxy.distance * 1000
 
         N_beams = np.array(area) / (beam_pix ** 2 * np.pi)

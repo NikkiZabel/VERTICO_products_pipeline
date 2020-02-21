@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 # Set some parameters to apply to all images below
 refresh = True
 overwrite = True
-sun = False
+sun = True
 tosave = True
 
 galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
@@ -64,10 +64,10 @@ for i in range(len(galaxies)):
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
     #              sun=sun, tosave=tosave).\
     #    PVD(axis='minor', full_width=False)
+    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #              sun=sun, tosave=tosave).spectrum(x_axis='vel_offset')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave).spectrum(x_axis='vel_offset')
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-    #            sun=sun, tosave=tosave).radial_profile(units='arcsec',
-    #                                    alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
-    #                                                                        check_aperture=True)
+                sun=sun, tosave=tosave).radial_profile(units='arcsec',
+                                        alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
+                                                                            check_aperture=True)
 
