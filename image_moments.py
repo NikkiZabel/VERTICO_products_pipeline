@@ -9,6 +9,7 @@ from sauron_colormap import register_sauron_colormap; register_sauron_colormap()
 from targets import galaxies
 from create_moments import MomentMaps
 from clip_cube import ClipCube
+from matplotlib.colors import ListedColormap
 
 
 class CreateImages:
@@ -20,9 +21,25 @@ class CreateImages:
         self.path_uncorr = path_uncorr
         self.refresh = refresh
         self.overwrite = overwrite
-        self.savepath = savepath + self.galaxy.name or './' + self.galaxy.name
+        self.savepath = savepath or './'
         self.sun = sun
         self.tosave = tosave
+
+    @staticmethod
+    def custom_cmap(cmap=plt.cm.afmhot_r):
+        """
+        Cut off the dark colours in afmhot_r (or something else) to make sure the black lines in the PVD are visible on it.
+        :return:
+        """
+        cmap = cmap
+        # my_cmap = cmap(np.arange(cmap.N))
+
+        # Cut off the colors at purple so they don't go to black
+        my_cmap = cmap(np.arange(0, cmap.N - 50, 1))
+
+        my_cmap = ListedColormap(my_cmap)
+
+        return my_cmap
 
     def moment_zero(self, units='M_Sun/pc^2', path=''):
 
@@ -286,8 +303,16 @@ class CreateImages:
         vres = clipped_cube.header['CDELT3'] / 1000.  # velocity resolution
         position = np.arange(0, PV.shape[1], 1)
         offset = (position - len(position) / 2 + shift_x) * res * 3600
+
         # Plot the PVD
-        fig, ax = plt.subplots(figsize=(10, 7))
+        fig, ax = plt.subplots(figsize=(15, 8))
+
+        # Add mock axis to get a nice colourbar
+        #ax1 = fig.add_axes([0.5, 0.5, 0.00000000000001, 0.0000000000001])
+        #mock = ax1.contourf(PV.data, cmap=self.custom_cmap(), levels=20)
+        #ax1.axis('off')
+
+       # ax = fig.add_axes([0, 0, 1, 1])
         ax_kpc = ax.twiny()  # add second x-axis at the top of the figure (position in kpc)
         ax_rel = ax.twinx()  # add second y-axis to the right of the figure (relative velocity)
 
@@ -328,20 +353,22 @@ class CreateImages:
         velocity, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                      tosave=False).create_vel_array(clipped_cube)
 
-        levels = list(np.linspace(np.amin(PV.data), np.amax(PV.data), 20))
-        levels = 20
+        levels = list(np.linspace(np.amax(PV.data) * 0.05, np.amax(PV.data), 20))
 
         # Contours in black
-        ax.contour(PV.data,
+        C2 = ax.contour(PV.data,
                    extent=[np.amin(offset), np.amax(offset), velocity[0] - sysvel, velocity[-1] - sysvel],
-                   colors='k', levels=levels,
-                   linewidths=1)
+                   colors='k', levels=levels, linewidths=1)
 
         # Filling with coloured contours
-        ax.contourf(PV.data,
+        C1 = ax.contourf(PV.data,
                     extent=[np.amin(offset), np.amax(offset), velocity[0] - sysvel, velocity[-1] - sysvel],
-                    cmap='afmhot_r', vmin=0.1 * np.amax(PV.data), vmax=0.8 * np.amax(PV.data),
-                    levels=levels)
+                    cmap=self.custom_cmap(), levels=levels)
+
+        # Add a colourbar
+        cbar = fig.colorbar(C1, pad=0.1, format='%.1f')
+        cbar.add_lines(C2)
+        cbar.set_label('Brightness temperature [K]')
 
         # Make the plot pretty
         #ax.set_xlim(-1.5 * self.galaxy.size * res * 3600, 1.5 * self.galaxy.size * res * 3600)
@@ -442,10 +469,12 @@ class CreateImages:
         plt.figure(figsize=(10, 7))
 
         if units == 'kpc':
-            plt.errorbar(radii_kpc, np.log10(rad_prof), yerr=error/rad_prof * 0.434, c='k', linestyle='None', marker='o')
+            plt.errorbar(radii_kpc, np.log10(rad_prof), yerr=error/rad_prof * 0.434, c='k', linestyle='None',
+                         marker='o', ms=10)
             plt.xlabel('Radius [kpc]')
         elif units == 'arcsec':
-            plt.errorbar(radii_arcsec, np.log10(rad_prof), yerr=error/rad_prof * 0.434, c='k', linestyle='None', marker='o')
+            plt.errorbar(radii_arcsec, np.log10(rad_prof), yerr=error/rad_prof * 0.434, c='k', linestyle='None',
+                         marker='o', ms=10)
             plt.xlabel(r'Radius [$^{\prime\prime}$]')
         else:
             raise AttributeError('Please choose between "kpc" and "arcsec" for the keyword "units".')

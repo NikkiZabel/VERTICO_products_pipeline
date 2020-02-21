@@ -22,14 +22,17 @@ for i in range(len(galaxies)):
 
     path = '/home/nikki/Documents/Data/VERTICO/' + galaxy + '/'
 
+    if not os.path.exists(path + galaxy + '_Products'):
+        os.mkdir(path + galaxy + '_Products/')
+
     if sun:
-        if not os.path.exists(path + 'Sun_method/'):
-            os.mkdir(path + 'Sun_method/')
-        savepath = path + 'Sun_method/'
+        if not os.path.exists(path + galaxy + '_Products/Sun_method/'):
+            os.mkdir(path + galaxy + '_Products/Sun_method/')
+        savepath = path + galaxy + '_Products/Sun_method/'
     else:
-        if not os.path.exists(path + 'Smooth_method/'):
-            os.mkdir(path + 'Smooth_method/')
-        savepath = path + 'Smooth_method/'
+        if not os.path.exists(path + galaxy + '_Products/Smooth_method/'):
+            os.mkdir(path + galaxy + '_Products/Smooth_method/')
+        savepath = path + galaxy + '_Products/Smooth_method/'
 
     if galaxy == 'NGC4606':
         import matplotlib
@@ -39,12 +42,12 @@ for i in range(len(galaxies)):
         file_pbcorr = path + galaxy + '_7m+tp_co21_pbcorr_round_k.fits'
         file_uncorr = path + galaxy + '_7m+tp_co21_flat_round_k.fits'
         cube_corr, cube_uncorr = ClipCube(galaxy, file_pbcorr, file_uncorr).readfits()
-        savepath = savepath + '_7m+tp_co21_pbcorr_round_k_'
+        savepath = savepath + galaxy + '_7m+tp_co21_pbcorr_round_k_'
     except:
         file_pbcorr = path + galaxy + '_7m_co21_pbcorr_round_k.fits'
         file_uncorr = path + galaxy + '_7m_co21_flat_round_k.fits'
         cube_corr, cube_uncorr = ClipCube(galaxy, file_pbcorr, file_uncorr).readfits()
-        savepath = savepath + '_7m_co21_pbcorr_round_k_'
+        savepath = savepath + galaxy + '_7m_co21_pbcorr_round_k_'
 
     # Have a first look at the cube to figure out some parameters
     #plt.imshow(np.sum(cube_corr.data, axis=0))
@@ -55,19 +58,19 @@ for i in range(len(galaxies)):
     #clipped_cube, mom0, mom1, mom2 = moment_maps(galaxy, path, dv=10, pbcor=pbcor, cliplevel=cliplevel, stokes=stokes, sun=True, tosave=True).calc_moms(units='M_Sun/pc^2', alpha_co=6.25)
 
     # Call th#ese to create images of the moment maps
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #              sun=sun, tosave=tosave).moment_zero(units='K km/s')
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #             sun=sun, tosave=tosave).moment_1_2()
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #              sun=sun, tosave=tosave).moment_1_2(moment=2)
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-    #              sun=sun, tosave=tosave).\
-    #    PVD(axis='minor', full_width=False)
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #              sun=sun, tosave=tosave).spectrum(x_axis='vel_offset')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave).radial_profile(units='arcsec',
+                  sun=sun, tosave=tosave).moment_zero(units='K km/s')
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                 sun=sun, tosave=tosave).moment_1_2()
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave).moment_1_2(moment=2)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave).\
+        PVD(axis='major', full_width=False)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave).spectrum(x_axis='vel_offset')
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                sun=sun, tosave=tosave).radial_profile(units='kpc',
                                         alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
                                                                             check_aperture=True)
 

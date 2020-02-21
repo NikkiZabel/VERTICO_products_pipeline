@@ -5,6 +5,7 @@ from targets import galaxies
 from clip_cube import ClipCube
 from photutils import EllipticalAnnulus
 from photutils import aperture_photometry
+from astropy import wcs
 
 
 class MomentMaps:
@@ -246,6 +247,10 @@ class MomentMaps:
         # There is a lot of garbage because of the interpolation used by the rotation function, define a lower limit to get rid of that
         PV[PV < 0.001] = 0
 
+        # Find the sky coordinates of the central pixel
+        w = wcs.WCS(clipped_cube.header, naxis=2)
+        centre_sky = wcs.utils.pixel_to_skycoord(self.galaxy.centre_y, self.galaxy.centre_x, wcs=w)
+
         # Create an appropriate header
         pvd_header = fits.Header()
         pvd_header['SIMPLE'] = clipped_cube.header['SIMPLE']
@@ -280,6 +285,10 @@ class MomentMaps:
         pvd_header['PC2_1'] = clipped_cube.header['PC2_1']
         pvd_header['PC1_2'] = clipped_cube.header['PC1_2']
         pvd_header['PC2_2'] = pvd_header['CDELT2']
+        pvd_header['CENTR_PIX'] = '(' + str(self.galaxy.centre_y) + ', ' + str(self.galaxy.centre_x) + ')'
+        pvd_header.comments['CENTR_PIX'] = 'Central pix used for rot. + loc. slit'
+        pvd_header['CENTR_PIX_SKY'] = '(' + str(np.round(centre_sky.ra.deg, 2)) + ', ' + str(np.round(centre_sky.dec.deg, 2)) + ')'
+        pvd_header.comments['CENTR_PIX_SKY'] = 'Central pix in sky coords (deg)'
         pvd_header['SYSVEL'] = sysvel + self.galaxy.sysvel_offset
         pvd_header['RESTFRQ'] = clipped_cube.header['RESTFRQ']
         pvd_header.comments['RESTFRQ'] = clipped_cube.header.comments['RESTFRQ']
@@ -452,10 +461,19 @@ class MomentMaps:
         N_beams = np.array(area) / (beam_pix ** 2 * np.pi)
         error = np.sqrt(N_beams) * rms
 
+        w = wcs.WCS(mom0_hdu.header, naxis=2)
+        centre_sky = wcs.utils.pixel_to_skycoord(self.galaxy.centre_y, self.galaxy.centre_x, wcs=w)
+
+        csv_header = 'Elliptical apertures centered around (RA, Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                     ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(self.galaxy.centre_y) + \
+                     ', ' + str(self.galaxy.centre_x) + ')). ' \
+                    'Radii are defined as the semi-major axes of these apertures. \n \n' \
+                     'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+
         if self.tosave:
             np.savetxt(self.savepath + 'radial_profile.csv',
-                       np.column_stack((rad_prof, np.ones(len(rad_prof)) * error, radii_deg * 3600, radii_kpc)), delimiter=',',
-                       header='Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)')
+                       np.column_stack((rad_prof, np.ones(len(rad_prof)) * error, radii_deg * 3600, radii_kpc)),
+                       delimiter=',', header=csv_header)
 
         #print(np.log10(np.amax(rad_prof_cum)))
 
