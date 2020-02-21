@@ -3,8 +3,10 @@ import os
 import numpy as np
 from matplotlib.gridspec import GridSpec
 
-path = '/home/nikki/Documents/Data/VERTICO/Mosaic/'
-files = os.listdir(path)
+path = '/home/nikki/Documents/Data/VERTICO/Z_mosaic/'
+dirs = os.listdir(path)
+files = [x for x in dirs if os.path.isfile(os.path.join(path, x))]
+
 count = 0
 
 f, axarr = plt.subplots(5, 6, figsize=(10, 10))
@@ -20,8 +22,8 @@ for i in range(axarr.shape[0]):
 
         img = plt.imread(path + files[count])
 
-        img = img[:, ~np.all(img==1, axis=(0, 2)), :]
-        img = img[~np.all(img==1, axis=(1, 2)), :, :]
+        img = img[:, ~np.all(img == 1, axis=(0, 2)), :]
+        img = img[~np.all(img == 1, axis=(1, 2)), :, :]
 
         axarr[i, j].imshow(img)
 
@@ -29,7 +31,7 @@ for i in range(axarr.shape[0]):
 
 ax1 = f.add_subplot(gs[2, 1:5])
 ax1.axis('off')
-logo = plt.imread('/home/nikki/Documents/Data/VERTICO/logo-full-blackblue.png')
+logo = plt.imread('/home/nikki/Documents/Data/VERTICO/materials/logo-full-blackblue.png')
 ax1.imshow(logo)
 
 plt.tight_layout()

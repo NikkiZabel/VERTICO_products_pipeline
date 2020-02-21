@@ -14,14 +14,13 @@ from clip_cube import ClipCube
 class CreateImages:
 
     def __init__(self, galname, path_pbcorr, path_uncorr, savepath=None, refresh=False, overwrite=True,
-                 make_cutout=False, sun=True, tosave=False):
+                 sun=True, tosave=False):
         self.galaxy = galaxies(galname)
         self.path_pbcorr = path_pbcorr
         self.path_uncorr = path_uncorr
         self.refresh = refresh
         self.overwrite = overwrite
         self.savepath = savepath + self.galaxy.name or './' + self.galaxy.name
-        self.make_cutout = make_cutout
         self.sun = sun
         self.tosave = tosave
 
@@ -47,10 +46,9 @@ class CreateImages:
         else:
             image = fits.open(path + 'moment0.fits')[0]
 
-        #f = plt.figure(figsize=self.galaxy.figsize)
-        f = plt.figure(figsize=(10, 10))
+        f = plt.figure(figsize=self.galaxy.figsize)
 
-        if self.make_cutout:
+        if self.galaxy.size > 0:
             # make a smaller cutout of the CO emission
             w = wcs.WCS(image.header)
             cutout = Cutout2D(image.data, (self.galaxy.centre_y, self.galaxy.centre_x), self.galaxy.size, wcs=w,
@@ -64,7 +62,7 @@ class CreateImages:
         fig.set_theme('publication')
 
         # add the galaxy name in the upper right corner
-        #fig.add_label(0.8, 0.9, self.galaxy.name, relative=True, fontsize=20)
+        fig.add_label(0.8, 0.9, self.galaxy.name, relative=True, fontsize=20)
 
         fig.show_contour(image, cmap='magma_r', levels=np.linspace(np.amax(image.data)*1e-9, np.amax(image.data), 20),
                          filled=True, overlap=True)
@@ -107,26 +105,24 @@ class CreateImages:
         else:
             ticks = np.arange(0, np.amax(image.data) + 100, 200)
 
-        #cbar = f.colorbar(colors, ticks=ticks)
-        #if units == 'K km/s':
-        #    cbar.set_label(r'Integrated intensity [K km s$^{-1}$]')
-        #elif units == 'M_Sun/pc^2':
-        #    cbar.set_label(r'Surface density [M$_\odot$ pc$^{-2}$]')
-        #else:
-        #    raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
+        cbar = f.colorbar(colors, ticks=ticks)
+        if units == 'K km/s':
+            cbar.set_label(r'Integrated intensity [K km s$^{-1}$]')
+        elif units == 'M_Sun/pc^2':
+            cbar.set_label(r'Surface density [M$_\odot$ pc$^{-2}$]')
+        else:
+            raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
 
         # show the beam of the observations
-        #fig.add_beam(frame=False)  # automatically imports BMAJ, BMIN, and BPA
-        #fig.beam.set_edgecolor('k')
-        #fig.beam.set_color('k')
-        #fig.beam.set_borderpad(1)
+        fig.add_beam(frame=False)  # automatically imports BMAJ, BMIN, and BPA
+        fig.beam.set_edgecolor('k')
+        fig.beam.set_color('k')
+        fig.beam.set_borderpad(1)
 
         # show a scalebar
-        #length = np.degrees(1.e-3 / self.galaxy.distance)  # length of the scalebar in degrees, corresponding to 1 kpc
-        #fig.add_scalebar(length=length, label='1 kpc', frame=False)
-        #fig.scalebar.set_linewidth(5)
-
-        plt.axis('off')
+        length = np.degrees(1.e-3 / self.galaxy.distance)  # length of the scalebar in degrees, corresponding to 1 kpc
+        fig.add_scalebar(length=length, label='1 kpc', frame=False)
+        fig.scalebar.set_linewidth(5)
 
         plt.tight_layout()
 
@@ -170,7 +166,7 @@ class CreateImages:
 
         f = plt.figure(figsize=self.galaxy.figsize)
 
-        if self.make_cutout:
+        if self.galaxy.size > 0:
             #make a smaller cutout of the CO emission
             w = wcs.WCS(image.header)
             cutout = Cutout2D(image.data, (self.galaxy.centre_y, self.galaxy.centre_x), self.galaxy.size, wcs=w,

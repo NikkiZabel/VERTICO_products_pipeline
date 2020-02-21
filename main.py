@@ -1,24 +1,35 @@
 from image_moments import CreateImages
 from create_moments import *
 import warnings; warnings.filterwarnings("ignore")
+import os
 from matplotlib import pyplot as plt
 
 # Set some parameters to apply to all images below
 refresh = True
-overwrite = False
-make_cutout = False
-sun = True
+overwrite = True
+sun = False
 tosave = True
 
 galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
             'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
             'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808']
 
+galaxies = ['NGC4808']
+
 for i in range(len(galaxies)):
 
     galaxy = galaxies[i]
 
     path = '/home/nikki/Documents/Data/VERTICO/' + galaxy + '/'
+
+    if sun:
+        if not os.path.exists(path + 'Sun_method/'):
+            os.mkdir(path + 'Sun_method/')
+        savepath = path + 'Sun_method/'
+    else:
+        if not os.path.exists(path + 'Smooth_method/'):
+            os.mkdir(path + 'Smooth_method/')
+        savepath = path + 'Smooth_method/'
 
     if galaxy == 'NGC4606':
         import matplotlib
@@ -28,14 +39,12 @@ for i in range(len(galaxies)):
         file_pbcorr = path + galaxy + '_7m+tp_co21_pbcorr_round_k.fits'
         file_uncorr = path + galaxy + '_7m+tp_co21_flat_round_k.fits'
         cube_corr, cube_uncorr = ClipCube(galaxy, file_pbcorr, file_uncorr).readfits()
-        savepath = path + '_7m+tp_co21_pbcorr_round_k_'
+        savepath = savepath + '_7m+tp_co21_pbcorr_round_k_'
     except:
         file_pbcorr = path + galaxy + '_7m_co21_pbcorr_round_k.fits'
         file_uncorr = path + galaxy + '_7m_co21_flat_round_k.fits'
         cube_corr, cube_uncorr = ClipCube(galaxy, file_pbcorr, file_uncorr).readfits()
-        savepath = path + '_7m_co21_pbcorr_round_k'
-
-    savepath = '/home/nikki/Documents/Data/VERTICO/Mosaic/'
+        savepath = savepath + '_7m_co21_pbcorr_round_k_'
 
     # Have a first look at the cube to figure out some parameters
     #plt.imshow(np.sum(cube_corr.data, axis=0))
@@ -47,18 +56,18 @@ for i in range(len(galaxies)):
 
     # Call th#ese to create images of the moment maps
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  make_cutout=make_cutout, sun=sun, tosave=tosave).moment_zero(units='K km/s')
+                  sun=sun, tosave=tosave).moment_zero(units='K km/s')
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                 sun=sun, tosave=tosave).moment_1_2()
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave).moment_1_2(moment=2)
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-    #             make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2()
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-    #              make_cutout=make_cutout, sun=sun, tosave=tosave).moment_1_2(moment=2)
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-    #              make_cutout=make_cutout, sun=sun, tosave=tosave).\
+    #              sun=sun, tosave=tosave).\
     #    PVD(axis='minor', full_width=False)
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-    #              make_cutout=make_cutout, sun=sun, tosave=tosave).spectrum(x_axis='frequency')
+    #              sun=sun, tosave=tosave).spectrum(x_axis='frequency')
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=path, refresh=refresh, overwrite=overwrite,
-    #            make_cutout=make_cutout, sun=sun, tosave=tosave).radial_profile(units='arcsec',
+    #            sun=sun, tosave=tosave).radial_profile(units='arcsec',
     #                                    alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
     #                                                                        check_aperture=True)
 
