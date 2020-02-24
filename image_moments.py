@@ -303,6 +303,10 @@ class CreateImages:
         vres = clipped_cube.header['CDELT3'] / 1000.  # velocity resolution
         position = np.arange(0, PV.shape[1], 1)
         offset = (position - len(position) / 2) * res * 3600
+        if axis == 'major':
+            offset -= shift_x
+        else:
+            offset += 0
         velocity = np.arange(0, PV.shape[0], 1)
         vel_offset = (velocity - len(velocity) / 2) * vres
 
@@ -352,10 +356,7 @@ class CreateImages:
         ax.callbacks.connect("ylim_changed", absolute_yax)
         ax.callbacks.connect("xlim_changed", x_kpc)
 
-        velocity, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                     tosave=False).create_vel_array(clipped_cube)
-
-        levels = list(np.linspace(np.amax(PV.data) * 0.05, np.amax(PV.data), 20))
+        levels = list(np.linspace(np.amax(PV.data) * 0.15, np.amax(PV.data), 20))
 
         # Contours in black
         C2 = ax.contour(PV.data,
@@ -368,12 +369,15 @@ class CreateImages:
                     cmap=self.custom_cmap(), levels=levels)
 
         # Add a colourbar
-        cbar = fig.colorbar(C1, pad=0.1, format='%.1f')
+        if axis == 'major':
+            cbar = fig.colorbar(C1, pad=0.1, format='%.1f')
+        if axis == 'minor':
+            cbar = fig.colorbar(C1, pad=0.1, format='%.1f')
         cbar.add_lines(C2)
         cbar.set_label('Brightness temperature [K]')
 
         # Make the plot pretty
-        ax.set_xlim(np.amin(offset) - 10, np.amax(offset) + 10)
+        ax.set_xlim(np.amin(offset) - 15, np.amax(offset) + 15)
         ax.set_ylim(-self.galaxy.vrange, self.galaxy.vrange)
         ax.set_xlabel('Offset [arcsec]')
         ax_kpc.set_xlabel('Offset [kpc]')
@@ -483,6 +487,7 @@ class CreateImages:
 
         plt.ylabel(r'log(Surface density [$M_\odot$ pc$^{-2}$])')
         plt.xlim(-0.01)
+        plt.ylim(0)
 
         plt.tight_layout()
 

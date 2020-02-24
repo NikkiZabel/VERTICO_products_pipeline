@@ -133,6 +133,58 @@ class MomentMaps:
 
         return header
 
+    def rotate_cube(self, cube, angle, naxis=3):
+
+        if naxis == 3:
+
+            shift_y = np.ceil(self.galaxy.centre_x - cube.shape[1] / 2) * 2 + self.galaxy.pv_corr
+            shift_x = np.ceil(self.galaxy.centre_y - cube.shape[2] / 2) * 2
+
+            if shift_x > 0:
+                temp = np.zeros((cube.shape[0], cube.shape[1] + int(abs(shift_x)), cube.shape[2]))
+                temp[:, :-int(abs(shift_x)), :] = cube.data
+            elif shift_x < 0:
+                temp = np.zeros((cube.shape[0], cube.shape[1] + int(abs(shift_x)), cube.shape[2]))
+                temp[:, int(abs(shift_x)):, :] = cube.data
+            else:
+                temp = cube.data
+
+            if shift_y > 0:
+                rot_cube = np.zeros((temp.shape[0], temp.shape[1], temp.shape[2] + int(abs(shift_y))))
+                rot_cube[:, :, :-int(abs(shift_y))] = temp
+            elif shift_y < 0:
+                rot_cube = np.zeros((temp.shape[0], temp.shape[1], temp.shape[2] + int(abs(shift_y))))
+                rot_cube[:, :, int(abs(shift_y)):] = temp
+            else:
+                rot_cube = temp
+
+            return ndimage.interpolation.rotate(rot_cube, angle, axes=(1, 2), reshape=True), shift_x
+
+        elif naxis == 2:
+
+            shift_y = np.ceil(self.galaxy.centre_x - cube.shape[0] / 2) * 2 + self.galaxy.pv_corr
+            shift_x = np.ceil(self.galaxy.centre_y - cube.shape[1] / 2) * 2
+
+            if shift_x > 0:
+                temp = np.zeros((cube.shape[0] + int(abs(shift_x)), cube.shape[1]))
+                temp[:-int(abs(shift_x)), :] = cube.data
+            elif shift_x < 0:
+                temp = np.zeros((cube.shape[0] + int(abs(shift_x)), cube.shape[1]))
+                temp[int(abs(shift_x)):, :] = cube.data
+            else:
+                temp = cube.data
+
+            if shift_y > 0:
+                rot_cube = np.zeros((temp.shape[0], temp.shape[1] + int(abs(shift_y))))
+                rot_cube[:, :-int(abs(shift_y))] = temp
+            elif shift_y < 0:
+                rot_cube = np.zeros((temp.shape[1], temp.shape[2] + int(abs(shift_y))))
+                rot_cube[:, int(abs(shift_y)):] = temp
+            else:
+                rot_cube = temp
+
+            return ndimage.interpolation.rotate(rot_cube, angle, axes=(0, 1), reshape=True), shift_x
+
     def calc_moms(self, units='M_Sun/pc^2', alpha_co=6.25):
         """
         Clip the spectral cube according to the desired method, and create moment 0, 1, and 2 maps. Save them as fits
@@ -203,8 +255,6 @@ class MomentMaps:
         res = clipped_cube.header['CDELT2']  # degrees per pixel
         beampix = clipped_cube.header['BMAJ'] / res  # beam size in pixels
         slitsize = np.ceil(beampix / 2)
-        shift_y = np.ceil(self.galaxy.centre_x - clipped_cube.shape[1] / 2) * 2 + self.galaxy.pv_corr
-        shift_x = np.ceil(self.galaxy.centre_y - clipped_cube.shape[2] / 2) * 2
 
         # Rotate the cube along the spatial axes, so that the galaxy lies horizontal
         if axis == 'major':
@@ -214,25 +264,7 @@ class MomentMaps:
         else:
             raise AttributeError('Please choose between "major" and "minor" for the "axis" keyword')
 
-        if shift_x > 0:
-            temp = np.zeros((clipped_cube.shape[0], clipped_cube.shape[1] + int(abs(shift_x)), clipped_cube.shape[2]))
-            temp[:, :-int(abs(shift_x)), :] = clipped_cube.data
-        elif shift_x < 0:
-            temp = np.zeros((clipped_cube.shape[0], clipped_cube.shape[1] + int(abs(shift_x)), clipped_cube.shape[2]))
-            temp[:, int(abs(shift_x)):, :] = clipped_cube.data
-        else:
-            temp = clipped_cube.data
-
-        if shift_y > 0:
-            pvdcube = np.zeros((temp.shape[0], temp.shape[1], temp.shape[2] + int(abs(shift_y))))
-            pvdcube[:, :, :-int(abs(shift_y))] = temp
-        elif shift_y < 0:
-            pvdcube = np.zeros((temp.shape[0], temp.shape[1], temp.shape[2] + int(abs(shift_y))))
-            pvdcube[:, :, int(abs(shift_y)):] = temp
-        else:
-            pvdcube = temp
-
-        cube_rot = ndimage.interpolation.rotate(pvdcube, rot_angle, axes=(1, 2), reshape=True)
+        cube_rot, shift_x = self.rotate_cube(clipped_cube, rot_angle)
 
         if find_angle:
             from matplotlib import pyplot as plt
@@ -419,69 +451,98 @@ class MomentMaps:
             print('Reading the inclination from the master table.')
             table = fits.open(table_path)
             inc = table[1].data['inclination'][table[1].data['Galaxy'] == self.galaxy.name]
+            inc = [89]
             e = np.sin(np.deg2rad(inc))[0]
 
         centre = (self.galaxy.centre_y, self.galaxy.centre_x)
-        b_in = -beam_pix + 0.000000000001
-        b_out = 0
-        theta = self.galaxy.angle + 45
-
         rad_prof = []
-        area = []
         radius = []
-        emission = 2112
-        area_temp = 1
+        area = []
 
-        if check_aperture:
-            from matplotlib import pyplot as plt
-            plt.figure()
-            plt.imshow(mom0_hdu.data)
+        if self.galaxy.high_inc:
+            angle = self.galaxy.angle + 90 + 180
+            mom0_rot, shift_x = self.rotate_cube(mom0_hdu, angle, naxis=2)
 
-        while emission / area_temp > 1:
+            inner = 0
+            centre = (mom0_rot.shape[0] + shift_x) / 2
+            emission = 2112
 
-            b_in += beam_pix
-            b_out += beam_pix
+            while emission > 1:
+                slice1 = mom0_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
+                slice2 = mom0_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
+                emission = np.average(np.average(slice1) + np.average(slice2))
 
-            if emission == 2112:
-                a_in = 0.0000000000001
-            else:
-                a_in = a_out
+                rad_prof.append(emission)
+                radius.append(inner + beam_pix)
 
-            if e == 1:
-                a_out = b_out
-            else:
-                a_out = b_out / np.sqrt(1 - e ** 2)
+                area.append(len(slice1[slice1 > 0]) + len(slice2[slice2 > 0]))
 
-            aperture = EllipticalAnnulus(centre, a_in, a_out, b_out, theta)
+                inner += beam_pix
+
+        else:
+            a_in = -beam_pix + 0.000000000001
+            a_out = 0
+            theta = self.galaxy.angle + 45
+
+            emission = 2112
+            area_temp = 1
 
             if check_aperture:
-                aperture.plot(color='red')
+                from matplotlib import pyplot as plt
+                plt.figure()
+                plt.imshow(mom0_hdu.data)
 
-            emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0] #* \
-                      # (np.deg2rad(mom0_hdu.header['CDELT2']) * self.galaxy.distance * 1e6) ** 2
+            while emission / area_temp > 1:
 
-            area_temp = aperture.area
-            area.append(area_temp)
-            rad_prof.append(emission / area_temp)
-            radius.append(b_out)
+                a_in += beam_pix
+                a_out += beam_pix
+
+                if emission == 2112:
+                    b_in = 0.0000000000001
+                else:
+                    b_in = a_out
+
+                if e == 1:
+                    b_out = a_out
+                else:
+                    b_out = a_out * np.sqrt(1 - e ** 2)
+
+                aperture = EllipticalAnnulus(centre, a_in, a_out, b_out, theta)
+
+                if check_aperture:
+                    aperture.plot(color='red')
+
+                emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0] #* \
+                          # (np.deg2rad(mom0_hdu.header['CDELT2']) * self.galaxy.distance * 1e6) ** 2
+
+                area_temp = aperture.area
+                area.append(area_temp)
+                rad_prof.append(emission / area_temp)
+                radius.append(b_out)
 
         rad_prof = rad_prof[:-1]
-        area = area[:-1]
         radius = np.array(radius[:-1])
+        area = area[:-1]
         radii_deg = radius * mom0_hdu.header['CDELT2']
         radii_kpc = np.deg2rad(radii_deg) * self.galaxy.distance * 1000
-
         N_beams = np.array(area) / (beam_pix ** 2 * np.pi)
         error = np.sqrt(N_beams) * rms
 
         w = wcs.WCS(mom0_hdu.header, naxis=2)
         centre_sky = wcs.utils.pixel_to_skycoord(self.galaxy.centre_y, self.galaxy.centre_x, wcs=w)
 
-        csv_header = 'Elliptical apertures centered around (RA, Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
-                     ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(self.galaxy.centre_y) + \
-                     ', ' + str(self.galaxy.centre_x) + ')). ' \
-                    'Radii are defined as the semi-major axes of these apertures. \n \n' \
-                     'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+        if self.galaxy.high_inc:
+            csv_header = 'Slices parallel to the minor axis centered around (RA, Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                         ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(self.galaxy.centre_y) + \
+                         ', ' + str(self.galaxy.centre_x) + ')). ' \
+                        'Radii are equal to one beamsize. \n \n' \
+                         'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+        else:
+            csv_header = 'Elliptical apertures centered around (RA, Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                         ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(self.galaxy.centre_y) + \
+                         ', ' + str(self.galaxy.centre_x) + ')). ' \
+                        'Radii are defined as the semi-major axes of these apertures. \n \n' \
+                         'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
 
         if self.tosave:
             np.savetxt(self.savepath + 'radial_profile.csv',

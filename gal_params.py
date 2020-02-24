@@ -12,7 +12,6 @@ def parameters(galaxy):
         stop = 52
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -39,7 +38,6 @@ def parameters(galaxy):
         stop = 52
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -66,7 +64,6 @@ def parameters(galaxy):
         stop = 58
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -93,7 +90,6 @@ def parameters(galaxy):
         stop = 62
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -120,7 +116,6 @@ def parameters(galaxy):
         stop = 59
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -147,7 +142,6 @@ def parameters(galaxy):
         stop = 59
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -174,7 +168,6 @@ def parameters(galaxy):
         stop = 50
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -201,7 +194,6 @@ def parameters(galaxy):
         stop = 63
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -228,7 +220,6 @@ def parameters(galaxy):
         stop = 68
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -255,7 +246,6 @@ def parameters(galaxy):
         stop = 59
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -282,7 +272,6 @@ def parameters(galaxy):
         stop = 62
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -309,7 +298,6 @@ def parameters(galaxy):
         stop = 75
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -336,7 +324,6 @@ def parameters(galaxy):
         stop = 52
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -363,7 +350,6 @@ def parameters(galaxy):
         stop = 55
         sysvel_offset = 20
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -390,7 +376,6 @@ def parameters(galaxy):
         stop = 47
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -413,12 +398,11 @@ def parameters(galaxy):
         vrange_2 = 30
         cliplevel = 3
         stokes = False
-        start = 30
+        start = 32
         stop = 65
         sysvel_offset = 0
         angle = 58
         pv_corr = 1
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -430,7 +414,8 @@ def parameters(galaxy):
         expand_by_npix = None
         expand_by_nchan = 2
         inclination = None
-        eccentricity = 1
+        eccentricity = None
+        high_inc = True
         figsize = (10, 7)
 
     if galaxy == 'NGC4302':
@@ -445,7 +430,6 @@ def parameters(galaxy):
         stop = 60
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -472,7 +456,6 @@ def parameters(galaxy):
         stop = 59
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -499,7 +482,6 @@ def parameters(galaxy):
         stop = 67
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -526,7 +508,6 @@ def parameters(galaxy):
         stop = 67
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -553,7 +534,6 @@ def parameters(galaxy):
         stop = 64
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -580,7 +560,6 @@ def parameters(galaxy):
         stop = 63
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -607,7 +586,6 @@ def parameters(galaxy):
         stop = 50
         sysvel_offset = 0
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -634,7 +612,6 @@ def parameters(galaxy):
         stop = 50
         sysvel_offset = 10
         angle = 0
-        vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -661,7 +638,6 @@ def parameters(galaxy):
         stop = 57
         sysvel_offset = 30
         angle = 274
-        vel_centre_pvd = 25
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -689,7 +665,6 @@ def parameters(galaxy):
         stop = 66
         sysvel_offset = 0
         angle = 20
-        vel_centre_pvd = 19
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -716,7 +691,6 @@ def parameters(galaxy):
         stop = 61
         sysvel_offset = 0
         angle = 245
-        vel_centre_pvd = 14
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -743,7 +717,6 @@ def parameters(galaxy):
         stop = 45
         sysvel_offset = 0
         angle = 335 - 180
-        vel_centre_pvd = 14
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -761,5 +734,5 @@ def parameters(galaxy):
     name = galaxy
 
     return name, centre_x, centre_y, size, vrange, vrange_2, cliplevel, stokes, start, stop, sysvel_offset, angle, \
-           pv_corr, vel_centre_pvd, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \
-           prune_by_fracbeam, expand_by_fracbeam, expand_by_npix, expand_by_nchan, inclination, eccentricity, figsize
+           pv_corr, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, prune_by_fracbeam, \
+           expand_by_fracbeam, expand_by_npix, expand_by_nchan, inclination, eccentricity, high_inc, figsize
