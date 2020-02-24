@@ -413,10 +413,11 @@ def parameters(galaxy):
         vrange_2 = 30
         cliplevel = 3
         stokes = False
-        start = 32
-        stop = 62
+        start = 30
+        stop = 65
         sysvel_offset = 0
-        angle = 0
+        angle = 58
+        pv_corr = 1
         vel_centre_pvd = 0
         distance = 16.5
         nchan_low = 2
@@ -706,7 +707,7 @@ def parameters(galaxy):
     elif galaxy == 'NGC4189':
         centre_y = 32
         centre_x = 20
-        size = 60
+        size = 0
         vrange = 150
         vrange_2 = 50
         cliplevel = 3
@@ -760,5 +761,5 @@ def parameters(galaxy):
     name = galaxy
 
     return name, centre_x, centre_y, size, vrange, vrange_2, cliplevel, stokes, start, stop, sysvel_offset, angle, \
-           vel_centre_pvd, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \
+           pv_corr, vel_centre_pvd, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \
            prune_by_fracbeam, expand_by_fracbeam, expand_by_npix, expand_by_nchan, inclination, eccentricity, figsize

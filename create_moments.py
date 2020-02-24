@@ -196,15 +196,15 @@ class MomentMaps:
 
         return cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel
 
-    def PVD(self, axis='major', full_width=False):
+    def PVD(self, axis='major', full_width=False, find_angle=False, check_slit=False):
 
         clipped_cube, _, _, _, sysvel = self.calc_moms()
 
         res = clipped_cube.header['CDELT2']  # degrees per pixel
         beampix = clipped_cube.header['BMAJ'] / res  # beam size in pixels
         slitsize = np.ceil(beampix / 2)
-        shift_x = self.galaxy.centre_x - clipped_cube.shape[1] / 2
-        shift_y = self.galaxy.centre_y - clipped_cube.shape[2] / 2
+        shift_y = np.ceil(self.galaxy.centre_x - clipped_cube.shape[1] / 2) * 2 + self.galaxy.pv_corr
+        shift_x = np.ceil(self.galaxy.centre_y - clipped_cube.shape[2] / 2) * 2
 
         # Rotate the cube along the spatial axes, so that the galaxy lies horizontal
         if axis == 'major':
@@ -234,6 +234,11 @@ class MomentMaps:
 
         cube_rot = ndimage.interpolation.rotate(pvdcube, rot_angle, axes=(1, 2), reshape=True)
 
+        if find_angle:
+            from matplotlib import pyplot as plt
+            plt.imshow(np.sum(cube_rot, axis=0))
+            return
+
         # Define a slit around the centre of the galaxy with a width of the beam size (or use the full width of the galaxy)
         if full_width:
             slit = cube_rot[:, cube_rot.shape[1] / 2 - self.galaxy.size / 2:cube_rot.shape[1] / 2 +
@@ -244,8 +249,16 @@ class MomentMaps:
         # Collapse along the slit to create the PV diagram
         PV = np.sum(slit, axis=1)
 
+        if check_slit:
+            from matplotlib import pyplot as plt
+            plt.imshow(np.sum(slit, axis=0))
+
         # There is a lot of garbage because of the interpolation used by the rotation function, define a lower limit to get rid of that
         PV[PV < 0.001] = 0
+
+        # Remove empty rows and columns
+        PV = PV[:, ~np.all(PV == 0, axis=0)]
+        PV = PV[~np.all(PV == 0, axis=1), :]
 
         # Find the sky coordinates of the central pixel
         w = wcs.WCS(clipped_cube.header, naxis=2)

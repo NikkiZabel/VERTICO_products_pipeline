@@ -145,7 +145,7 @@ class CreateImages:
 
         if self.tosave:
             if units == 'K km/s':
-                plt.savefig(self.savepath + 'moment0_K.png', bbox_inches='tight')
+                plt.savefig(self.savepath + 'moment0_K.pdf', bbox_inches='tight')
             if units == 'M_Sun/pc^2':
                 plt.savefig(self.savepath + 'moment0_M_Sun.pdf', bbox_inches='tight')
         return
@@ -263,7 +263,7 @@ class CreateImages:
 
         return
 
-    def PVD(self, axis='major', findcentre=False, find_velcentre=False, full_width=False):
+    def PVD(self, axis='major', full_width=False, find_angle=False, check_slit=False):
         """
         Plot a position-velocity diagram of the galaxy
         :param mom0: moment 0 image of the galaxy
@@ -278,13 +278,13 @@ class CreateImages:
             if self.overwrite:
                 PV, shift_x = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                  savepath=self.savepath, tosave=True).\
-                    PVD(axis=axis, full_width=full_width)
+                    PVD(axis=axis, full_width=full_width, find_angle=find_angle, check_slit=check_slit)
             else:
                 PV, shift_x = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False).\
-                    PVD(axis=axis, full_width=full_width)
+                    PVD(axis=axis, full_width=full_width, find_angle=find_angle, check_slit=check_slit)
         else:
             _, shift_x = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False). \
-                PVD(axis=axis, full_width=full_width)
+                PVD(axis=axis, full_width=full_width, find_angle=find_angle, check_slit=check_slit)
             PV = fits.open(self.path + 'PVD.fits')[0]
 
         clipped_cube, _, _, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
@@ -302,7 +302,9 @@ class CreateImages:
         res = clipped_cube.header['CDELT2']
         vres = clipped_cube.header['CDELT3'] / 1000.  # velocity resolution
         position = np.arange(0, PV.shape[1], 1)
-        offset = (position - len(position) / 2 + shift_x) * res * 3600
+        offset = (position - len(position) / 2) * res * 3600
+        velocity = np.arange(0, PV.shape[0], 1)
+        vel_offset = (velocity - len(velocity) / 2) * vres
 
         # Plot the PVD
         fig, ax = plt.subplots(figsize=(15, 8))
@@ -357,12 +359,12 @@ class CreateImages:
 
         # Contours in black
         C2 = ax.contour(PV.data,
-                   extent=[np.amin(offset), np.amax(offset), velocity[0] - sysvel, velocity[-1] - sysvel],
+                   extent=[np.amin(offset), np.amax(offset), np.amax(vel_offset), np.amin(vel_offset)],
                    colors='k', levels=levels, linewidths=1)
 
         # Filling with coloured contours
         C1 = ax.contourf(PV.data,
-                    extent=[np.amin(offset), np.amax(offset), velocity[0] - sysvel, velocity[-1] - sysvel],
+                    extent=[np.amin(offset), np.amax(offset), np.amax(vel_offset), np.amin(vel_offset)],
                     cmap=self.custom_cmap(), levels=levels)
 
         # Add a colourbar
@@ -371,8 +373,8 @@ class CreateImages:
         cbar.set_label('Brightness temperature [K]')
 
         # Make the plot pretty
-        #ax.set_xlim(-1.5 * self.galaxy.size * res * 3600, 1.5 * self.galaxy.size * res * 3600)
-        ax.set_ylim(velocity[-1] - sysvel + 20, velocity[0] - sysvel - 20)
+        ax.set_xlim(np.amin(offset) - 10, np.amax(offset) + 10)
+        ax.set_ylim(-self.galaxy.vrange, self.galaxy.vrange)
         ax.set_xlabel('Offset [arcsec]')
         ax_kpc.set_xlabel('Offset [kpc]')
         ax.set_ylabel(r'Relative velocity [km s$^{-1}$]')
