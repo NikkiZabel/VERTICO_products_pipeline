@@ -103,7 +103,7 @@ class MomentMaps:
         axis of the spectral cube
         :param cube (HDU file): HDU file of the spectral cube for which we want to make the velocity array
         :return: three arrays: the velocity array in one dimension, the length equals the numbers of channels that
-        contain emission, the same velocity array but in the shape of the spectral cube, and the one-dimensional
+        contain emission, the same velocity array but in the shape off the spectral cube, and the one-dimensional
         velocity array corresponding to the entire velocity axis of the cube (including line-free channels)
         """
         v_val = cube.header['CRVAL3'] / 1000.  # Velocity in the reference channel, m/s to km/s
@@ -137,8 +137,8 @@ class MomentMaps:
 
         if naxis == 3:
 
-            shift_y = np.ceil(self.galaxy.centre_x - cube.shape[1] / 2) * 2 + self.galaxy.pv_corr
-            shift_x = np.ceil(self.galaxy.centre_y - cube.shape[2] / 2) * 2
+            shift_y = np.ceil(self.galaxy.centre_x - cube.shape[1] / 2) * 2
+            shift_x = np.ceil(self.galaxy.centre_y - cube.shape[2] / 2) * 2 + self.galaxy.pv_corr
 
             if shift_x > 0:
                 temp = np.zeros((cube.shape[0], cube.shape[1] + int(abs(shift_x)), cube.shape[2]))
@@ -178,7 +178,7 @@ class MomentMaps:
                 rot_cube = np.zeros((temp.shape[0], temp.shape[1] + int(abs(shift_y))))
                 rot_cube[:, :-int(abs(shift_y))] = temp
             elif shift_y < 0:
-                rot_cube = np.zeros((temp.shape[1], temp.shape[2] + int(abs(shift_y))))
+                rot_cube = np.zeros((temp.shape[0], temp.shape[1] + int(abs(shift_y))))
                 rot_cube[:, int(abs(shift_y)):] = temp
             else:
                 rot_cube = temp
@@ -248,7 +248,7 @@ class MomentMaps:
 
         return cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel
 
-    def PVD(self, axis='major', full_width=False, find_angle=False, check_slit=False):
+    def PVD(self, axis='major', find_angle=False, check_slit=False):
 
         clipped_cube, _, _, _, sysvel = self.calc_moms()
 
@@ -258,9 +258,9 @@ class MomentMaps:
 
         # Rotate the cube along the spatial axes, so that the galaxy lies horizontal
         if axis == 'major':
-            rot_angle = self.galaxy.angle + 90 + 180
+            rot_angle = self.galaxy.angle + 90
         elif axis == 'minor':
-            rot_angle = self.galaxy.angle + 180
+            rot_angle = self.galaxy.angle
         else:
             raise AttributeError('Please choose between "major" and "minor" for the "axis" keyword')
 
@@ -272,9 +272,8 @@ class MomentMaps:
             return
 
         # Define a slit around the centre of the galaxy with a width of the beam size (or use the full width of the galaxy)
-        if full_width:
-            slit = cube_rot[:, cube_rot.shape[1] / 2 - self.galaxy.size / 2:cube_rot.shape[1] / 2 +
-                                                                                self.galaxy.size / 2, :]
+        if self.galaxy.full_width:
+            slit = cube_rot
         else:
             slit = cube_rot[:, int(cube_rot.shape[1] / 2 - slitsize):int(cube_rot.shape[1] / 2 + slitsize), :]
 
@@ -283,10 +282,12 @@ class MomentMaps:
 
         if check_slit:
             from matplotlib import pyplot as plt
-            plt.imshow(np.sum(slit, axis=0))
+            test = cube_rot.copy()
+            test[:, int(cube_rot.shape[1] / 2 - slitsize): int(cube_rot.shape[1] / 2 + slitsize),:] = np.nan
+            plt.imshow(np.sum(test, axis=0))
 
         # There is a lot of garbage because of the interpolation used by the rotation function, define a lower limit to get rid of that
-        PV[PV < 0.001] = 0
+        PV[PV < 1e-3] = 0
 
         # Remove empty rows and columns
         PV = PV[:, ~np.all(PV == 0, axis=0)]
@@ -318,7 +319,7 @@ class MomentMaps:
         pvd_header['LATPOLE'] = clipped_cube.header['LATPOLE']
         pvd_header['CTYPE1'] = 'OFFSET'
         pvd_header['CRVAL1'] = 0
-        pvd_header['CDELT1'] = clipped_cube.header['CDELT1'] / (cube_rot.shape[2] / pvdcube.shape[2])
+        pvd_header['CDELT1'] = clipped_cube.header['CDELT1'] / (cube_rot.shape[2] / cube_rot.shape[2])
         pvd_header['CRPIX1'] = np.ceil(PV.shape[1] / 2)
         pvd_header['CUNIT1'] = clipped_cube.header['CUNIT1']
         pvd_header['CTYPE2'] = 'VRAD'
@@ -451,7 +452,6 @@ class MomentMaps:
             print('Reading the inclination from the master table.')
             table = fits.open(table_path)
             inc = table[1].data['inclination'][table[1].data['Galaxy'] == self.galaxy.name]
-            inc = [89]
             e = np.sin(np.deg2rad(inc))[0]
 
         centre = (self.galaxy.centre_y, self.galaxy.centre_x)
@@ -460,17 +460,26 @@ class MomentMaps:
         area = []
 
         if self.galaxy.high_inc:
-            angle = self.galaxy.angle + 90 + 180
+
+            angle = self.galaxy.angle + 180 + 90
+
             mom0_rot, shift_x = self.rotate_cube(mom0_hdu, angle, naxis=2)
 
             inner = 0
-            centre = (mom0_rot.shape[0] + shift_x) / 2
+            centre = (mom0_rot.shape[1]) / 2 + shift_x + self.galaxy.rad_prof_corr
             emission = 2112
 
-            while emission > 1:
+            while emission > 1e-1:
                 slice1 = mom0_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
                 slice2 = mom0_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
                 emission = np.average(np.average(slice1) + np.average(slice2))
+
+                if check_aperture:
+                    mom0_rot[:, int(centre + inner):int(centre + inner + beam_pix)] = 10
+                    mom0_rot[:, int(centre - inner - beam_pix):int(centre - inner)] = 20
+                    from matplotlib import pyplot as plt
+                    plt.imshow(mom0_rot)
+                    break
 
                 rad_prof.append(emission)
                 radius.append(inner + beam_pix)
@@ -482,7 +491,7 @@ class MomentMaps:
         else:
             a_in = -beam_pix + 0.000000000001
             a_out = 0
-            theta = self.galaxy.angle + 45
+            theta = self.galaxy.angle - 45
 
             emission = 2112
             area_temp = 1
@@ -492,7 +501,7 @@ class MomentMaps:
                 plt.figure()
                 plt.imshow(mom0_hdu.data)
 
-            while emission / area_temp > 1:
+            while emission / area_temp > 1e-1:
 
                 a_in += beam_pix
                 a_out += beam_pix
@@ -548,7 +557,5 @@ class MomentMaps:
             np.savetxt(self.savepath + 'radial_profile.csv',
                        np.column_stack((rad_prof, np.ones(len(rad_prof)) * error, radii_deg * 3600, radii_kpc)),
                        delimiter=',', header=csv_header)
-
-        #print(np.log10(np.amax(rad_prof_cum)))
 
         return rad_prof, radii_deg * 3600, radii_kpc, rms

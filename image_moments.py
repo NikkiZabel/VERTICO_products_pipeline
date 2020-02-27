@@ -263,7 +263,7 @@ class CreateImages:
 
         return
 
-    def PVD(self, axis='major', full_width=False, find_angle=False, check_slit=False):
+    def PVD(self, axis='major', find_angle=False, check_slit=False):
         """
         Plot a position-velocity diagram of the galaxy
         :param mom0: moment 0 image of the galaxy
@@ -278,37 +278,27 @@ class CreateImages:
             if self.overwrite:
                 PV, shift_x = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                  savepath=self.savepath, tosave=True).\
-                    PVD(axis=axis, full_width=full_width, find_angle=find_angle, check_slit=check_slit)
+                    PVD(axis=axis, find_angle=find_angle, check_slit=check_slit)
             else:
                 PV, shift_x = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False).\
-                    PVD(axis=axis, full_width=full_width, find_angle=find_angle, check_slit=check_slit)
+                    PVD(axis=axis, find_angle=find_angle, check_slit=check_slit)
         else:
             _, shift_x = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False). \
-                PVD(axis=axis, full_width=full_width, find_angle=find_angle, check_slit=check_slit)
+                PVD(axis=axis, find_angle=find_angle, check_slit=check_slit)
             PV = fits.open(self.path + 'PVD.fits')[0]
 
         clipped_cube, _, _, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                sun=self.sun, tosave=False).calc_moms()
 
-        # OR DO THIS??
-        # find the middle of the galaxy, where the relative velocity is closest to zero
-        #mid_v = np.where((vel_array - sysvel) > 0)[0][0]  # index of velocity axis where the velocity is closest to the system velocity
-        #line = PV[mid_v, :]  # line along the spatial axis where this is true
-        #emission = line[line > 0.01]  # chunk of that line where there's actually emission
-        #mid_emis = emission[int(len(emission) / 2.)]  # the middle of the chunck with emission
-        #middle_PV = np.where(PV[mid_v, :] == mid_emis)[0]  # index of the middle of the chunck with emission
-
         # Create a physical position axis using the middle found and the spatial resolution, in arc seconds
         res = clipped_cube.header['CDELT2']
-        vres = clipped_cube.header['CDELT3'] / 1000.  # velocity resolution
+        vres = clipped_cube.header['CDELT3'] / 1000  # velocity resolution
         position = np.arange(0, PV.shape[1], 1)
         offset = (position - len(position) / 2) * res * 3600
         if axis == 'major':
             offset -= shift_x
         else:
             offset += 0
-        velocity = np.arange(0, PV.shape[0], 1)
-        vel_offset = (velocity - len(velocity) / 2) * vres
 
         # Plot the PVD
         fig, ax = plt.subplots(figsize=(15, 8))
@@ -356,29 +346,31 @@ class CreateImages:
         ax.callbacks.connect("ylim_changed", absolute_yax)
         ax.callbacks.connect("xlim_changed", x_kpc)
 
-        levels = list(np.linspace(np.amax(PV.data) * 0.15, np.amax(PV.data), 20))
+        velocity, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
+                                    sun=self.sun, savepath=self.savepath, tosave=False).create_vel_array(clipped_cube)
+
+        velocity = np.flip(velocity) - sysvel
+
+        levels = list(np.linspace(np.amax(PV.data) * 0.2, np.amax(PV.data), 20))
 
         # Contours in black
         C2 = ax.contour(PV.data,
-                   extent=[np.amin(offset), np.amax(offset), np.amax(vel_offset), np.amin(vel_offset)],
+                   extent=[np.amin(offset), np.amax(offset), np.amin(velocity), np.amax(velocity)],
                    colors='k', levels=levels, linewidths=1)
 
         # Filling with coloured contours
         C1 = ax.contourf(PV.data,
-                    extent=[np.amin(offset), np.amax(offset), np.amax(vel_offset), np.amin(vel_offset)],
+                    extent=[np.amin(offset), np.amax(offset), np.amin(velocity), np.amax(velocity)],
                     cmap=self.custom_cmap(), levels=levels)
 
         # Add a colourbar
-        if axis == 'major':
-            cbar = fig.colorbar(C1, pad=0.1, format='%.1f')
-        if axis == 'minor':
-            cbar = fig.colorbar(C1, pad=0.1, format='%.1f')
+        cbar = fig.colorbar(C1, pad=0.1, format='%.2f')
         cbar.add_lines(C2)
         cbar.set_label('Brightness temperature [K]')
 
         # Make the plot pretty
-        ax.set_xlim(np.amin(offset) - 15, np.amax(offset) + 15)
-        ax.set_ylim(-self.galaxy.vrange, self.galaxy.vrange)
+        ax.set_xlim(np.amin(offset) - 0.2 * np.amax(offset), np.amax(offset) + 0.2 * np.amax(offset))
+        ax.set_ylim(-self.galaxy.vrange * 1.3, self.galaxy.vrange * 1.3)
         ax.set_xlabel('Offset [arcsec]')
         ax_kpc.set_xlabel('Offset [kpc]')
         ax.set_ylabel(r'Relative velocity [km s$^{-1}$]')

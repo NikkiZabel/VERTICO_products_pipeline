@@ -14,7 +14,7 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
             'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
             'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808']
 
-galaxies = ['NGC4330']
+galaxies = ['NGC4808']
 
 for i in range(len(galaxies)):
 
@@ -53,6 +53,7 @@ for i in range(len(galaxies)):
     #plt.imshow(np.sum(cube_corr.data, axis=0))
     #plt.figure()
     #plt.plot(np.sum(cube_corr.data, axis=(1, 2)))
+    #plt.figure()
 
     # Call this to creates fits files of the moment maps, or use the "refresh" and "overwrite" options below
     #clipped_cube, mom0, mom1, mom2 = moment_maps(galaxy, path, dv=10, pbcor=pbcor, cliplevel=cliplevel, stokes=stokes, sun=True, tosave=True).calc_moms(units='M_Sun/pc^2', alpha_co=6.25)
@@ -67,11 +68,11 @@ for i in range(len(galaxies)):
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
     #              sun=sun, tosave=tosave).moment_1_2(moment=2)
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #              sun=sun, tosave=tosave).\
-    #    PVD(axis='major', full_width=False, find_angle=False, check_slit=True)
+    #             sun=sun, tosave=tosave).\
+    #   PVD(axis='major', find_angle=False, check_slit=True)
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
     #              sun=sun, tosave=tosave).\
-    #    PVD(axis='minor', full_width=False, check_slit=True)
+    #    PVD(axis='minor', check_slit=False)
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
     #              sun=sun, tosave=tosave).spectrum(x_axis='vel_offset')
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
