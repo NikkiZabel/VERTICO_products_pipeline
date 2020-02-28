@@ -4,6 +4,11 @@ from scipy import ndimage
 from scipy.ndimage import binary_dilation, label
 from targets import galaxies
 from astropy.convolution import convolve_fft
+from astroquery.ned import Ned
+from astropy.nddata.utils import Cutout2D
+from astropy import wcs
+from astropy.coordinates import SkyCoord
+from astropy import units as u
 
 
 class ClipCube:
@@ -93,6 +98,65 @@ class ClipCube:
         cube_uncorr.data[~np.isfinite(cube_uncorr.data)] = 0
 
         return cube_pbcorr, cube_uncorr
+
+    def preprocess(self, cube):
+
+        from matplotlib import pyplot as plt
+
+        # Find the desired new size based on rows and columns that are zero
+        empty_x = ~np.all(cube.data == 0, axis=(0, 1))
+        empty_y = ~np.all(cube.data == 0, axis=(0, 2))
+
+        new_size_x = len(empty_x[empty_x])
+        new_size_y = len(empty_y[empty_y])
+
+        # Read in central coordinates from NED
+        ra = Ned.query_object(cube.header['OBJECT'])['RA'][0]
+        dec = Ned.query_object(cube.header['OBJECT'])['DEC'][0]
+
+        # Find the central pixel based on these coordinates and WCS info
+        w = wcs.WCS(cube.header, naxis=2)
+        centre_sky = SkyCoord(ra, dec, unit=(u.deg, u.deg))
+        centre_pix = wcs.utils.skycoord_to_pixel(centre_sky, w)
+
+        plt.figure()
+        plt.imshow(np.sum(cube.data, axis=0))
+        plt.scatter(centre_pix[0], centre_pix[1], c='r')
+
+        shift_y = int(np.round(centre_pix[0] - cube.shape[2] / 2))
+        shift_x = int(np.round(centre_pix[1] - cube.shape[1] / 2))
+
+        if shift_x > 0:
+            temp = np.zeros((cube.shape[0], cube.shape[1] + shift_x * 2, cube.shape[2]))
+            temp[:, 0:cube.shape[1], :] = cube.data
+        elif shift_x < 0:
+            temp = np.zeros((cube.shape[0], cube.shape[1] + abs(shift_x) * 2, cube.shape[2]))
+            temp[:, temp.shape[1] - cube.shape[1]:temp.shape[1], :] = cube.data
+        else:
+            temp = cube.data
+
+        if shift_y > 0:
+            cube_new = np.zeros((temp.shape[0], temp.shape[1], temp.shape[2] + shift_y * 2))
+            cube_new[:, :, 0:temp.shape[2]] = temp
+        elif shift_y < 0:
+            cube_new = np.zeros((temp.shape[0], temp.shape[1], temp.shape[2] + abs(shift_y) * 2))
+            cube_new[:, :, cube_new.shape[2] - temp.shape[2]:cube_new.shape[2]] = temp
+        else:
+            cube_new = temp
+
+        plt.figure()
+        plt.imshow(np.sum(cube_new, axis=0))
+        plt.scatter(centre_pix[0], centre_pix[1], c='r')
+
+        new_header = cube.header.copy()
+        new_header['CRVAL1'] = centre_sky.ra.value
+        new_header['CRVAL2'] = centre_sky.dec.value
+        new_header['CRPIX1'] = cube_new.shape[1] / 2
+        new_header['CPRIX2'] = cube_new.shape[2] / 2
+        new_header['NAXIS1'] = cube_new.shape[2]
+        new_header['NAXIS2'] = cube_new.shape[1]
+
+        new_cube = fits.PrimaryHDU(cube_new, new_header)
 
     def split_cube(self, cube):
         """
