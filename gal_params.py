@@ -690,6 +690,7 @@ def parameters(galaxy):
         sysvel_offset = 10
         angle = 40
         pv_corr = 0
+        full_width = False
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -704,6 +705,7 @@ def parameters(galaxy):
         eccentricity = None
         high_inc = False
         figsize = (9.5, 7)
+        rad_prof_corr = 0
 
     if galaxy == 'NGC4713':
         centre_y = 26

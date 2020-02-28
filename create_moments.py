@@ -133,58 +133,6 @@ class MomentMaps:
 
         return header
 
-    def rotate_cube(self, cube, angle, naxis=3):
-
-        if naxis == 3:
-
-            shift_y = np.ceil(self.galaxy.centre_x - cube.shape[1] / 2) * 2
-            shift_x = np.ceil(self.galaxy.centre_y - cube.shape[2] / 2) * 2 + self.galaxy.pv_corr
-
-            if shift_x > 0:
-                temp = np.zeros((cube.shape[0], cube.shape[1] + int(abs(shift_x)), cube.shape[2]))
-                temp[:, :-int(abs(shift_x)), :] = cube.data
-            elif shift_x < 0:
-                temp = np.zeros((cube.shape[0], cube.shape[1] + int(abs(shift_x)), cube.shape[2]))
-                temp[:, int(abs(shift_x)):, :] = cube.data
-            else:
-                temp = cube.data
-
-            if shift_y > 0:
-                rot_cube = np.zeros((temp.shape[0], temp.shape[1], temp.shape[2] + int(abs(shift_y))))
-                rot_cube[:, :, :-int(abs(shift_y))] = temp
-            elif shift_y < 0:
-                rot_cube = np.zeros((temp.shape[0], temp.shape[1], temp.shape[2] + int(abs(shift_y))))
-                rot_cube[:, :, int(abs(shift_y)):] = temp
-            else:
-                rot_cube = temp
-
-            return ndimage.interpolation.rotate(rot_cube, angle, axes=(1, 2), reshape=True), shift_x
-
-        elif naxis == 2:
-
-            shift_y = np.ceil(self.galaxy.centre_x - cube.shape[0] / 2) * 2 + self.galaxy.pv_corr
-            shift_x = np.ceil(self.galaxy.centre_y - cube.shape[1] / 2) * 2
-
-            if shift_x > 0:
-                temp = np.zeros((cube.shape[0] + int(abs(shift_x)), cube.shape[1]))
-                temp[:-int(abs(shift_x)), :] = cube.data
-            elif shift_x < 0:
-                temp = np.zeros((cube.shape[0] + int(abs(shift_x)), cube.shape[1]))
-                temp[int(abs(shift_x)):, :] = cube.data
-            else:
-                temp = cube.data
-
-            if shift_y > 0:
-                rot_cube = np.zeros((temp.shape[0], temp.shape[1] + int(abs(shift_y))))
-                rot_cube[:, :-int(abs(shift_y))] = temp
-            elif shift_y < 0:
-                rot_cube = np.zeros((temp.shape[0], temp.shape[1] + int(abs(shift_y))))
-                rot_cube[:, int(abs(shift_y)):] = temp
-            else:
-                rot_cube = temp
-
-            return ndimage.interpolation.rotate(rot_cube, angle, axes=(0, 1), reshape=True), shift_x
-
     def calc_moms(self, units='M_Sun/pc^2', alpha_co=6.25):
         """
         Clip the spectral cube according to the desired method, and create moment 0, 1, and 2 maps. Save them as fits
@@ -264,7 +212,7 @@ class MomentMaps:
         else:
             raise AttributeError('Please choose between "major" and "minor" for the "axis" keyword')
 
-        cube_rot, shift_x = self.rotate_cube(clipped_cube, rot_angle)
+        cube_rot = ndimage.interpolation.rotate(clipped_cube.data, rot_angle, axes=(1, 2), reshape=True)
 
         if find_angle:
             from matplotlib import pyplot as plt
@@ -362,7 +310,7 @@ class MomentMaps:
             if axis == 'minor':
                 pvd_hdu.writeto(self.savepath + 'PVD_minor.fits', overwrite=True)
 
-        return pvd_hdu, shift_x
+        return pvd_hdu
 
     def spectrum(self):
         """

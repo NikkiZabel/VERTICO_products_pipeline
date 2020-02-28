@@ -276,15 +276,13 @@ class CreateImages:
 
         if self.refresh:
             if self.overwrite:
-                PV, shift_x = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                PV = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                  savepath=self.savepath, tosave=True).\
                     PVD(axis=axis, find_angle=find_angle, check_slit=check_slit)
             else:
-                PV, shift_x = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False).\
+                PV = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False).\
                     PVD(axis=axis, find_angle=find_angle, check_slit=check_slit)
         else:
-            _, shift_x = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False). \
-                PVD(axis=axis, find_angle=find_angle, check_slit=check_slit)
             PV = fits.open(self.path + 'PVD.fits')[0]
 
         clipped_cube, _, _, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
@@ -295,10 +293,6 @@ class CreateImages:
         vres = clipped_cube.header['CDELT3'] / 1000  # velocity resolution
         position = np.arange(0, PV.shape[1], 1)
         offset = (position - len(position) / 2) * res * 3600
-        if axis == 'major':
-            offset -= shift_x
-        else:
-            offset += 0
 
         # Plot the PVD
         fig, ax = plt.subplots(figsize=(15, 8))

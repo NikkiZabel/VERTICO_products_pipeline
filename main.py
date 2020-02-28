@@ -8,13 +8,13 @@ from matplotlib import pyplot as plt
 refresh = True
 overwrite = True
 sun = True
-tosave = True
+tosave = False
 
 galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
             'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
             'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808']
 
-galaxies = ['NGC4808']
+galaxies = ['IC3392']
 
 for i in range(len(galaxies)):
 
@@ -67,9 +67,9 @@ for i in range(len(galaxies)):
     #             sun=sun, tosave=tosave).moment_1_2()
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
     #              sun=sun, tosave=tosave).moment_1_2(moment=2)
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #             sun=sun, tosave=tosave).\
-    #   PVD(axis='major', find_angle=False, check_slit=True)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                 sun=sun, tosave=tosave).\
+       PVD(axis='major', find_angle=False, check_slit=True)
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
     #              sun=sun, tosave=tosave).\
     #    PVD(axis='minor', check_slit=False)
@@ -79,12 +79,12 @@ for i in range(len(galaxies)):
     #              sun=sun, tosave=tosave).spectrum(x_axis='velocity')
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
     #             sun=sun, tosave=tosave).spectrum(x_axis='frequency')
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave).radial_profile(units='arcsec',
-                                    alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
-                                                                            check_aperture=True)
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave).radial_profile(units='kpc',
-                                    alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
-                                                                            check_aperture=True)
+    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #            sun=sun, tosave=tosave).radial_profile(units='arcsec',
+    #                                alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
+    #                                                                        check_aperture=True)
+    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #            sun=sun, tosave=tosave).radial_profile(units='kpc',
+    #                                alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
+    #                                                                        check_aperture=True)
 

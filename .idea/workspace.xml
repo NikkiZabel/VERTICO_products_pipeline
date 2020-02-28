@@ -4,6 +4,10 @@
     <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/clip_cube.py" beforeDir="false" afterPath="$PROJECT_DIR$/clip_cube.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_moments.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -259,11 +263,17 @@
       <option name="project" value="LOCAL" />
       <updated>1582825063926</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="New pre-processing function">
+      <created>1582895783785</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1582895783785</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Implemented unit options for moment 0 map." />
     <MESSAGE value="Split up the PVD into creating it (+ saving it as a fits-file) and plotting it. Added the option to use the minor axis instead." />
     <MESSAGE value="Output all the desired fits and txt files with appropriate headers." />
     <MESSAGE value="Added radial profiles." />
@@ -288,14 +298,15 @@
     <MESSAGE value="Some tweaking of the PVD" />
     <MESSAGE value="New method for dealing with high inclinations for radial profile" />
     <MESSAGE value="Tweaked some galaxy parameters + new working code for padding the image to put the galaxy in the centre." />
-    <option name="LAST_COMMIT_MESSAGE" value="Tweaked some galaxy parameters + new working code for padding the image to put the galaxy in the centre." />
+    <MESSAGE value="New pre-processing function" />
+    <option name="LAST_COMMIT_MESSAGE" value="New pre-processing function" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="600" y="147" width="782" height="1080" key="CommitChangelistDialog2" timestamp="1582825063753">
+    <state x="600" y="147" width="782" height="1080" key="CommitChangelistDialog2" timestamp="1582895783711">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="552" y="1203" key="CommitChangelistDialog2/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1581007710807" />
-    <state x="600" y="147" width="777" height="819" key="CommitChangelistDialog2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1582825063753" />
+    <state x="600" y="147" width="777" height="819" key="CommitChangelistDialog2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1582895783711" />
     <state x="600" y="147" width="782" height="924" key="CommitChangelistDialog2/67.27.1853.1053@67.27.1853.1053" timestamp="1581519376119" />
     <state x="600" y="1080" width="782" height="1080" key="CommitChangelistDialog2/67.27.1853.2133@67.27.1853.2133" timestamp="1582119237888" />
     <state x="381" y="71" width="1102" height="751" key="FileChooserDialogImpl" timestamp="1581335857420">
@@ -308,11 +319,11 @@
     </state>
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1582211021685" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053@67.27.1853.1053" timestamp="1579877369983" />
-    <state x="588" y="289" width="800" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1582825065614">
+    <state x="588" y="289" width="800" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1582895784739">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="540" y="1349" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1581007711900" />
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1582825065614" />
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1582895784739" />
     <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053@67.27.1853.1053" timestamp="1581519377806" />
     <state x="588" y="1080" width="800" height="1080" key="Vcs.Push.Dialog.v2/67.27.1853.2133@67.27.1853.2133" timestamp="1582119239027" />
     <state x="648" y="379" key="com.intellij.ide.util.TipDialog" timestamp="1581503804799">
