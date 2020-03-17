@@ -65,15 +65,18 @@ class ClipCube:
         :return: 2D or 3D array of the inner 1/8 of the cube in the spatial directions
         """
 
-        start_x = int(self.galaxy.centre_x - 10)
-        stop_x = int(self.galaxy.centre_x + 10)
-
-        start_y = int(self.galaxy.centre_y - 10)
-        stop_y = int(self.galaxy.centre_y + 10)
-
         if len(cube.shape) == 3:
+            start_x = int(cube.shape[1] / 2 - 10)
+            stop_x = int(cube.shape[1] / 2 + 10)
+            start_y = int(cube.shape[2] / 2 - 10)
+            stop_y = int(cube.shape[2] / 2 + 10)
             return cube[:, start_x:stop_x, start_y:stop_y]
+
         elif len(cube.shape) == 2:
+            start_x = int(cube.shape[0] / 2 - 10)
+            stop_x = int(cube.shape[0] / 2 + 10)
+            start_y = int(cube.shape[1] / 2 - 10)
+            stop_y = int(cube.shape[1] / 2 + 10)
             return cube[start_x:stop_x, start_y:stop_y]
         else:
             raise AttributeError('Please provide a 2D or 3D array.')
@@ -197,15 +200,15 @@ class ClipCube:
         new_header['NAXIS1'] = cube_new.shape[2]
         new_header['NAXIS2'] = cube_new.shape[1]
 
-        return fits.PrimaryHDU(cube_new, new_header)
+        return fits.PrimaryHDU(cube_new, new_header), centre_pix[1], centre_pix[0]
 
     def preprocess(self, cube):
 
         cube = self.cut_empty_rows(cube)
         cube = self.cut_empty_columns(cube)
-        cube = self.centre_data(cube)
+        cube, centre_x, centre_y = self.centre_data(cube)
 
-        return cube
+        return cube, centre_x, centre_y
 
 
     def split_cube(self, cube):
@@ -442,14 +445,13 @@ class ClipCube:
             mask_hdu = fits.PrimaryHDU(mask.astype(int), cube_pbcorr.header)
             mask_hdu.writeto(self.savepath + 'mask_smooth.fits', overwrite=True)
 
-
         emiscube_pbcorr.data *= mask
         clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr.data, cube_pbcorr.header)
 
         # Do some pre-processing to make the creation of the moments easier
-        clipped_hdu = self.preprocess(clipped_hdu)
+        clipped_hdu, centre_x, centre_y = self.preprocess(clipped_hdu)
 
         if self.tosave:
             clipped_hdu.writeto(self.savepath + 'clipped_cube.fits', overwrite=True)
 
-        return clipped_hdu
+        return clipped_hdu, centre_x, centre_y

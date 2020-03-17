@@ -3,15 +3,12 @@ import gal_params
 class galaxies:
     def __init__(self, galname):
 
-        name, centre_x, centre_y, size, vrange, vrange_2, cliplevel, stokes, start, stop, sysvel_offset, angle, \
-        pv_corr, full_width, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \
-        prune_by_fracbeam, expand_by_fracbeam, expand_by_npix, expand_by_nchan, inclination, eccentricity, high_inc, \
-        figsize, rad_prof_corr = gal_params.parameters(galname)
+        name, vrange, vrange_2, cliplevel, stokes, start, stop, sysvel_offset, angle, \
+        full_width, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \
+        prune_by_fracbeam, expand_by_fracbeam, expand_by_npix, expand_by_nchan, inclination, eccentricity, \
+        figsize = gal_params.parameters(galname)
 
         self.name = name
-        self.centre_x = centre_x
-        self.centre_y = centre_y
-        self.size = size
         self.vrange = vrange
         self.vrange2 = vrange_2
         self.cliplevel = cliplevel
@@ -20,7 +17,6 @@ class galaxies:
         self.stop = stop
         self.sysvel_offset = sysvel_offset
         self.angle = angle
-        self.pv_corr = pv_corr
         self.full_width = full_width
         self.distance = distance
         self.nchan_low = nchan_low
@@ -34,6 +30,4 @@ class galaxies:
         self.expand_by_nchan = expand_by_nchan
         self.inclination = inclination
         self.eccentricity = eccentricity
-        self.high_inc = high_inc
         self.figsize = figsize
-        self.rad_prof_corr = rad_prof_corr

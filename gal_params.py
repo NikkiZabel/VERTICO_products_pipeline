@@ -1,9 +1,86 @@
 def parameters(galaxy):
 
+    if galaxy == 'NGC4772':
+        centre_y = 0
+        centre_x = 0
+        vrange = 400
+        vrange_2 = 30
+        cliplevel = 3
+        stokes = False
+        start = 5
+        stop = 90
+        sysvel_offset = 0
+        angle = 130
+        full_width = True
+        distance = 16.5
+        nchan_low = 2
+        cliplevel_low = 2
+        nchan_high = 3
+        cliplevel_high = 3.5
+        prune_by_npix = None
+        prune_by_fracbeam = 1
+        expand_by_fracbeam = None
+        expand_by_npix = None
+        expand_by_nchan = 2
+        inclination = None
+        eccentricity = None
+        figsize = (9, 7.5)
+
+    if galaxy == 'NGC4567':
+        centre_y = 0
+        centre_x = 0
+        vrange = 120
+        vrange_2 = 50
+        cliplevel = 3
+        stokes = False
+        start = 35
+        stop = 63
+        sysvel_offset = 0
+        angle = 100
+        full_width = False
+        distance = 16.5
+        nchan_low = 2
+        cliplevel_low = 2
+        nchan_high = 3
+        cliplevel_high = 3.5
+        prune_by_npix = None
+        prune_by_fracbeam = 1
+        expand_by_fracbeam = None
+        expand_by_npix = None
+        expand_by_nchan = 2
+        inclination = None
+        eccentricity = None
+        figsize = (11, 6)
+
+    if galaxy == 'NGC4396':
+        centre_y = 0
+        centre_x = 0
+        vrange = 100
+        vrange_2 = 30
+        cliplevel = 3
+        stokes = False
+        start = 27
+        stop = 49
+        sysvel_offset = 0
+        angle = 125
+        full_width = False
+        distance = 16.5
+        nchan_low = 2
+        cliplevel_low = 2
+        nchan_high = 3
+        cliplevel_high = 3.5
+        prune_by_npix = None
+        prune_by_fracbeam = 1
+        expand_by_fracbeam = None
+        expand_by_npix = None
+        expand_by_nchan = 2
+        inclination = None
+        eccentricity = None
+        figsize = (10, 7)
+
     if galaxy == 'VCC1581':
         centre_y = 40
         centre_x = 37
-        size = 0
         vrange = 0
         vrange_2 = 0
         cliplevel = 3
@@ -29,7 +106,6 @@ def parameters(galaxy):
     if galaxy == 'NGC4808':
         centre_y = 40
         centre_x = 37
-        size = 0
         vrange = 150
         vrange_2 = 40
         cliplevel = 3
@@ -38,7 +114,6 @@ def parameters(galaxy):
         stop = 52
         sysvel_offset = 0
         angle = 310
-        pv_corr = 0
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -52,14 +127,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = False
         figsize = (10, 7.5)
-        rad_prof_corr = 0
 
     if galaxy == 'NGC4651':
         centre_y = 29
         centre_x = 26
-        size = 0
         vrange = 200
         vrange_2 = 75
         cliplevel = 3
@@ -68,7 +140,6 @@ def parameters(galaxy):
         stop = 58
         sysvel_offset = 0
         angle = 260
-        pv_corr = 0
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -82,14 +153,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = False
         figsize = (10, 7)
-        rad_prof_corr = 0
 
     if galaxy == 'NGC4607':
         centre_y = 19
         centre_x = 31
-        size = 0
         vrange = 120
         vrange_2 = 30
         cliplevel = 3
@@ -98,7 +166,6 @@ def parameters(galaxy):
         stop = 62
         sysvel_offset = 0
         angle = 182
-        pv_corr = 13
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -112,14 +179,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = True
         figsize = (9, 10)
-        rad_prof_corr = -1
 
     if galaxy == 'NGC4606':
         centre_y = 21
         centre_x = 20
-        size = 25
         vrange = 80
         vrange_2 = 40
         cliplevel = 3
@@ -128,7 +192,6 @@ def parameters(galaxy):
         stop = 59
         sysvel_offset = 0
         angle = 215
-        pv_corr = 3
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -142,14 +205,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = False
         figsize = (10, 8)
-        rad_prof_corr = 0
 
     if galaxy == 'NGC4533':
         centre_y = 18
         centre_x = 25
-        size = 30
         vrange = 80
         vrange_2 = 30
         cliplevel = 3
@@ -158,7 +218,6 @@ def parameters(galaxy):
         stop = 59
         sysvel_offset = 0
         angle = 165
-        pv_corr = -10
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -172,14 +231,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = True
         figsize = (10, 8)
-        rad_prof_corr = 8
 
     if galaxy == 'NGC4532':
         centre_y = 26
         centre_x = 39
-        size = 0
         vrange = 100
         vrange_2 = 30
         cliplevel = 3
@@ -188,7 +244,6 @@ def parameters(galaxy):
         stop = 50
         sysvel_offset = 0
         angle = 330
-        pv_corr = 8
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -202,14 +257,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = True
         figsize = (10, 10)
-        rad_prof_corr = 1
 
     if galaxy == 'NGC4522':
         centre_y = 34
         centre_x = 32
-        size = 0
         vrange = 100
         vrange_2 = 30
         cliplevel = 3
@@ -218,7 +270,6 @@ def parameters(galaxy):
         stop = 63
         sysvel_offset = 0
         angle = 215
-        pv_corr = 5
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -232,14 +283,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = True
         figsize = (11, 9)
-        rad_prof_corr = -10
 
     if galaxy == 'NGC4419':
         centre_y = 24
         centre_x = 27
-        size = 0
         vrange = 200
         vrange_2 = 75
         cliplevel = 3
@@ -248,7 +296,6 @@ def parameters(galaxy):
         stop = 68
         sysvel_offset = 0
         angle = 310
-        pv_corr = 7
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -262,14 +309,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = True
         figsize = (10, 8)
-        rad_prof_corr = 6
 
     if galaxy == 'NGC4405':
         centre_y = 28
         centre_x = 35
-        size = 0
         vrange = 100
         vrange_2 = 30
         cliplevel = 3
@@ -278,7 +322,6 @@ def parameters(galaxy):
         stop = 59
         sysvel_offset = 0
         angle = 200
-        pv_corr = -4
         full_width = 0
         distance = 16.5
         nchan_low = 2
@@ -292,14 +335,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = False
         figsize = (10, 8)
-        rad_prof_corr = 0
 
     if galaxy == 'NGC4394':
         centre_y = 27
         centre_x = 32
-        size = 0
         vrange = 100
         vrange_2 = 50
         cliplevel = 3
@@ -308,7 +348,6 @@ def parameters(galaxy):
         stop = 62
         sysvel_offset = 0
         angle = 70
-        pv_corr = 6
         full_width = True
         distance = 16.5
         nchan_low = 2
@@ -322,14 +361,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = 1
-        high_inc = False
         figsize = (11, 9)
-        rad_prof_corr = 0
 
     if galaxy == 'NGC4388':
         centre_y = 52
         centre_x = 18
-        size = 0
         vrange = 200
         vrange_2 = 100
         cliplevel = 3
@@ -338,7 +374,6 @@ def parameters(galaxy):
         stop = 75
         sysvel_offset = 0
         angle = 90
-        pv_corr = 0
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -352,14 +387,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = True
         figsize = (14.5, 6)
-        rad_prof_corr = -4
 
     if galaxy == 'NGC4383':
         centre_y = 35
         centre_x = 26
-        size = 0
         vrange = 100
         vrange_2 = 50
         cliplevel = 3
@@ -368,7 +400,6 @@ def parameters(galaxy):
         stop = 52
         sysvel_offset = 0
         angle = 200
-        pv_corr = 10
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -382,14 +413,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = False
         figsize = (11, 8)
-        rad_prof_corr = 0
 
     if galaxy == 'NGC4380':
         centre_y = 36
         centre_x = 40
-        size = 0
         vrange = 200
         vrange_2 = 50
         cliplevel = 3
@@ -398,7 +426,6 @@ def parameters(galaxy):
         stop = 55
         sysvel_offset = 20
         angle = 333
-        pv_corr = 6
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -412,14 +439,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = False
         figsize = (11, 9)
-        rad_prof_corr = 0
 
     if galaxy == 'NGC4351':
         centre_y = 28
         centre_x = 22
-        size = 0
         vrange = 50
         vrange_2 = 30
         cliplevel = 3
@@ -428,7 +452,6 @@ def parameters(galaxy):
         stop = 47
         sysvel_offset = 0
         angle = 65
-        pv_corr = 0
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -442,14 +465,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = False
         figsize = (11, 7.5)
-        rad_prof_corr = 0
 
     if galaxy == 'NGC4330':
         centre_y = 43
         centre_x = 37
-        size = 0
         vrange = 150
         vrange_2 = 30
         cliplevel = 3
@@ -458,7 +478,6 @@ def parameters(galaxy):
         stop = 65
         sysvel_offset = 0
         angle = 58
-        pv_corr = 1
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -471,13 +490,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = 89
         eccentricity = None
-        high_inc = True
         figsize = (10, 7)
 
     if galaxy == 'NGC4302':
         centre_y = 16
         centre_x = 73
-        size = 0
         vrange = 200
         vrange_2 = 75
         cliplevel = 3
@@ -486,7 +503,6 @@ def parameters(galaxy):
         stop = 60
         sysvel_offset = 0
         angle = 180
-        pv_corr = -10
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -500,14 +516,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = True
         figsize = (5.5, 12)
-        rad_prof_corr = 3
 
     if galaxy == 'NGC4294':
         centre_y = 25
         centre_x = 35
-        size = 40
         vrange = 100
         vrange_2 = 40
         cliplevel = 3
@@ -516,7 +529,6 @@ def parameters(galaxy):
         stop = 59
         sysvel_offset = 0
         angle = 340
-        pv_corr = -4
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -530,13 +542,10 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = False
-        figsize = (10, 7.5)
 
     if galaxy == 'NGC4222':
         centre_y = 42
         centre_x = 35
-        size = 0
         vrange = 100
         vrange_2 = 25
         cliplevel = 3
@@ -545,7 +554,6 @@ def parameters(galaxy):
         stop = 67
         sysvel_offset = 0
         angle = 58
-        pv_corr = 0
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -559,14 +567,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = True
         figsize = (10, 7)
-        rad_prof_corr = 0
 
     if galaxy == 'NGC4216':
         centre_y = 40
         centre_x = 87
-        size = 0
         vrange = 300
         vrange_2 = 75
         cliplevel = 3
@@ -575,7 +580,6 @@ def parameters(galaxy):
         stop = 67
         sysvel_offset = 0
         angle = 200
-        pv_corr = 0
         full_width = True
         distance = 16.5
         nchan_low = 2
@@ -589,14 +593,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = True
         figsize = (7.5, 10)
-        rad_prof_corr = 0
 
     if galaxy == 'NGC4192':
         centre_y = 48
         centre_x = 73
-        size = 0
         vrange = 250
         vrange_2 = 100
         cliplevel = 3
@@ -605,7 +606,6 @@ def parameters(galaxy):
         stop = 64
         sysvel_offset = 0
         angle = 150
-        pv_corr = 0
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -619,14 +619,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = True
         figsize = (9.5, 10)
-        rad_prof_corr = -3
 
     if galaxy == 'NGC4064':
         centre_y = 26
         centre_x = 28
-        size = 30
         vrange = 120
         vrange_2 = 60
         cliplevel = 3
@@ -635,7 +632,6 @@ def parameters(galaxy):
         stop = 61
         sysvel_offset = 0
         angle = 345
-        pv_corr = 11
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -648,13 +644,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = False
         figsize = (10, 7.5)
 
     if galaxy == 'IC3418':
         centre_y = 23
         centre_x = 21
-        size = 0
         vrange = 0
         vrange_2 = 0
         cliplevel = 3
@@ -674,13 +668,12 @@ def parameters(galaxy):
         expand_by_npix = None
         expand_by_nchan = 2
         inclination = None
-        eccentricity = 1
+        eccentricity = None
         figsize = (12, 7)
 
     if galaxy == 'IC3392':
         centre_y = 23
         centre_x = 21
-        size = 0
         vrange = 120
         vrange_2 = 40
         cliplevel = 3
@@ -689,7 +682,6 @@ def parameters(galaxy):
         stop = 52
         sysvel_offset = 10
         angle = 40
-        pv_corr = 0
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -703,14 +695,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = False
         figsize = (9.5, 7)
-        rad_prof_corr = 0
 
     if galaxy == 'NGC4713':
         centre_y = 26
         centre_x = 25
-        size = 0
         vrange = 110
         vrange_2 = 40
         cliplevel = 4
@@ -719,7 +708,6 @@ def parameters(galaxy):
         stop = 57
         sysvel_offset = 0
         angle = 274
-        pv_corr = 22
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -733,14 +721,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = False
         figsize = (12, 7)
-        rad_prof_corr = 0
 
     elif galaxy == 'NGC4568':
         centre_y = 23
         centre_x = 27
-        size = 0
         vrange = 150
         vrange_2 = 75
         cliplevel = 4
@@ -749,7 +734,6 @@ def parameters(galaxy):
         stop = 66
         sysvel_offset = 0
         angle = 20
-        pv_corr = 0
         full_width = False
         distance = 16.5
         nchan_low = 2
@@ -763,14 +747,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None  #70
         eccentricity = None
-        high_inc = False
         figsize = (11.5, 10)
-        rad_prof_corr = 0
 
     elif galaxy == 'NGC4189':
         centre_y = 32
         centre_x = 20
-        size = 0
         vrange = 150
         vrange_2 = 50
         cliplevel = 3
@@ -779,7 +760,6 @@ def parameters(galaxy):
         stop = 61
         sysvel_offset = 0
         angle = 245
-        pv_corr = 0
         distance = 16.5
         nchan_low = 2
         cliplevel_low = 2
@@ -792,13 +772,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = False
         figsize = (12, 7.5)
 
     elif galaxy == 'NGC4299':
         centre_y = 24
         centre_x = 24
-        size = 0
         vrange = 100
         vrange_2 = 25
         cliplevel = 1
@@ -807,7 +785,6 @@ def parameters(galaxy):
         stop = 45
         sysvel_offset = 0
         angle = 270
-        pv_corr = 0
         full_width = True
         distance = 16.5
         nchan_low = 2
@@ -821,12 +798,11 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        high_inc = False
         figsize = (10, 7)
 
     name = galaxy
 
-    return name, centre_x, centre_y, size, vrange, vrange_2, cliplevel, stokes, start, stop, sysvel_offset, angle, \
-           pv_corr, full_width, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \
+    return name, vrange, vrange_2, cliplevel, stokes, start, stop, sysvel_offset, angle, \
+           full_width, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \
            prune_by_fracbeam, expand_by_fracbeam, expand_by_npix, expand_by_nchan, inclination, eccentricity, \
-           high_inc, figsize, rad_prof_corr
+           figsize

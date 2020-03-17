@@ -65,15 +65,6 @@ class CreateImages:
 
         f = plt.figure(figsize=self.galaxy.figsize)
 
-        if self.galaxy.size > 0:
-            # make a smaller cutout of the CO emission
-            w = wcs.WCS(image.header)
-            cutout = Cutout2D(image.data, (self.galaxy.centre_y, self.galaxy.centre_x), self.galaxy.size, wcs=w,
-                              mode='partial')
-            image.header['CRPIX1'] = cutout.wcs.wcs.crpix[0]
-            image.header['CRPIX2'] = cutout.wcs.wcs.crpix[1]
-            image = fits.PrimaryHDU(cutout.data, image.header)
-
         # show the image in colour
         fig = apl.FITSFigure(image, figure=f)
         fig.set_theme('publication')
@@ -183,15 +174,6 @@ class CreateImages:
 
         f = plt.figure(figsize=self.galaxy.figsize)
 
-        if self.galaxy.size > 0:
-            #make a smaller cutout of the CO emission
-            w = wcs.WCS(image.header)
-            cutout = Cutout2D(image.data, (self.galaxy.centre_y, self.galaxy.centre_x), self.galaxy.size, wcs=w,
-                              mode='partial')
-            image.header['CRPIX1'] = cutout.wcs.wcs.crpix[0]
-            image.header['CRPIX2'] = cutout.wcs.wcs.crpix[1]
-            image = fits.PrimaryHDU(cutout.data, image.header)
-
         # show the image in colour
         fig = apl.FITSFigure(image, figure=f)
 
@@ -208,34 +190,45 @@ class CreateImages:
 
         #add a colourbar
         if moment == 2:
-            fig.show_contour(image, cmap='sauron', levels=np.linspace(0, self.galaxy.vrange2, len(vel_array)), vmin=0,
-                             vmax=self.galaxy.vrange2, extend='both', filled=True, overlap=True)
-            colors = plt.contourf([[0, 0], [0, 0]], levels=np.linspace(0, self.galaxy.vrange2, len(vel_array)),
+            if self.galaxy.vrange2:
+                vrange2 = self.galaxy.vrange2
+            else:
+                vrange2 = np.nanmax(image.data - sysvel)
+
+            fig.show_contour(image, cmap='sauron', levels=np.linspace(0, vrange2, len(vel_array)), vmin=0,
+                             vmax=vrange2, extend='both', filled=True, overlap=True)
+            colors = plt.contourf([[0, 0], [0, 0]], levels=np.linspace(0, vrange2, len(vel_array)),
                                   cmap='sauron')
 
-            if self.galaxy.vrange2 < 11:
-                ticks = np.arange(0, self.galaxy.vrange2 + 1, 1)
-            elif self.galaxy.vrange2 < 100:
-                ticks = np.arange(0, self.galaxy.vrange2 + 10, 10)
+            if vrange2 < 11:
+                ticks = np.arange(0, vrange2 + 1, 1)
+            elif vrange2 < 100:
+                ticks = np.arange(0, vrange2 + 10, 10)
             else:
-                ticks = np.arange(0, self.galaxy.vrange2 + 20, 20)
+                ticks = np.arange(0, vrange2 + 20, 20)
             cbar = f.colorbar(colors, ticks=ticks)
             cbar.set_label(r'Observed $\sigma_v$ [km s$^{-1}$]')
 
         else:
-            fig.show_contour(image, cmap='sauron', levels=np.linspace(-self.galaxy.vrange, self.galaxy.vrange,
-                len(vel_array)), vmin=-self.galaxy.vrange, vmax=self.galaxy.vrange, extend='both', filled=True,
-                             overlap=True)
-            colors = plt.contourf([[0, 0], [0, 0]], levels=np.linspace(-self.galaxy.vrange, self.galaxy.vrange,
-                                                                       len(vel_array)), cmap='sauron')
-            if self.galaxy.vrange < 16:
-                tickarr = np.arange(-self.galaxy.vrange, 0, 3)
-            elif self.galaxy.vrange < 60:
-                tickarr = np.arange(-self.galaxy.vrange, 0, 10)
-            elif self.galaxy.vrange < 130:
-                tickarr = np.arange(-self.galaxy.vrange, 0, 20)
+            if self.galaxy.vrange:
+                vrange = self.galaxy.vrange
             else:
-                tickarr = np.arange(-self.galaxy.vrange, 0, 40)
+                vrange = 1.5 * (np.nanmax(image.data) - sysvel)
+
+            fig.show_contour(image, cmap='sauron', levels=np.linspace(-vrange, vrange,
+                len(vel_array)), vmin=-vrange, vmax=vrange, extend='both', filled=True,
+                             overlap=True)
+            colors = plt.contourf([[0, 0], [0, 0]], levels=np.linspace(-vrange, vrange,
+                                                                       len(vel_array)), cmap='sauron')
+
+            if vrange < 16:
+                tickarr = np.arange(-vrange, 0, 3)
+            elif vrange < 60:
+                tickarr = np.arange(-vrange, 0, 10)
+            elif vrange < 130:
+                tickarr = np.arange(-vrange, 0, 20)
+            else:
+                tickarr = np.arange(-vrange, 0, 40)
 
             ticks = np.concatenate((tickarr, [0], abs(tickarr)))
             cbar = f.colorbar(colors, ticks=ticks)
@@ -349,12 +342,12 @@ class CreateImages:
 
         # Contours in black
         C2 = ax.contour(PV.data,
-                   extent=[np.amin(offset), np.amax(offset), np.amin(velocity), np.amax(velocity)],
+                   extent=[np.amax(offset), np.amin(offset), np.amax(velocity), np.amin(velocity)],
                    colors='k', levels=levels, linewidths=1)
 
         # Filling with coloured contours
         C1 = ax.contourf(PV.data,
-                    extent=[np.amin(offset), np.amax(offset), np.amin(velocity), np.amax(velocity)],
+                    extent=[np.amax(offset), np.amin(offset), np.amax(velocity), np.amin(velocity)],
                     cmap=self.custom_cmap(), levels=levels)
 
         # Add a colourbar
@@ -364,7 +357,10 @@ class CreateImages:
 
         # Make the plot pretty
         ax.set_xlim(np.amin(offset) - 0.2 * np.amax(offset), np.amax(offset) + 0.2 * np.amax(offset))
-        ax.set_ylim(-self.galaxy.vrange * 1.3, self.galaxy.vrange * 1.3)
+        if self.galaxy.vrange:
+            ax.set_ylim(-self.galaxy.vrange * 1.5, self.galaxy.vrange * 1.5)
+        else:
+            ax.set_ylim(-np.amax(velocity) * 1.1, np.amax(velocity) * 1.1)
         ax.set_xlabel('Offset [arcsec]')
         ax_kpc.set_xlabel('Offset [kpc]')
         ax.set_ylabel(r'Relative velocity [km s$^{-1}$]')
@@ -372,7 +368,7 @@ class CreateImages:
         x1, x2 = ax.get_xlim()
         y1, y2 = ax.get_ylim()
         ax.errorbar(0.8 * x2, 0.7 * y2, xerr=clipped_cube.header['BMAJ'] * 3600 / 2., yerr=vres / 2., ecolor='k', capsize=2.5)
-        ax.annotate('PA = ' + str((self.galaxy.angle)) + '$^o$', xy=(-0.8 * x2, -0.7 * y2), fontsize=20)
+        ax.annotate('PA = ' + str(self.galaxy.angle) + '$^o$', xy=(-0.8 * x2, -0.7 * y2), fontsize=20)
 
         plt.tight_layout()
 
@@ -388,6 +384,7 @@ class CreateImages:
             if self.overwrite:
                 spectrum, velocity, v_off, frequency = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                     sun=self.sun, savepath=self.savepath, tosave=True).spectrum()
+
             else:
                 spectrum, velocity, v_off, frequency = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                     sun=self.sun, savepath=self.savepath, tosave=False).spectrum()

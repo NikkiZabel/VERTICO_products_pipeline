@@ -17,6 +17,8 @@ class MomentMaps:
         self.savepath = savepath or './'
         self.sun = sun
         self.tosave = tosave
+        _, self.centre_x, self.centre_y = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                                   savepath=self.savepath, tosave=self.tosave).do_clip()
 
     def makebeam(self, xpixels, ypixels, header, rot=0, cent=0):
         """
@@ -143,7 +145,7 @@ class MomentMaps:
         :return: clipped spectral cube, HDUs of the moment 0, 1, and 2 maps, and the systemic velocity in km/s
         """
 
-        cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
+        cube, _, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
                         tosave=self.tosave).do_clip()
 
         vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
@@ -231,7 +233,7 @@ class MomentMaps:
         if check_slit:
             from matplotlib import pyplot as plt
             test = cube_rot.copy()
-            test[:, int(cube_rot.shape[1] / 2 - slitsize): int(cube_rot.shape[1] / 2 + slitsize),:] = np.nan
+            test[:, int(cube_rot.shape[1] / 2 - slitsize): int(cube_rot.shape[1] / 2 + slitsize), :] = np.nan
             plt.imshow(np.sum(test, axis=0))
 
         # There is a lot of garbage because of the interpolation used by the rotation function, define a lower limit to get rid of that
@@ -243,7 +245,7 @@ class MomentMaps:
 
         # Find the sky coordinates of the central pixel
         w = wcs.WCS(clipped_cube.header, naxis=2)
-        centre_sky = wcs.utils.pixel_to_skycoord(self.galaxy.centre_y, self.galaxy.centre_x, wcs=w)
+        centre_sky = wcs.utils.pixel_to_skycoord(self.centre_y, self.centre_x, wcs=w)
 
         # Create an appropriate header
         pvd_header = fits.Header()
@@ -260,6 +262,8 @@ class MomentMaps:
         pvd_header['BMAJ'] = clipped_cube.header['BMAJ']
         pvd_header['BMIN'] = clipped_cube.header['BMIN']
         pvd_header['BPA'] = clipped_cube.header['BPA']
+        pvd_header['FULL_WIDTH'] = self.galaxy.full_width
+        pvd_header.comments['FULL_WIDTH'] = 'True if all emission used.'
         pvd_header['OBJECT'] = clipped_cube.header['OBJECT']
         pvd_header['EQUINOX'] = 2000
         pvd_header['RADESYS'] = 'FK5'
@@ -279,7 +283,7 @@ class MomentMaps:
         pvd_header['PC2_1'] = clipped_cube.header['PC2_1']
         pvd_header['PC1_2'] = clipped_cube.header['PC1_2']
         pvd_header['PC2_2'] = pvd_header['CDELT2']
-        pvd_header['CENTR_PIX'] = '(' + str(self.galaxy.centre_y) + ', ' + str(self.galaxy.centre_x) + ')'
+        pvd_header['CENTR_PIX'] = '(' + str(self.centre_y) + ', ' + str(self.centre_x) + ')'
         pvd_header.comments['CENTR_PIX'] = 'Central pix used for rot. + loc. slit'
         pvd_header['CENTR_PIX_SKY'] = '(' + str(np.round(centre_sky.ra.deg, 2)) + ', ' + str(np.round(centre_sky.dec.deg, 2)) + ')'
         pvd_header.comments['CENTR_PIX_SKY'] = 'Central pix in sky coords (deg)'
@@ -329,14 +333,6 @@ class MomentMaps:
         #psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
         #beamsize = np.sum(psf)
 
-        # Make a cutout around the emission in the spatial direction, to reduce noise
-        cutout = cube_pbcorr.data[:, self.galaxy.centre_y - self.galaxy.size:self.galaxy.centre_y + self.galaxy.size,
-                 self.galaxy.centre_x - self.galaxy.size:self.galaxy.centre_x + self.galaxy.size]
-
-        ### THIS OVERWRITES THE CUTOUT TO USE THE ENTIRE CUBE ###
-        cutout = cube_pbcorr.data                       # <----------------------------------------------------------
-        ### REMOVE IF WE DO WANT TO USE THE CUTOUT ###
-
         # Make this work if necessary
         #if custom_region:
             #region = pyregion.open(path + 'ds9.reg')
@@ -344,7 +340,7 @@ class MomentMaps:
             #mask_3d = np.tile(mask, (len(cube[:, 0, 0]), 1, 1))
             #cutout = np.where(mask_3d, cube, 0)
 
-        spectrum = np.nansum(cutout, axis=(1, 2))
+        spectrum = np.nansum(cube_pbcorr.data, axis=(1, 2))
         _, _, vel_array_full = self.create_vel_array(cube_pbcorr)
 
         spectrum_velocities = vel_array_full[self.galaxy.start - 5:self.galaxy.stop + 5]
@@ -355,17 +351,17 @@ class MomentMaps:
         if self.tosave:
             np.savetxt(self.savepath + 'spectrum.csv',
                        np.column_stack((spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies)),
-                       delimiter=',', header='Spectrum (K), Velocity (km/s), Velocity offset (km/s)Frequency (GHz)')
+                       delimiter=',', header='Spectrum (K), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)')
 
         # Estimate the rms in the spectrum
         #emis, noise = self.splitCube(cutout, self.galaxy.start, self.galaxy.stop)
         #rms = np.std(np.sum(noise, axis=(1, 2)))
         #np.savetxt(path + 'specnoise.txt', [rms / beamsize])
 
-        psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
-        beamsize = np.sum(psf)
-        spectrum /= beamsize
-        print(np.log10(3.93e-17 * 16.5 ** 2. * 2e20 / 0.7 * np.trapz(np.flip(spectrum), np.flip(spectrum_velocities)) / cube_pbcorr.header['JTOK']))
+        #psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
+        #beamsize = np.sum(psf)
+        #spectrum /= beamsize
+        #print(np.log10(3.93e-17 * 16.5 ** 2. * 2e20 / 0.7 * np.trapz(np.flip(spectrum), np.flip(spectrum_velocities)) / cube_pbcorr.header['JTOK']))
 
         return spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies # / beamsize
 
@@ -402,19 +398,66 @@ class MomentMaps:
             inc = table[1].data['inclination'][table[1].data['Galaxy'] == self.galaxy.name]
             e = np.sin(np.deg2rad(inc))[0]
 
-        centre = (self.galaxy.centre_y, self.galaxy.centre_x)
+        centre = (self.centre_y, self.centre_x)
+        hi_inc = False
         rad_prof = []
         radius = []
         area = []
 
-        if self.galaxy.high_inc:
+        b_in = -beam_pix + 0.000000000001
+        b_out = 0
+        theta = self.galaxy.angle
+
+        emission = 2112
+        area_temp = 1
+
+        if check_aperture:
+            from matplotlib import pyplot as plt
+            plt.figure()
+            plt.imshow(mom0_hdu.data)
+
+        while emission / area_temp > 1e-1:
+
+            b_in += beam_pix
+            b_out += beam_pix
+
+            if emission == 2112:
+                a_in = 0.0000000000001
+            else:
+                a_in = a_out
+
+            if e == 1:
+                a_out = b_out
+            else:
+                a_out = b_out / np.sqrt(1 - e ** 2)
+
+            aperture = EllipticalAnnulus(centre, a_in, a_out, b_out, theta)
+
+            if check_aperture:
+                aperture.plot(color='red')
+
+            emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0] #* \
+                      # (np.deg2rad(mom0_hdu.header['CDELT2']) * self.galaxy.distance * 1e6) ** 2
+
+            area_temp = aperture.area
+            area.append(area_temp)
+            rad_prof.append(emission / area_temp)
+            radius.append(a_out)
+
+        if len(radius) < 5:
+
+            hi_inc = True
+
+            rad_prof = []
+            radius = []
+            area = []
 
             angle = self.galaxy.angle + 180 + 90
 
-            mom0_rot, shift_x = self.rotate_cube(mom0_hdu, angle, naxis=2)
+            mom0_rot = ndimage.interpolation.rotate(mom0_hdu.data, angle, reshape=True)
 
             inner = 0
-            centre = (mom0_rot.shape[1]) / 2 + shift_x + self.galaxy.rad_prof_corr
+            centre = (mom0_rot.shape[1]) / 2
             emission = 2112
 
             while emission > 1e-1:
@@ -436,47 +479,6 @@ class MomentMaps:
 
                 inner += beam_pix
 
-        else:
-            a_in = -beam_pix + 0.000000000001
-            a_out = 0
-            theta = self.galaxy.angle - 45
-
-            emission = 2112
-            area_temp = 1
-
-            if check_aperture:
-                from matplotlib import pyplot as plt
-                plt.figure()
-                plt.imshow(mom0_hdu.data)
-
-            while emission / area_temp > 1e-1:
-
-                a_in += beam_pix
-                a_out += beam_pix
-
-                if emission == 2112:
-                    b_in = 0.0000000000001
-                else:
-                    b_in = a_out
-
-                if e == 1:
-                    b_out = a_out
-                else:
-                    b_out = a_out * np.sqrt(1 - e ** 2)
-
-                aperture = EllipticalAnnulus(centre, a_in, a_out, b_out, theta)
-
-                if check_aperture:
-                    aperture.plot(color='red')
-
-                emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0] #* \
-                          # (np.deg2rad(mom0_hdu.header['CDELT2']) * self.galaxy.distance * 1e6) ** 2
-
-                area_temp = aperture.area
-                area.append(area_temp)
-                rad_prof.append(emission / area_temp)
-                radius.append(b_out)
-
         rad_prof = rad_prof[:-1]
         radius = np.array(radius[:-1])
         area = area[:-1]
@@ -486,18 +488,18 @@ class MomentMaps:
         error = np.sqrt(N_beams) * rms
 
         w = wcs.WCS(mom0_hdu.header, naxis=2)
-        centre_sky = wcs.utils.pixel_to_skycoord(self.galaxy.centre_y, self.galaxy.centre_x, wcs=w)
+        centre_sky = wcs.utils.pixel_to_skycoord(self.centre_y, self.centre_x, wcs=w)
 
-        if self.galaxy.high_inc:
+        if hi_inc:
             csv_header = 'Slices parallel to the minor axis centered around (RA, Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
-                         ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(self.galaxy.centre_y) + \
-                         ', ' + str(self.galaxy.centre_x) + ')). ' \
+                         ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(self.centre_y) + \
+                         ', ' + str(self.centre_x) + ')). ' \
                         'Radii are equal to one beamsize. \n \n' \
                          'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
         else:
             csv_header = 'Elliptical apertures centered around (RA, Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
-                         ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(self.galaxy.centre_y) + \
-                         ', ' + str(self.galaxy.centre_x) + ')). ' \
+                         ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(self.centre_y) + \
+                         ', ' + str(self.centre_x) + ')). ' \
                         'Radii are defined as the semi-major axes of these apertures. \n \n' \
                          'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
 
