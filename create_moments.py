@@ -396,6 +396,10 @@ class MomentMaps:
             print('Reading the inclination from the master table.')
             table = fits.open(table_path)
             inc = table[1].data['inclination'][table[1].data['Galaxy'] == self.galaxy.name]
+            if inc == [90]:
+                inc = [89]
+            if inc == [0]:
+                inc = [1]
             e = np.sin(np.deg2rad(inc))[0]
 
         centre = (self.centre_y, self.centre_x)
@@ -406,7 +410,7 @@ class MomentMaps:
 
         b_in = -beam_pix + 0.000000000001
         b_out = 0
-        theta = self.galaxy.angle
+        theta = np.deg2rad(self.galaxy.angle + 90)
 
         emission = 2112
         area_temp = 1
@@ -444,7 +448,7 @@ class MomentMaps:
             rad_prof.append(emission / area_temp)
             radius.append(a_out)
 
-        if len(radius) < 5:
+        if (len(radius) < 5) & (e > 0.7):
 
             hi_inc = True
 
