@@ -448,7 +448,7 @@ class MomentMaps:
             rad_prof.append(emission / area_temp)
             radius.append(a_out)
 
-        if (len(radius) < 5) & (e > 0.7):
+        if ((len(radius) < 5) & (e > 0.7)) or ((len(np.array(rad_prof)[np.log10(np.array(rad_prof)) < 0]) > 2) & (e > 0.7)):
 
             hi_inc = True
 

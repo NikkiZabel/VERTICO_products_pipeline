@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 # Set some parameters to apply to all images below
 refresh = True
 overwrite = True
-sun = True
+sun = False
 tosave = True
 
 galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
@@ -15,7 +15,7 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
             'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808', 'NGC4396',
             'NGC4567', 'NGC4772']
 
-#galaxies = ['NGC4380']
+galaxies = ['NGC4607']
 
 for i in range(len(galaxies)):
 

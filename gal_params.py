@@ -206,7 +206,7 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        figsize = (10, 8)
+        figsize = (8.5, 10)
 
     if galaxy == 'NGC4532':
         centre_y = 26

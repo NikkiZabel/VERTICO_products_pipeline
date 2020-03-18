@@ -70,14 +70,22 @@ class ClipCube:
             stop_x = int(cube.shape[1] / 2 + 10)
             start_y = int(cube.shape[2] / 2 - 10)
             stop_y = int(cube.shape[2] / 2 + 10)
-            return cube[:, start_x:stop_x, start_y:stop_y]
+            inner_square = cube[:, start_x:stop_x, start_y:stop_y]
+            if (inner_square == inner_square).any():
+                return inner_square
+            else:
+                return cube
 
         elif len(cube.shape) == 2:
             start_x = int(cube.shape[0] / 2 - 10)
             stop_x = int(cube.shape[0] / 2 + 10)
             start_y = int(cube.shape[1] / 2 - 10)
             stop_y = int(cube.shape[1] / 2 + 10)
-            return cube[start_x:stop_x, start_y:stop_y]
+            inner_square = cube[start_x:stop_x, start_y:stop_y]
+            if (inner_square == inner_square).any():
+                return inner_square
+            else:
+                return cube
         else:
             raise AttributeError('Please provide a 2D or 3D array.')
 
