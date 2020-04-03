@@ -203,12 +203,12 @@ class ClipCube:
         new_header = cube.header.copy()
         new_header['CRVAL1'] = centre_sky.ra.value
         new_header['CRVAL2'] = centre_sky.dec.value
-        new_header['CRPIX1'] = cube_new.shape[1] / 2
-        new_header['CRPIX2'] = cube_new.shape[2] / 2
+        new_header['CRPIX1'] = cube_new.shape[2] / 2
+        new_header['CRPIX2'] = cube_new.shape[1] / 2
         new_header['NAXIS1'] = cube_new.shape[2]
         new_header['NAXIS2'] = cube_new.shape[1]
 
-        return fits.PrimaryHDU(cube_new, new_header), centre_pix[1], centre_pix[0]
+        return fits.PrimaryHDU(cube_new, new_header), cube_new.shape[1] / 2, cube_new.shape[2] / 2
 
     def preprocess(self, cube):
 
