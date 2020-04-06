@@ -1,12 +1,12 @@
 def parameters(galaxy):
 
     if galaxy == 'NGC4561':
-        vrange = 150
-        vrange_2 = 75
-        cliplevel = 3
+        vrange = 30
+        vrange_2 = 20
+        cliplevel = 1.5
         stokes = False
-        start = 32
-        stop = 57
+        start = 37
+        stop = 41
         sysvel_offset = 0
         angle = 0
         full_width = True
@@ -22,7 +22,7 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        figsize = (9, 9)
+        figsize = (7.5, 9)
 
     if galaxy == 'NGC4450':
         vrange = 150
