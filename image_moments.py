@@ -72,7 +72,7 @@ class CreateImages:
         # add the galaxy name in the upper right corner
         fig.add_label(0.8, 0.9, self.galaxy.name, relative=True, fontsize=20)
 
-        fig.show_contour(image, cmap='magma_r', levels=np.linspace(np.amax(image.data)*1e-9, np.amax(image.data), 20),
+        fig.show_contour(image, cmap='magma_r', levels=np.linspace(np.amax(image.data)*1e-9, np.amax(image.data), 50),
                          filled=True, overlap=True)
 
         # axes and ticks
