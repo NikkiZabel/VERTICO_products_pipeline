@@ -6,6 +6,7 @@ from clip_cube import ClipCube
 from photutils import EllipticalAnnulus
 from photutils import aperture_photometry
 from astropy import wcs
+from astropy.stats import mad_std
 
 
 class MomentMaps:
@@ -19,6 +20,127 @@ class MomentMaps:
         self.tosave = tosave
         _, self.centre_x, self.centre_y = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                                    savepath=self.savepath, tosave=self.tosave).do_clip()
+
+    def calc_noise_in_cube(self,
+            masking_scheme='simple', mask=None,
+            spatial_average_npix=None, spatial_average_nbeam=5.0,
+            spectral_average_nchan=5, verbose=False):
+        """
+        From Jiayi Sun's script: https://github.com/astrojysun/Sun_Astro_Tools/blob/master/sun_astro_tools/spectralcube.py
+
+        Estimate rms noise in a (continuum-subtracted) spectral cube.
+        Parameters
+        ----------
+        masking_scheme : {'simple', 'user'}, optional
+            Scheme for flagging signal in the cube. 'simple' means to flag
+            all values above 3*rms or below -3*rms (default scheme);
+            'user' means to use the user-specified mask (i.e., `mask`).
+        mask : `np.ndarray` object, optional
+            User-specified signal mask (this parameter is ignored if
+            `masking_scheme` is not 'user')
+        spatial_average_npix : int, optional
+            Size of the spatial averaging box, in terms of pixel number
+            If not None, `spatial_average_nbeam` will be ingored.
+            (Default: None)
+        spatial_average_nbeam : float, optional
+            Size of the spatial averaging box, in the unit of beam FWHM
+            (Default: 5.0)
+        spectral_average_nchan : int, optional
+            Size of the spectral averaging box, in terms of channel number
+            (Default: 5)
+        verbose : bool, optional
+            Whether to print the detailed processing information in terminal
+            Default is to not print.
+
+        Returns
+        -------
+        rmscube : SpectralCube object
+            Spectral cube containing the rms noise at each ppv location
+        """
+
+        if masking_scheme not in ['simple', 'user']:
+            raise ValueError("'masking_scheme' should be specified as"
+                             "either 'simple' or 'user'")
+        elif masking_scheme == 'user' and mask is None:
+            raise ValueError("'masking_scheme' set to 'user', yet "
+                             "no user-specified mask found")
+
+        # Calculate the noise in the line-free part of the PB UN/CORRECTED cube
+        cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                    savepath=self.savepath, tosave=self.tosave).readfits()
+        emiscube, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                    savepath=self.savepath, tosave=self.tosave).split_cube(cube_pbcorr)
+
+        # Centre and clip empty rows and columns to get it in the same shape as the other products
+        noisecube, _, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                    savepath=self.savepath, tosave=self.tosave).preprocess(noisecube)
+
+        # extract negative values (only needed if masking_scheme='simple')
+        if masking_scheme == 'simple':
+            if verbose:
+                print("Extracting negative values...")
+            negdata = np.where(noisecube.data < 0, noisecube.data, np.nan)
+            negdata = np.stack([negdata, -1 * negdata], axis=-1)
+        else:
+            negdata = None
+
+        # find rms noise as a function of channel
+        if verbose:
+            print("Estimating rms noise as a function of channel...")
+        if masking_scheme == 'user':
+            mask_v = mask
+        elif masking_scheme == 'simple':
+            rms_v = mad_std(negdata, axis=(1, 2, 3), ignore_nan=True)
+            uplim_v = (3 * rms_v).reshape(-1, 1, 1)
+            lolim_v = (-3 * rms_v).reshape(-1, 1, 1)
+            mask_v = (((noisecube.data - uplim_v) < 0) &
+                      ((noisecube.data - lolim_v) > 0))
+
+        rms_v = mad_std(np.where(mask_v == 1, noisecube.data, np.nan), axis=(1, 2), ignore_nan=True)
+        rms_v = ndimage.generic_filter(rms_v, np.nanmedian,
+                               mode='constant', cval=np.nan,
+                               size=spectral_average_nchan)
+
+        # find rms noise as a function of sightline
+        if verbose:
+            print("Estimating rms noise as a function of sightline...")
+        if masking_scheme == 'user':
+            mask_s = mask
+        elif masking_scheme == 'simple':
+            rms_s = mad_std(negdata, axis=(0, 3), ignore_nan=True)
+            uplim_s = 3 * rms_s
+            lolim_s = -3 * rms_s
+            mask_s = (((noisecube.data - uplim_s) < 0) &
+                      ((noisecube.data - lolim_s) > 0))
+        rms_s = mad_std(np.where(mask_s == 1, noisecube.data, np.nan), axis=0, ignore_nan=True)
+        if spatial_average_npix is None:
+            beamFWHM_pix = cube_pbcorr.header['BMAJ'] / cube_pbcorr.header['CDELT2']
+            beamFWHM_pix = np.max([beamFWHM_pix, 3])
+            spatial_average_npix = int(spatial_average_nbeam * beamFWHM_pix)
+        rms_s = ndimage.generic_filter(rms_s, np.nanmedian, mode='constant', cval=np.nan, size=spatial_average_npix)
+
+        # create rms noise cube from the tensor product of rms_v and rms_s
+        if verbose:
+            print("Creating rms noise cube (direct tensor product)...")
+        rmscube = np.einsum('i,jk', rms_v, rms_s)
+
+        # correct the normalization of the rms cube
+        if masking_scheme == 'user':
+            mask_n = mask
+        elif masking_scheme == 'simple':
+            rms_n = mad_std(negdata, ignore_nan=True)
+            uplim_n = 3 * rms_n
+            lolim_n = -3 * rms_n
+            mask_n = (((noisecube.data - uplim_n) < 0) &
+                      ((noisecube.data - lolim_n) > 0))
+        rms_n = mad_std(noisecube.data[mask_n])
+        rmscube /= rms_n
+
+        # Write as FITS file
+        rmscube_hdu = fits.PrimaryHDU(rmscube, noisecube.header)
+        rmscube_hdu.writeto(self.savepath + 'rms_cube.fits', overwrite=True)
+
+        return rmscube_hdu
 
     def makebeam(self, xpixels, ypixels, header, rot=0, cent=0):
         """
@@ -513,3 +635,20 @@ class MomentMaps:
                        delimiter=',', header=csv_header)
 
         return rad_prof, radii_deg * 3600, radii_kpc, rms
+
+    def mom0_uncertainty(self):
+        rmscube = self.calc_noise_in_cube()
+
+        cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = self.calc_moms()
+
+        mom0_uncertainty = np.sum((rmscube.data * abs(rmscube.header['CDELT3']) / 1000), axis=0)
+        mom0_uncertainty = fits.PrimaryHDU(mom0_uncertainty, mom0_hdu.header)
+
+        print(mom0_uncertainty.shape)
+        print(mom0_hdu.shape)
+
+        SN = mom0_hdu.data / mom0_uncertainty.data
+        SN_hdu = fits.PrimaryHDU(rmscube, mom0_hdu.header)
+        SN_hdu.header.pop('BUNIT')
+
+        return mom0_uncertainty, SN_hdu

@@ -218,7 +218,6 @@ class ClipCube:
 
         return cube, centre_x, centre_y
 
-
     def split_cube(self, cube):
         """
         Split a cube into a cube containing the channels with emission and a cube containing the channels without.
