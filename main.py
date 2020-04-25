@@ -18,7 +18,7 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
             'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689',
             'NGC4698']
 
-galaxies = ['NGC4394']
+galaxies = ['NGC4388']
 
 for i in range(len(galaxies)):
 
@@ -108,4 +108,4 @@ for i in range(len(galaxies)):
     #                                                                        check_aperture=False)
 
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave).noise_maps()
+                sun=sun, tosave=tosave).mom1_noise_maps()

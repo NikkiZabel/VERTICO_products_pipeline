@@ -651,3 +651,30 @@ class MomentMaps:
             mom0_uncertainty.writeto(self.savepath + 'mom0_SN.fits', overwrite=True)
 
         return mom0_uncertainty, SN_hdu
+
+    def mom1_uncertainty(self):
+
+        from matplotlib import pyplot as plt
+
+        rmscube = self.calc_noise_in_cube()
+        rms_map = np.nanmedian(rmscube.data, axis=0)
+
+        cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = self.calc_moms()
+
+        rmscube = np.tile(rms_map, (cube.shape[0], 1, 1))#.transpose()
+
+        vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
+        mom1_low = np.sum((cube.data - rmscube) * vel_narray, axis=0) / np.sum((cube.data - rmscube), axis=0) - sysvel
+
+        mom1_uncertainty = np.log10(np.abs(mom1_hdu.data - mom1_low.data))
+        mom1_uncertainty = fits.PrimaryHDU(mom1_uncertainty, mom1_hdu.header)
+
+        SN = mom1_hdu.data / mom1_uncertainty.data
+        SN_hdu = fits.PrimaryHDU(SN, mom1_hdu.header)
+        SN_hdu.header.pop('BUNIT')
+
+        if self.tosave:
+            mom1_uncertainty.writeto(self.savepath + 'mom1_unc.fits', overwrite=True)
+            mom1_uncertainty.writeto(self.savepath + 'mom1_SN.fits', overwrite=True)
+
+        return mom1_uncertainty, SN_hdu

@@ -480,7 +480,7 @@ class CreateImages:
             if units == 'arcsec':
                 plt.savefig(self.savepath + 'radial_profile_arcsec.pdf', bbox_inches='tight')
 
-    def noise_maps(self, path=''):
+    def mom0_noise_maps(self, path=''):
 
         if self.refresh:
             if self.overwrite:
@@ -546,3 +546,70 @@ class CreateImages:
 
         if self.tosave:
             plt.savefig(self.savepath + 'moment0_SN.pdf', bbox_inches='tight')
+
+    def mom1_noise_maps(self, path=''):
+
+        if self.refresh:
+            if self.overwrite:
+                mom1_unc, mom1_SN = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                               tosave=True).mom1_uncertainty()
+            else:
+                mom1_unc, mom1_SN = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                               tosave=False).mom1_uncertainty()
+        else:
+            mom1_unc = fits.open(path + 'mom1_unc.fits')[0]
+            mom1_SN = fits.open(path + 'mom1_SN.fits')[0]
+
+        # Image the uncertainty map
+        f = plt.figure(figsize=self.galaxy.figsize)
+        fig = apl.FITSFigure(mom1_unc, figure=f)
+        fig.set_theme('publication')
+        fig.show_grayscale()
+
+        # Add a colourbar
+        fig.add_colorbar()
+        fig.colorbar.set_axis_label_text(r'Difference (km s$^{-1}$)')
+        fig.colorbar.set_axis_label_font(size=30)
+        fig.colorbar.set_axis_label_pad(15)
+
+        # axes and ticks
+        fig.ticks.set_color('black')
+        fig.ticks.set_length(10)
+        fig.ticks.set_linewidth(2)
+        fig.tick_labels.set_xformat('hh:mm:ss')
+        fig.tick_labels.set_yformat('dd:mm:ss')
+        plt.rcParams['xtick.direction'] = 'in'
+        plt.rcParams['ytick.direction'] = 'in'
+        fig.ticks.set_minor_frequency(5)
+
+        plt.tight_layout()
+
+        if self.tosave:
+            plt.savefig(self.savepath + 'moment1_uncertainty.pdf', bbox_inches='tight')
+
+        # Image the S/N map
+        f = plt.figure(figsize=self.galaxy.figsize)
+        fig = apl.FITSFigure(mom1_SN, figure=f)
+        fig.set_theme('publication')
+        fig.show_grayscale()
+
+        # Add a colourbar
+        fig.add_colorbar()
+        fig.colorbar.set_axis_label_text('S/N')
+        fig.colorbar.set_axis_label_font(size=30)
+        fig.colorbar.set_axis_label_pad(15)
+
+        # axes and ticks
+        fig.ticks.set_color('black')
+        fig.ticks.set_length(10)
+        fig.ticks.set_linewidth(2)
+        fig.tick_labels.set_xformat('hh:mm:ss')
+        fig.tick_labels.set_yformat('dd:mm:ss')
+        plt.rcParams['xtick.direction'] = 'in'
+        plt.rcParams['ytick.direction'] = 'in'
+        fig.ticks.set_minor_frequency(5)
+
+        plt.tight_layout()
+
+        if self.tosave:
+            plt.savefig(self.savepath + 'moment1_SN.pdf', bbox_inches='tight')
