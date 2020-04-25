@@ -18,7 +18,7 @@ class MomentMaps:
         self.savepath = savepath or './'
         self.sun = sun
         self.tosave = tosave
-        _, self.centre_x, self.centre_y = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+        _, self.centre_x, self.centre_y, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                                    savepath=self.savepath, tosave=self.tosave).do_clip()
 
     def calc_noise_in_cube(self,
@@ -68,12 +68,10 @@ class MomentMaps:
         # Calculate the noise in the line-free part of the PB UN/CORRECTED cube
         cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                     savepath=self.savepath, tosave=self.tosave).readfits()
-        emiscube, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave).split_cube(cube_pbcorr)
 
         # Centre and clip empty rows and columns to get it in the same shape as the other products
-        noisecube, _, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave).preprocess(noisecube)
+        _, _, _, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                    savepath=self.savepath, tosave=self.tosave).do_clip()
 
         # extract negative values (only needed if masking_scheme='simple')
         if masking_scheme == 'simple':
@@ -267,7 +265,7 @@ class MomentMaps:
         :return: clipped spectral cube, HDUs of the moment 0, 1, and 2 maps, and the systemic velocity in km/s
         """
 
-        cube, _, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
+        cube, _, _, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
                         tosave=self.tosave).do_clip()
 
         vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
@@ -644,11 +642,12 @@ class MomentMaps:
         mom0_uncertainty = np.sum((rmscube.data * abs(rmscube.header['CDELT3']) / 1000), axis=0)
         mom0_uncertainty = fits.PrimaryHDU(mom0_uncertainty, mom0_hdu.header)
 
-        print(mom0_uncertainty.shape)
-        print(mom0_hdu.shape)
-
         SN = mom0_hdu.data / mom0_uncertainty.data
-        SN_hdu = fits.PrimaryHDU(rmscube, mom0_hdu.header)
+        SN_hdu = fits.PrimaryHDU(SN, mom0_hdu.header)
         SN_hdu.header.pop('BUNIT')
+
+        if self.tosave:
+            mom0_uncertainty.writeto(self.savepath + 'mom0_unc.fits', overwrite=True)
+            mom0_uncertainty.writeto(self.savepath + 'mom0_SN.fits', overwrite=True)
 
         return mom0_uncertainty, SN_hdu

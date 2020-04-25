@@ -109,7 +109,7 @@ class ClipCube:
 
         return cube_pbcorr, cube_uncorr
 
-    def cut_empty_rows(self, cube):
+    def cut_empty_rows(self, cube, noisecube=None):
 
         beam = cube.header['BMAJ']  # deg
         res = cube.header['CDELT2']  # deg/pixel
@@ -126,15 +126,20 @@ class ClipCube:
             last_false = idx_false[-1] + 1
             empty_x[first_false - beam_pix:first_false] = False
             empty_x[last_false:last_false + beam_pix] = False
+
             cube.data = cube.data[:, ~empty_x, :]
+            if noisecube:
+                noisecube.data = noisecube.data[:, ~empty_x, :]
 
             # Adjust the central pixel in the image header correspondingly
             pix_shift = [i for i, x in enumerate(empty_x) if not x][1] - 1
             cube.header['CRPIX2'] -= pix_shift
+            if noisecube:
+                noisecube.header['CRPIX2'] -= pix_shift
 
-        return cube
+        return cube, noisecube
 
-    def cut_empty_columns(self, cube):
+    def cut_empty_columns(self, cube, noisecube=None):
 
         beam = cube.header['BMAJ']  # deg
         res = cube.header['CDELT2']  # deg/pixel
@@ -153,14 +158,18 @@ class ClipCube:
             empty_y[last_false:last_false + beam_pix] = False
 
             cube.data = cube.data[:, :, ~empty_y]
+            if noisecube:
+                noisecube.data = noisecube.data[:, :, ~empty_y]
 
             # Adjust the header
             pix_shift = [i for i, x in enumerate(empty_y) if not x][1] - 1
             cube.header['CRPIX1'] -= pix_shift
+            if noisecube:
+                noisecube.header['CRPIX1'] -= pix_shift
 
-        return cube
+        return cube, noisecube
 
-    def centre_data(self, cube):
+    def centre_data(self, cube, noisecube=None):
         """
         Pad the image with zeros so that the centre of the galaxy (as defined in NED) overlaps with the centre of the
         cube
@@ -184,21 +193,37 @@ class ClipCube:
         if shift_x > 0:
             temp = np.zeros((cube.shape[0], cube.shape[1] + shift_x * 2, cube.shape[2]))
             temp[:, 0:cube.shape[1], :] = cube.data
+            if noisecube:
+                temp_noise = np.zeros((noisecube.shape[0], noisecube.shape[1] + shift_x * 2, noisecube.shape[2]))
+                temp_noise[:, 0:noisecube.shape[1], :] = noisecube.data
         elif shift_x < 0:
             temp = np.zeros((cube.shape[0], cube.shape[1] + abs(shift_x) * 2, cube.shape[2]))
             temp[:, temp.shape[1] - cube.shape[1]:temp.shape[1], :] = cube.data
+            if noisecube:
+                temp_noise = np.zeros((noisecube.shape[0], noisecube.shape[1] + abs(shift_x) * 2, noisecube.shape[2]))
+                temp_noise[:, temp_noise.shape[1] - noisecube.shape[1]:temp_noise.shape[1], :] = noisecube.data
         else:
             temp = cube.data
+            if noisecube:
+                temp_noise = noisecube.data
 
         # Same in the y-direction
         if shift_y > 0:
             cube_new = np.zeros((temp.shape[0], temp.shape[1], temp.shape[2] + shift_y * 2))
             cube_new[:, :, 0:temp.shape[2]] = temp
+            if noisecube:
+                noisecube_new = np.zeros((temp_noise.shape[0], temp_noise.shape[1], temp_noise.shape[2] + shift_y * 2))
+                noisecube_new[:, :, 0:temp_noise.shape[2]] = temp_noise
         elif shift_y < 0:
             cube_new = np.zeros((temp.shape[0], temp.shape[1], temp.shape[2] + abs(shift_y) * 2))
             cube_new[:, :, cube_new.shape[2] - temp.shape[2]:cube_new.shape[2]] = temp
+            if noisecube:
+                noisecube_new = np.zeros((temp_noise.shape[0], temp_noise.shape[1], temp_noise.shape[2] + abs(shift_y) * 2))
+                noisecube_new[:, :, noisecube_new.shape[2] - temp_noise.shape[2]:noisecube_new.shape[2]] = temp_noise
         else:
             cube_new = temp
+            if noisecube:
+                noisecube_new = temp_noise
 
         new_header = cube.header.copy()
         new_header['CRVAL1'] = centre_sky.ra.value
@@ -208,15 +233,20 @@ class ClipCube:
         new_header['NAXIS1'] = cube_new.shape[2]
         new_header['NAXIS2'] = cube_new.shape[1]
 
-        return fits.PrimaryHDU(cube_new, new_header), cube_new.shape[1] / 2, cube_new.shape[2] / 2
+        cube_hdu = fits.PrimaryHDU(cube_new, new_header)
 
-    def preprocess(self, cube):
+        noisecube_hdu = fits.PrimaryHDU(noisecube_new, new_header)
+        noisecube_hdu.header['NAXIS3'] = noisecube.header['NAXIS3']
 
-        cube = self.cut_empty_rows(cube)
-        cube = self.cut_empty_columns(cube)
-        cube, centre_x, centre_y = self.centre_data(cube)
+        return cube_hdu, cube_new.shape[1] / 2, cube_new.shape[2] / 2, noisecube_hdu
 
-        return cube, centre_x, centre_y
+    def preprocess(self, cube, noisecube=None):
+
+        cube, centre_x, centre_y, noisecube = self.centre_data(cube, noisecube)
+        cube, noisecube = self.cut_empty_rows(cube, noisecube)
+        cube, noisecube = self.cut_empty_columns(cube, noisecube)
+
+        return cube, centre_x, centre_y, noisecube
 
     def split_cube(self, cube):
         """
@@ -456,9 +486,10 @@ class ClipCube:
         clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr.data, cube_pbcorr.header)
 
         # Do some pre-processing to make the creation of the moments easier
-        clipped_hdu, centre_x, centre_y = self.preprocess(clipped_hdu)
+        clipped_hdu, centre_x, centre_y, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=noisecube_uncorr)
 
         if self.tosave:
             clipped_hdu.writeto(self.savepath + 'clipped_cube.fits', overwrite=True)
+            noisecube_hdu.writeto(self.savepath + 'trimmed_noisecube.fits', overwrite=True)
 
-        return clipped_hdu, centre_x, centre_y
+        return clipped_hdu, centre_x, centre_y, noisecube_hdu

@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 # Set some parameters to apply to all images below
 refresh = True
 overwrite = True
-sun = False
+sun = True
 tosave = True
 pbcor = True
 
@@ -107,4 +107,5 @@ for i in range(len(galaxies)):
     #                               alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
     #                                                                        check_aperture=False)
 
-    unc_test, SN_test = MomentMaps(galaxy, file_pbcorr, file_uncorr, savepath=savepath).mom0_uncertainty()
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                sun=sun, tosave=tosave).noise_maps()
