@@ -75,7 +75,7 @@ for i in range(len(galaxies)):
 
     print('Aspect ratio beam: ' + str(cube_corr.header['BMAJ'] / cube_corr.header['BMIN']))
 
-    cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = MomentMaps(galaxy, file_pbcorr, file_uncorr, sun=sun, tosave=False).calc_moms()
+    #cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = MomentMaps(galaxy, file_pbcorr, file_uncorr, sun=sun, tosave=False).calc_moms()
 
     # Call these to create images of the moment maps
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -107,7 +107,11 @@ for i in range(len(galaxies)):
     #                               alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
     #                                                                        check_aperture=False)
 
+    ### NEW STUFF ###
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
     #            sun=sun, tosave=tosave).mom1_2_noise_maps()
+    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #            sun=sun, tosave=tosave).mom0_noise_maps()
+
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave).mom0_noise_maps()
+                  sun=sun, tosave=tosave).moment_zero(peak=True)

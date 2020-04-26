@@ -697,3 +697,19 @@ class MomentMaps:
             mom2_uncertainty.writeto(self.savepath + 'mom2_unc.fits', overwrite=True)
 
         return mom1_uncertainty, mom2_uncertainty
+
+    def peak_temperature(self):
+        cube, _, _, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
+                        tosave=self.tosave).do_clip()
+
+        peak_temp = np.amax(cube.data, axis=0)
+
+        peak_temp_hdu = fits.PrimaryHDU(peak_temp, self.new_header(cube.header))
+        peak_temp_hdu.header['BTYPE'] = 'Peak temperature'
+        peak_temp_hdu.header['BUNIT'] = 'K'; peak_temp_hdu.header.comments['BUNIT'] = ''
+        self.add_clipping_keywords(peak_temp_hdu.header)
+
+        if self.tosave:
+            peak_temp_hdu.writeto(self.savepath + 'peak_temperature.fits', overwrite=True)
+
+        return peak_temp_hdu

@@ -41,9 +41,20 @@ class CreateImages:
 
         return my_cmap
 
-    def moment_zero(self, units='M_Sun/pc^2', path=''):
+    def moment_zero(self, units='M_Sun/pc^2', path='', peak=False):
 
-        if self.refresh:
+        if peak:
+            if self.refresh:
+                if self.overwrite:
+                    image = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                                    savepath=self.savepath, tosave=True).peak_temperature()
+                else:
+                    image = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                                    tosave=False).peak_temperature()
+            else:
+                image = fits.open(path + 'peak_temperature.fits')[0]
+
+        elif self.refresh:
             if units == 'M_Sun/pc^2':
                 if self.overwrite:
                     _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
@@ -72,7 +83,7 @@ class CreateImages:
         # add the galaxy name in the upper right corner
         fig.add_label(0.8, 0.9, self.galaxy.name, relative=True, fontsize=20)
 
-        fig.show_contour(image, cmap='magma_r', levels=np.linspace(np.amax(image.data)*1e-9, np.amax(image.data), 50),
+        fig.show_contour(image, cmap='magma_r', levels=np.linspace(np.amax(image.data)*1e-9, np.amax(image.data), 20),
                          filled=True, overlap=True)
 
         # axes and ticks
@@ -114,7 +125,9 @@ class CreateImages:
             ticks = np.arange(0, np.amax(image.data) + 100, 200)
 
         cbar = f.colorbar(colors, ticks=ticks)
-        if units == 'K km/s':
+        if peak:
+            cbar.set_label('Peak temperature [K]')
+        elif units == 'K km/s':
             cbar.set_label(r'Integrated intensity [K km s$^{-1}$]')
         elif units == 'M_Sun/pc^2':
             cbar.set_label(r'Surface density [M$_\odot$ pc$^{-2}$]')
@@ -485,7 +498,7 @@ class CreateImages:
         if self.refresh:
             if self.overwrite:
                 mom0_unc, mom0_SN = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                       tosave=True).mom0_uncertainty()
+                                       tosave=True, savepath=self.savepath).mom0_uncertainty()
             else:
                 mom0_unc, mom0_SN = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                        tosave=False).mom0_uncertainty()
@@ -552,7 +565,7 @@ class CreateImages:
         if self.refresh:
             if self.overwrite:
                 mom1_unc, mom2_unc = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                               tosave=True).mom1_2_uncertainty()
+                                               tosave=True, savepath=self.savepath).mom1_2_uncertainty()
             else:
                 mom1_unc, mom2_unc = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                                tosave=False).mom1_2_uncertainty()
@@ -568,7 +581,7 @@ class CreateImages:
 
         # Add a colourbar
         fig.add_colorbar()
-        fig.colorbar.set_axis_label_text(r'Uncertainty (log km s$^{-1}$)')
+        fig.colorbar.set_axis_label_text(r'log uncertainty (km s$^{-1}$)')
         fig.colorbar.set_axis_label_font(size=30)
         fig.colorbar.set_axis_label_pad(15)
 
@@ -595,7 +608,7 @@ class CreateImages:
 
         # Add a colourbar
         fig.add_colorbar()
-        fig.colorbar.set_axis_label_text(r'Uncertainty (log km s$^{-1}$)')
+        fig.colorbar.set_axis_label_text(r'Log uncertainty (km s$^{-1}$)')
         fig.colorbar.set_axis_label_font(size=30)
         fig.colorbar.set_axis_label_pad(15)
 
