@@ -501,7 +501,7 @@ class CreateImages:
 
         # Add a colourbar
         fig.add_colorbar()
-        fig.colorbar.set_axis_label_text(r'K km s$^{-1}$')
+        fig.colorbar.set_axis_label_text(r'Uncertainty (K km s$^{-1}$)')
         fig.colorbar.set_axis_label_font(size=30)
         fig.colorbar.set_axis_label_pad(15)
 
@@ -528,7 +528,7 @@ class CreateImages:
 
         # Add a colourbar
         fig.add_colorbar()
-        fig.colorbar.set_axis_label_text('S/N')
+        fig.colorbar.set_axis_label_text('log S/N')
         fig.colorbar.set_axis_label_font(size=30)
         fig.colorbar.set_axis_label_pad(15)
 
@@ -547,20 +547,20 @@ class CreateImages:
         if self.tosave:
             plt.savefig(self.savepath + 'moment0_SN.pdf', bbox_inches='tight')
 
-    def mom1_noise_maps(self, path=''):
+    def mom1_2_noise_maps(self, path=''):
 
         if self.refresh:
             if self.overwrite:
-                mom1_unc, mom1_SN = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                               tosave=True).mom1_uncertainty()
+                mom1_unc, mom2_unc = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                               tosave=True).mom1_2_uncertainty()
             else:
-                mom1_unc, mom1_SN = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                               tosave=False).mom1_uncertainty()
+                mom1_unc, mom2_unc = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                               tosave=False).mom1_2_uncertainty()
         else:
             mom1_unc = fits.open(path + 'mom1_unc.fits')[0]
-            mom1_SN = fits.open(path + 'mom1_SN.fits')[0]
+            mom2_unc = fits.open(path + 'mom2_unc.fits')[0]
 
-        # Image the uncertainty map
+        # Image the uncertainty maps
         f = plt.figure(figsize=self.galaxy.figsize)
         fig = apl.FITSFigure(mom1_unc, figure=f)
         fig.set_theme('publication')
@@ -568,7 +568,7 @@ class CreateImages:
 
         # Add a colourbar
         fig.add_colorbar()
-        fig.colorbar.set_axis_label_text(r'Difference (km s$^{-1}$)')
+        fig.colorbar.set_axis_label_text(r'Uncertainty (log km s$^{-1}$)')
         fig.colorbar.set_axis_label_font(size=30)
         fig.colorbar.set_axis_label_pad(15)
 
@@ -587,15 +587,15 @@ class CreateImages:
         if self.tosave:
             plt.savefig(self.savepath + 'moment1_uncertainty.pdf', bbox_inches='tight')
 
-        # Image the S/N map
+        # Moment 2
         f = plt.figure(figsize=self.galaxy.figsize)
-        fig = apl.FITSFigure(mom1_SN, figure=f)
+        fig = apl.FITSFigure(mom2_unc, figure=f)
         fig.set_theme('publication')
         fig.show_grayscale()
 
         # Add a colourbar
         fig.add_colorbar()
-        fig.colorbar.set_axis_label_text('S/N')
+        fig.colorbar.set_axis_label_text(r'Uncertainty (log km s$^{-1}$)')
         fig.colorbar.set_axis_label_font(size=30)
         fig.colorbar.set_axis_label_pad(15)
 
@@ -612,4 +612,4 @@ class CreateImages:
         plt.tight_layout()
 
         if self.tosave:
-            plt.savefig(self.savepath + 'moment1_SN.pdf', bbox_inches='tight')
+            plt.savefig(self.savepath + 'moment2_uncertainty.pdf', bbox_inches='tight')

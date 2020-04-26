@@ -640,9 +640,10 @@ class MomentMaps:
         cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = self.calc_moms()
 
         mom0_uncertainty = np.sum((rmscube.data * abs(rmscube.header['CDELT3']) / 1000), axis=0)
+        mom0_uncertainty = np.where(mom0_hdu.data > 0, mom0_uncertainty, np.nan)
         mom0_uncertainty = fits.PrimaryHDU(mom0_uncertainty, mom0_hdu.header)
 
-        SN = mom0_hdu.data / mom0_uncertainty.data
+        SN = np.log10(mom0_hdu.data / mom0_uncertainty.data)
         SN_hdu = fits.PrimaryHDU(SN, mom0_hdu.header)
         SN_hdu.header.pop('BUNIT')
 
@@ -652,9 +653,7 @@ class MomentMaps:
 
         return mom0_uncertainty, SN_hdu
 
-    def mom1_uncertainty(self):
-
-        from matplotlib import pyplot as plt
+    def mom1_uncertainty_old(self):
 
         rmscube = self.calc_noise_in_cube()
         rms_map = np.nanmedian(rmscube.data, axis=0)
@@ -669,12 +668,32 @@ class MomentMaps:
         mom1_uncertainty = np.log10(np.abs(mom1_hdu.data - mom1_low.data))
         mom1_uncertainty = fits.PrimaryHDU(mom1_uncertainty, mom1_hdu.header)
 
-        SN = mom1_hdu.data / mom1_uncertainty.data
-        SN_hdu = fits.PrimaryHDU(SN, mom1_hdu.header)
-        SN_hdu.header.pop('BUNIT')
+        if self.tosave:
+            mom1_uncertainty.writeto(self.savepath + 'mom1_unc.fits', overwrite=True)
+
+        return mom1_uncertainty
+
+    def mom1_2_uncertainty(self):
+
+        rmscube = self.calc_noise_in_cube()
+        rms_map = np.nanmedian(rmscube.data, axis=0)
+
+        cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = self.calc_moms()
+
+        vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
+
+        mom1_uncertainty = np.log10((cube.shape[0] * abs(cube.header['CDELT3'])) / (2 * np.sqrt(3)) * \
+                           (rms_map / np.sum(cube.data * vel_narray, axis=0)))  # Eqn 15 doc. Chris.
+
+        mom2_uncertainty = np.log10((cube.shape[0] * abs(cube.header['CDELT3'])) ** 2 / (8 * np.sqrt(5)) * \
+                           (rms_map / np.sum(cube.data * vel_narray, axis=0)) * \
+                           (mom2_hdu.data) ** -1)
+
+        mom1_uncertainty = fits.PrimaryHDU(mom1_uncertainty, mom1_hdu.header)
+        mom2_uncertainty = fits.PrimaryHDU(mom2_uncertainty, mom1_hdu.header)
 
         if self.tosave:
             mom1_uncertainty.writeto(self.savepath + 'mom1_unc.fits', overwrite=True)
-            mom1_uncertainty.writeto(self.savepath + 'mom1_SN.fits', overwrite=True)
+            mom2_uncertainty.writeto(self.savepath + 'mom2_unc.fits', overwrite=True)
 
-        return mom1_uncertainty, SN_hdu
+        return mom1_uncertainty, mom2_uncertainty
