@@ -487,8 +487,10 @@ class MomentMaps:
 
     def radial_profile(self, alpha_co=6.25, table_path=None, check_aperture=False):
 
-        _, mom0_hdu, _, _, _ = self.calc_moms(units='M_Sun/pc^2', alpha_co=alpha_co)
-        beam_pix = mom0_hdu.header['BMAJ'] / mom0_hdu.header['CDELT2']
+        _, mom0_hdu_K, _, _, _ = self.calc_moms(units='M_Sun/pc^2', alpha_co=alpha_co)
+        _, mom0_hdu_Msun, _, _, _ = self.calc_moms(units='K km/s', alpha_co=alpha_co)
+
+        beam_pix = mom0_hdu_K.header['BMAJ'] / mom0_hdu_K.header['CDELT2']
 
         # Estimate the rms from the spatial inner part of the cube
         cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
@@ -501,8 +503,8 @@ class MomentMaps:
                                             savepath=self.savepath,
                                             tosave=self.tosave).innersquare(noisecube.data)
         rms = np.nanstd(inner)
-        rms = rms / cube_pbcorr.header['JTOK']
-        rms = rms * abs(cube_pbcorr.header['CDELT3']) / 1000 * 91.9 * alpha_co * (cube_pbcorr.header['BMAJ'] * 3600 *
+        rms_Msun = rms / cube_pbcorr.header['JTOK']
+        rms_Msun = rms_Msun * abs(cube_pbcorr.header['CDELT3']) / 1000 * 91.9 * alpha_co * (cube_pbcorr.header['BMAJ'] * 3600 *
                 cube_pbcorr.header['BMIN'] * 3600) ** (-1)
 
         if self.galaxy.eccentricity:
@@ -524,7 +526,8 @@ class MomentMaps:
 
         centre = (self.centre_y, self.centre_x)
         hi_inc = False
-        rad_prof = []
+        rad_prof_K = []
+        rad_prof_Msun = []
         radius = []
         area = []
 
@@ -538,7 +541,7 @@ class MomentMaps:
         if check_aperture:
             from matplotlib import pyplot as plt
             plt.figure()
-            plt.imshow(mom0_hdu.data)
+            plt.imshow(mom0_hdu_K.data)
 
         while emission / area_temp > 1e-1:
 
@@ -560,58 +563,68 @@ class MomentMaps:
             if check_aperture:
                 aperture.plot(color='red')
 
-            emission = aperture_photometry(mom0_hdu.data, aperture)['aperture_sum'][0] #* \
-                      # (np.deg2rad(mom0_hdu.header['CDELT2']) * self.galaxy.distance * 1e6) ** 2
+            emission_K = aperture_photometry(mom0_hdu_K.data, aperture)['aperture_sum'][0]
+            emission_Msun = aperture_photometry(mom0_hdu_Msun.data, aperture)['aperture_sum'][0]
 
             area_temp = aperture.area
             area.append(area_temp)
-            rad_prof.append(emission / area_temp)
+            rad_prof_K.append(emission_K / area_temp)
+            rad_prof_Msun.append(emission_Msun / area_temp)
             radius.append(a_out)
 
-        if ((len(radius) < 5) & (e > 0.7)) or ((len(np.array(rad_prof)[np.log10(np.array(rad_prof)) < 0]) > 2) & (e > 0.7)):
+        if ((len(radius) < 5) & (e > 0.7)) or ((len(np.array(rad_prof_K)[np.log10(np.array(rad_prof_K)) < 0]) > 2) & (e > 0.7)):
 
             hi_inc = True
 
-            rad_prof = []
+            rad_prof_K = []
+            rad_prof_Msun = []
             radius = []
             area = []
 
             angle = self.galaxy.angle + 180 + 90
 
-            mom0_rot = ndimage.interpolation.rotate(mom0_hdu.data, angle, reshape=True)
+            mom0_K_rot = ndimage.interpolation.rotate(mom0_hdu_K.data, angle, reshape=True)
+            mom0_Msun_rot = ndimage.interpolation.rotate(mom0_hdu_Msun.data, angle, reshape=True)
 
             inner = 0
-            centre = (mom0_rot.shape[1]) / 2
+            centre = (mom0_K_rot.shape[1]) / 2
             emission = 2112
 
             while emission > 1e-1:
-                slice1 = mom0_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
-                slice2 = mom0_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
-                emission = np.average(np.average(slice1) + np.average(slice2))
+                slice1_K = mom0_K_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
+                slice2_K = mom0_K_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
+                emission_K = np.average(np.average(slice1_K) + np.average(slice2_K))
+
+                slice1_Msun = mom0_Msun_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
+                slice2_Msun = mom0_Msun_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
+                emission_Msun = np.average(np.average(slice1_Msun) + np.average(slice2_Msun))
 
                 if check_aperture:
-                    mom0_rot[:, int(centre + inner):int(centre + inner + beam_pix)] = 10
-                    mom0_rot[:, int(centre - inner - beam_pix):int(centre - inner)] = 20
+                    mom0_K_rot[:, int(centre + inner):int(centre + inner + beam_pix)] = 10
+                    mom0_K_rot[:, int(centre - inner - beam_pix):int(centre - inner)] = 20
                     from matplotlib import pyplot as plt
-                    plt.imshow(mom0_rot)
+                    plt.imshow(mom0_K_rot)
                     break
 
-                rad_prof.append(emission)
+                rad_prof_K.append(emission_K)
+                rad_prof_Msun.append(emission_Msun)
                 radius.append(inner + beam_pix)
 
-                area.append(len(slice1[slice1 > 0]) + len(slice2[slice2 > 0]))
+                area.append(len(slice1_K[slice1_K > 0]) + len(slice2_K[slice2_K > 0]))
 
                 inner += beam_pix
 
-        rad_prof = rad_prof[:-1]
+        rad_prof_K = rad_prof_K[:-1]
+        rad_prof_Msun = rad_prof_Msun[:-1]
         radius = np.array(radius[:-1])
         area = area[:-1]
-        radii_deg = radius * mom0_hdu.header['CDELT2']
+        radii_deg = radius * mom0_hdu_K.header['CDELT2']
         radii_kpc = np.deg2rad(radii_deg) * self.galaxy.distance * 1000
         N_beams = np.array(area) / (beam_pix ** 2 * np.pi)
-        error = np.sqrt(N_beams) * rms
+        error_K = np.sqrt(N_beams) * rms
+        error_Msun = np.sqrt(N_beams) * rms_Msun
 
-        w = wcs.WCS(mom0_hdu.header, naxis=2)
+        w = wcs.WCS(mom0_hdu_K.header, naxis=2)
         centre_sky = wcs.utils.pixel_to_skycoord(self.centre_y, self.centre_x, wcs=w)
 
         if hi_inc:
@@ -619,20 +632,23 @@ class MomentMaps:
                          ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(self.centre_y) + \
                          ', ' + str(self.centre_x) + ')). ' \
                         'Radii are equal to one beamsize. \n \n' \
+                         'Surface density (K km/s), RMS error (K km/s), ' \
                          'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
         else:
             csv_header = 'Elliptical apertures centered around (RA, Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
                          ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(self.centre_y) + \
                          ', ' + str(self.centre_x) + ')). ' \
                         'Radii are defined as the semi-major axes of these apertures. \n \n' \
+                        'Surface density (K km/s), RMS error (K km/s), ' \
                          'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
 
         if self.tosave:
             np.savetxt(self.savepath + 'radial_profile.csv',
-                       np.column_stack((rad_prof, np.ones(len(rad_prof)) * error, radii_deg * 3600, radii_kpc)),
-                       delimiter=',', header=csv_header)
+                       np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * error_K, rad_prof_Msun,
+                                        np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
+                                        delimiter=',', header=csv_header)
 
-        return rad_prof, radii_deg * 3600, radii_kpc, rms
+        return rad_prof_K, rms, rad_prof_Msun, rms_Msun, radii_deg * 3600, radii_kpc
 
     def mom0_uncertainty(self):
         rmscube = self.calc_noise_in_cube()

@@ -450,48 +450,70 @@ class CreateImages:
             if x_axis == 'vel_offset':
                 plt.savefig(self.savepath + 'spectrum_vel_offset.pdf', bbox_inches='tight')
 
-    def radial_profile(self, units='kpc', alpha_co=6.25, table_path=None, check_aperture=False):
+    def radial_profile(self, y_units='K kms', x_units='kpc', alpha_co=6.25, table_path=None, check_aperture=False):
+
+        if not ((y_units == 'K km/s') or (y_units == 'M_Sun pc^-2')):
+            raise AttributeError('Please choose between "K kms" and "M_Sun pc^-2" for the keyword "y_units".')
+        if not ((x_units == 'kpc') or (x_units == 'arcsec')):
+            raise AttributeError('Please choose between "kpc" and "arcsec" for the keyword "x_units".')
 
         if self.refresh:
             if self.overwrite:
-                rad_prof, radii_arcsec, radii_kpc, error = MomentMaps(self.galaxy.name, self.path_pbcorr,
+                rad_prof_K, rad_prof_K_err, rad_prof_Msun, rad_prof_Msun_err, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr,
                         self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=True).\
                     radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture)
             else:
-                rad_prof, radii_arcsec, radii_kpc, error = MomentMaps(self.galaxy.name, self.path_pbcorr,
+                rad_prof_K, rad_prof_K_err, rad_prof_Msun, rad_prof_Msun_err, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr,
                         self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=False).\
                     radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture)
-
         else:
             temp = np.loadtxt(self.savepath + 'radial_profile.csv', delimiter=',')
-            rad_prof = temp[:, 0]
-            radii_arcsec = temp[:, 1]
-            radii_kpc = temp[:, 2]
+            rad_prof_K = temp[:, 0]
+            rad_prof_K_err = temp[:, 1]
+            rad_prof_Msun = temp[:, 2]
+            rad_prof_Msun_err = temp[:, 3]
+            radii_arcsec = temp[:, 4]
+            radii_kpc = temp[:, 5]
 
         plt.figure(figsize=(10, 7))
 
-        if units == 'kpc':
-            plt.errorbar(radii_kpc, np.log10(rad_prof), yerr=error/rad_prof * 0.434, c='k', linestyle='None',
-                         marker='o', ms=10)
+        if x_units == 'kpc':
             plt.xlabel('Radius [kpc]')
-        elif units == 'arcsec':
-            plt.errorbar(radii_arcsec, np.log10(rad_prof), yerr=error/rad_prof * 0.434, c='k', linestyle='None',
-                         marker='o', ms=10)
+            if y_units == 'K km/s':
+                plt.errorbar(radii_kpc, np.log10(rad_prof_K), yerr=rad_prof_K_err/rad_prof_K * 0.434, c='k', linestyle='None',
+                             marker='o', ms=10)
+                plt.ylabel(r'log(Surface density [K km s$^{-1}$])')
+            else:
+                plt.errorbar(radii_kpc, np.log10(rad_prof_Msun), yerr=rad_prof_Msun_err/rad_prof_Msun * 0.434, c='k', linestyle='None',
+                             marker='o', ms=10)
+                plt.ylabel(r'log(Surface density [$M_\odot$ pc$^{-2}$])')
+        elif x_units == 'arcsec':
             plt.xlabel(r'Radius [$^{\prime\prime}$]')
-        else:
-            raise AttributeError('Please choose between "kpc" and "arcsec" for the keyword "units".')
+            if y_units == 'K km/s':
+                plt.errorbar(radii_arcsec, np.log10(rad_prof_K), yerr=rad_prof_K_err/rad_prof_K * 0.434, c='k', linestyle='None',
+                             marker='o', ms=10)
+                plt.ylabel(r'log(Surface density [K km s$^{-1}$])')
+            else:
+                plt.errorbar(radii_arcsec, np.log10(rad_prof_Msun), yerr=rad_prof_Msun_err/rad_prof_Msun * 0.434, c='k', linestyle='None',
+                             marker='o', ms=10)
+                plt.ylabel(r'log(Surface density [$M_\odot$ pc$^{-2}$])')
 
-        plt.ylabel(r'log(Surface density [$M_\odot$ pc$^{-2}$])')
         plt.xlim(-0.01)
         plt.ylim(0)
 
         plt.tight_layout()
 
         if self.tosave:
-            if units == 'kpc':
-                plt.savefig(self.savepath + 'radial_profile_kpc.pdf', bbox_inches='tight')
-            if units == 'arcsec':
-                plt.savefig(self.savepath + 'radial_profile_arcsec.pdf', bbox_inches='tight')
+            if x_units == 'kpc':
+                if y_units == 'K km/s':
+                    plt.savefig(self.savepath + 'radial_profile_kpc_Kkms-1.pdf', bbox_inches='tight')
+                else:
+                    plt.savefig(self.savepath + 'radial_profile_kpc_Msun_pc-2.pdf', bbox_inches='tight')
+            if x_units == 'arcsec':
+                if y_units == 'K km/s':
+                    plt.savefig(self.savepath + 'radial_profile_arcsec_Kkms-1.pdf', bbox_inches='tight')
+                else:
+                    plt.savefig(self.savepath + 'radial_profile_arcsec_Msun_pc-2.pdf', bbox_inches='tight')
 
     def mom0_noise_maps(self, path=''):
 
