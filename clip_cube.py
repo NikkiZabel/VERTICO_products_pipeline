@@ -3,8 +3,6 @@ import numpy as np
 from scipy import ndimage
 from scipy.ndimage import binary_dilation, label
 from targets import galaxies
-from astropy.convolution import convolve_fft
-from astroquery.ned import Ned
 from astropy import wcs
 from astropy.coordinates import SkyCoord
 from astropy import units as u
@@ -171,23 +169,19 @@ class ClipCube:
 
     def centre_data(self, cube, noisecube=None):
         """
-        Pad the image with zeros so that the centre of the galaxy (as defined in NED) overlaps with the centre of the
+        Pad the image with zeros so that the centre of the galaxy overlaps with the centre of the
         cube
         :return:
         """
 
-        # Read in central coordinates from NED
-        ra = Ned.query_object(cube.header['OBJECT'])['RA'][0]
-        dec = Ned.query_object(cube.header['OBJECT'])['DEC'][0]
-
         # Find the central pixel based on these coordinates and WCS info
         w = wcs.WCS(cube.header, naxis=2)
-        centre_sky = SkyCoord(ra, dec, unit=(u.deg, u.deg))
+        centre_sky = SkyCoord(cube.header['OBSRA'], cube.header['OBSDEC'], unit=(u.deg, u.deg))
         centre_pix = wcs.utils.skycoord_to_pixel(centre_sky, w)
 
         # The amount the centre needs to shift to overlap with the central coordinates
-        shift_x = int(np.round(centre_pix[1] - cube.shape[1] / 2))
-        shift_y = int(np.round(centre_pix[0] - cube.shape[2] / 2))
+        shift_x = int(np.round(centre_pix[0] - cube.shape[2] / 2))
+        shift_y = int(np.round(centre_pix[1] - cube.shape[1] / 2))
 
         # Pad the image with twice the amount it has to shift, so that the new centre overlaps with the coordinates
         if shift_x > 0:
@@ -226,12 +220,24 @@ class ClipCube:
                 noisecube_new = temp_noise
 
         new_header = cube.header.copy()
-        new_header['CRVAL1'] = centre_sky.ra.value
-        new_header['CRVAL2'] = centre_sky.dec.value
-        new_header['CRPIX1'] = cube_new.shape[2] / 2
-        new_header['CRPIX2'] = cube_new.shape[1] / 2
+        # Only change the CRPIX if the padding happens BEFORE the current CRPIX
+        if shift_y < 0:
+            new_header['CRPIX1'] = cube.header['CRPIX1'] - 2 * shift_y
+        if shift_x < 0:
+            new_header['CRPIX2'] = cube.header['CRPIX2'] - 2 * shift_x
         new_header['NAXIS1'] = cube_new.shape[2]
         new_header['NAXIS2'] = cube_new.shape[1]
+
+        print(shift_y)
+        print(shift_x)
+        print(cube.shape)
+        print(cube_new.shape)
+
+        print(cube.header['CRPIX1'])
+        print(new_header['CRPIX1'])
+
+        print(cube.header['CRPIX2'])
+        print(new_header['CRPIX2'])
 
         cube_hdu = fits.PrimaryHDU(cube_new, new_header)
 
@@ -245,6 +251,8 @@ class ClipCube:
         cube, centre_x, centre_y, noisecube = self.centre_data(cube, noisecube)
         cube, noisecube = self.cut_empty_rows(cube, noisecube)
         cube, noisecube = self.cut_empty_columns(cube, noisecube)
+
+        centre_x = 1; centre_y = 1
 
         return cube, centre_x, centre_y, noisecube
 
@@ -486,7 +494,10 @@ class ClipCube:
         clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr.data, cube_pbcorr.header)
 
         # Do some pre-processing to make the creation of the moments easier
-        clipped_hdu, centre_x, centre_y, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=noisecube_uncorr)
+        pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/' + str(self.galaxy.name) + '/' +
+                       str(self.galaxy.name) + '_7m_co21_pb_rebin.fits')[0]
+
+        clipped_hdu, centre_x, centre_y, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=pb)
 
         if self.tosave:
             clipped_hdu.writeto(self.savepath + 'clipped_cube.fits', overwrite=True)

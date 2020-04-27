@@ -18,7 +18,7 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
             'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689',
             'NGC4698']
 
-galaxies = ['NGC4388']
+galaxies = ['NGC4405']
 
 for i in range(len(galaxies)):
 
@@ -78,8 +78,8 @@ for i in range(len(galaxies)):
     #cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = MomentMaps(galaxy, file_pbcorr, file_uncorr, sun=sun, tosave=False).calc_moms()
 
     # Call these to create images of the moment maps
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #              sun=sun, tosave=tosave).moment_zero(units='K km/s')
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave).moment_zero(units='K km/s')
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
     #              sun=sun, tosave=tosave).moment_zero()
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -116,12 +116,12 @@ for i in range(len(galaxies)):
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
     #              sun=sun, tosave=tosave).moment_zero(peak=True)
 
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave).radial_profile(y_units='K km/s', x_units='kpc',
-                                   alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
-                                                                            check_aperture=False)
+    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #            sun=sun, tosave=tosave).radial_profile(y_units='K km/s', x_units='kpc',
+    #                               alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
+    #                                                                        check_aperture=False)
 
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave).radial_profile(y_units='K km/s', x_units='arcsec',
-                                   alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
-                                                                            check_aperture=False)
+    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #            sun=sun, tosave=tosave).radial_profile(y_units='K km/s', x_units='arcsec',
+    #                               alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
+    #                                                                        check_aperture=False)

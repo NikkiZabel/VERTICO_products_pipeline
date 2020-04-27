@@ -653,7 +653,21 @@ class MomentMaps:
     def mom0_uncertainty(self):
         rmscube = self.calc_noise_in_cube()
 
+        from matplotlib import pyplot as plt
+
+        # Tim's method
+        _, _, _, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                    savepath=self.savepath, tosave=self.tosave).do_clip()
+        inner = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                            savepath=self.savepath,
+                                            tosave=self.tosave).innersquare(noisecube.data)
+
+        rms = np.nanstd(inner)
+        rms_map = np.median(rms / noisecube.data, axis=0)
+
         cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = self.calc_moms()
+
+        plt.imshow(rms_map)
 
         mom0_uncertainty = np.sum((rmscube.data * abs(rmscube.header['CDELT3']) / 1000), axis=0)
         mom0_uncertainty = np.where(mom0_hdu.data > 0, mom0_uncertainty, np.nan)
