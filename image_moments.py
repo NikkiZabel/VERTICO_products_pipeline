@@ -148,9 +148,11 @@ class CreateImages:
         plt.tight_layout()
 
         if self.tosave:
-            if units == 'K km/s':
+            if peak:
+                plt.savefig(self.savepath + 'peak_temperature.pdf', bbox_inches='tight')
+            elif units == 'K km/s':
                 plt.savefig(self.savepath + 'moment0_K.pdf', bbox_inches='tight')
-            if units == 'M_Sun/pc^2':
+            elif units == 'M_Sun/pc^2':
                 plt.savefig(self.savepath + 'moment0_M_Sun.pdf', bbox_inches='tight')
         return
 
@@ -499,7 +501,10 @@ class CreateImages:
                 plt.ylabel(r'log(Surface density [$M_\odot$ pc$^{-2}$])')
 
         plt.xlim(-0.01)
-        plt.ylim(0)
+        if y_units == 'K km/s':
+            plt.ylim(-1)
+        else:
+            plt.ylim(0)
 
         plt.tight_layout()
 

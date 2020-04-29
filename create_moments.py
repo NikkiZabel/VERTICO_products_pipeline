@@ -18,8 +18,6 @@ class MomentMaps:
         self.savepath = savepath or './'
         self.sun = sun
         self.tosave = tosave
-        _, self.centre_x, self.centre_y, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                                   savepath=self.savepath, tosave=self.tosave).do_clip()
 
     def calc_noise_in_cube(self,
             masking_scheme='simple', mask=None,
@@ -70,7 +68,7 @@ class MomentMaps:
                                     savepath=self.savepath, tosave=self.tosave).readfits()
 
         # Centre and clip empty rows and columns to get it in the same shape as the other products
-        _, _, _, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+        _, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                     savepath=self.savepath, tosave=self.tosave).do_clip()
 
         # extract negative values (only needed if masking_scheme='simple')
@@ -161,7 +159,7 @@ class MomentMaps:
         sigma = beam / np.sqrt(8. * np.log(2.))
 
         # If centre is not defined, make it the centre of the image
-        if not cent: cent = [xpixels / 2., ypixels / 2]
+        if not cent: cent = [xpixels / 2, ypixels / 2]
 
         # Implement a rotation if specified
         if np.tan(np.radians(rot)) == 0:
@@ -265,7 +263,7 @@ class MomentMaps:
         :return: clipped spectral cube, HDUs of the moment 0, 1, and 2 maps, and the systemic velocity in km/s
         """
 
-        cube, _, _, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
+        cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
                         tosave=self.tosave).do_clip()
 
         vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
@@ -286,7 +284,7 @@ class MomentMaps:
         inner_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, savepath=self.savepath,
                               tosave=self.tosave).innersquare(mom1)
 
-        sysvel = np.nanmean(inner_cube) + self.galaxy.sysvel_offset
+        sysvel = np.nanmean(inner_cube)# + self.galaxy.sysvel_offset
         mom1 -= sysvel
 
         mom0_hdu = fits.PrimaryHDU(mom0, self.new_header(cube.header))
@@ -365,7 +363,7 @@ class MomentMaps:
 
         # Find the sky coordinates of the central pixel
         w = wcs.WCS(clipped_cube.header, naxis=2)
-        centre_sky = wcs.utils.pixel_to_skycoord(self.centre_y, self.centre_x, wcs=w)
+        centre_sky = wcs.utils.pixel_to_skycoord(clipped_cube.shape[0] / 2, clipped_cube.shape[1] / 2, wcs=w)
 
         # Create an appropriate header
         pvd_header = fits.Header()
@@ -403,7 +401,7 @@ class MomentMaps:
         pvd_header['PC2_1'] = clipped_cube.header['PC2_1']
         pvd_header['PC1_2'] = clipped_cube.header['PC1_2']
         pvd_header['PC2_2'] = pvd_header['CDELT2']
-        pvd_header['CENTR_PIX'] = '(' + str(self.centre_y) + ', ' + str(self.centre_x) + ')'
+        pvd_header['CENTR_PIX'] = '(' + str(clipped_cube.shape[0] / 2) + ', ' + str(clipped_cube.shape[1] / 2) + ')'
         pvd_header.comments['CENTR_PIX'] = 'Central pix used for rot. + loc. slit'
         pvd_header['CENTR_PIX_SKY'] = '(' + str(np.round(centre_sky.ra.deg, 2)) + ', ' + str(np.round(centre_sky.dec.deg, 2)) + ')'
         pvd_header.comments['CENTR_PIX_SKY'] = 'Central pix in sky coords (deg)'
@@ -487,8 +485,8 @@ class MomentMaps:
 
     def radial_profile(self, alpha_co=6.25, table_path=None, check_aperture=False):
 
-        _, mom0_hdu_K, _, _, _ = self.calc_moms(units='M_Sun/pc^2', alpha_co=alpha_co)
-        _, mom0_hdu_Msun, _, _, _ = self.calc_moms(units='K km/s', alpha_co=alpha_co)
+        _, mom0_hdu_Msun, _, _, _ = self.calc_moms(units='M_Sun/pc^2', alpha_co=alpha_co)
+        _, mom0_hdu_K, _, _, _ = self.calc_moms(units='K km/s', alpha_co=alpha_co)
 
         beam_pix = mom0_hdu_K.header['BMAJ'] / mom0_hdu_K.header['CDELT2']
 
@@ -524,7 +522,7 @@ class MomentMaps:
                 inc = [1]
             e = np.sin(np.deg2rad(inc))[0]
 
-        centre = (self.centre_y, self.centre_x)
+        centre = (int(mom0_hdu_K.shape[0]/2), int(mom0_hdu_K.shape[1]/2))
         hi_inc = False
         rad_prof_K = []
         rad_prof_Msun = []
@@ -535,7 +533,7 @@ class MomentMaps:
         b_out = 0
         theta = np.deg2rad(self.galaxy.angle + 90)
 
-        emission = 2112
+        emission_Msun = 2112
         area_temp = 1
 
         if check_aperture:
@@ -543,12 +541,12 @@ class MomentMaps:
             plt.figure()
             plt.imshow(mom0_hdu_K.data)
 
-        while emission / area_temp > 1e-1:
+        while emission_Msun / area_temp > 1e-1:
 
             b_in += beam_pix
             b_out += beam_pix
 
-            if emission == 2112:
+            if emission_Msun == 2112:
                 a_in = 0.0000000000001
             else:
                 a_in = a_out
@@ -588,9 +586,9 @@ class MomentMaps:
 
             inner = 0
             centre = (mom0_K_rot.shape[1]) / 2
-            emission = 2112
+            emission_Msun = 2112
 
-            while emission > 1e-1:
+            while emission_Msun > 1e-1:
                 slice1_K = mom0_K_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
                 slice2_K = mom0_K_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
                 emission_K = np.average(np.average(slice1_K) + np.average(slice2_K))
@@ -625,19 +623,19 @@ class MomentMaps:
         error_Msun = np.sqrt(N_beams) * rms_Msun
 
         w = wcs.WCS(mom0_hdu_K.header, naxis=2)
-        centre_sky = wcs.utils.pixel_to_skycoord(self.centre_y, self.centre_x, wcs=w)
+        centre_sky = wcs.utils.pixel_to_skycoord(mom0_hdu_K.shape[0] / 2, mom0_hdu_K.shape[1] / 2, wcs=w)
 
         if hi_inc:
             csv_header = 'Slices parallel to the minor axis centered around (RA, Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
-                         ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(self.centre_y) + \
-                         ', ' + str(self.centre_x) + ')). ' \
+                         ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
+                         ', ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
                         'Radii are equal to one beamsize. \n \n' \
                          'Surface density (K km/s), RMS error (K km/s), ' \
                          'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
         else:
             csv_header = 'Elliptical apertures centered around (RA, Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
-                         ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(self.centre_y) + \
-                         ', ' + str(self.centre_x) + ')). ' \
+                         ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
+                         ', ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
                         'Radii are defined as the semi-major axes of these apertures. \n \n' \
                         'Surface density (K km/s), RMS error (K km/s), ' \
                          'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
@@ -648,6 +646,9 @@ class MomentMaps:
                                         np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
                                         delimiter=',', header=csv_header)
 
+        #from matplotlib import pyplot as plt
+        #plt.scatter(radii_deg * 3600, rad_prof_K)
+
         return rad_prof_K, rms, rad_prof_Msun, rms_Msun, radii_deg * 3600, radii_kpc
 
     def mom0_uncertainty(self):
@@ -656,7 +657,7 @@ class MomentMaps:
         from matplotlib import pyplot as plt
 
         # Tim's method
-        _, _, _, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+        _, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                     savepath=self.savepath, tosave=self.tosave).do_clip()
         inner = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                             savepath=self.savepath,
@@ -667,7 +668,7 @@ class MomentMaps:
 
         cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = self.calc_moms()
 
-        plt.imshow(rms_map)
+        #plt.imshow(rms_map)
 
         mom0_uncertainty = np.sum((rmscube.data * abs(rmscube.header['CDELT3']) / 1000), axis=0)
         mom0_uncertainty = np.where(mom0_hdu.data > 0, mom0_uncertainty, np.nan)
@@ -729,7 +730,7 @@ class MomentMaps:
         return mom1_uncertainty, mom2_uncertainty
 
     def peak_temperature(self):
-        cube, _, _, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
+        cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
                         tosave=self.tosave).do_clip()
 
         peak_temp = np.amax(cube.data, axis=0)

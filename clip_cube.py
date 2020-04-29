@@ -64,10 +64,10 @@ class ClipCube:
         """
 
         if len(cube.shape) == 3:
-            start_x = int(cube.shape[1] / 2 - 10)
-            stop_x = int(cube.shape[1] / 2 + 10)
-            start_y = int(cube.shape[2] / 2 - 10)
-            stop_y = int(cube.shape[2] / 2 + 10)
+            start_x = int(cube.shape[1] / 2 - 20)
+            stop_x = int(cube.shape[1] / 2 + 20)
+            start_y = int(cube.shape[2] / 2 - 20)
+            stop_y = int(cube.shape[2] / 2 + 20)
             inner_square = cube[:, start_x:stop_x, start_y:stop_y]
             if (inner_square == inner_square).any():
                 return inner_square
@@ -75,10 +75,10 @@ class ClipCube:
                 return cube
 
         elif len(cube.shape) == 2:
-            start_x = int(cube.shape[0] / 2 - 10)
-            stop_x = int(cube.shape[0] / 2 + 10)
-            start_y = int(cube.shape[1] / 2 - 10)
-            stop_y = int(cube.shape[1] / 2 + 10)
+            start_x = int(cube.shape[0] / 2 - 20)
+            stop_x = int(cube.shape[0] / 2 + 20)
+            start_y = int(cube.shape[1] / 2 - 20)
+            stop_y = int(cube.shape[1] / 2 + 20)
             inner_square = cube[start_x:stop_x, start_y:stop_y]
             if (inner_square == inner_square).any():
                 return inner_square
@@ -120,9 +120,12 @@ class ClipCube:
         if np.sum(empty_x) > beam_pix:
             beam_pix = int(np.round(beam_pix))
             idx_false = [i for i, x in enumerate(empty_x) if not x]
-            first_false = idx_false[1] - 1
+            first_false = idx_false[0] - 1
             last_false = idx_false[-1] + 1
-            empty_x[first_false - beam_pix:first_false] = False
+            if first_false - beam_pix > 0:
+                empty_x[first_false - beam_pix:first_false] = False
+            else:
+                empty_x[0:first_false] = False
             empty_x[last_false:last_false + beam_pix] = False
 
             cube.data = cube.data[:, ~empty_x, :]
@@ -135,9 +138,15 @@ class ClipCube:
             if noisecube:
                 noisecube.header['CRPIX2'] -= pix_shift
 
+        if not noisecube:
+            noisecube = np.array([0])
+
         return cube, noisecube
 
     def cut_empty_columns(self, cube, noisecube=None):
+
+        if len(noisecube.shape) == 1:
+            noisecube = None
 
         beam = cube.header['BMAJ']  # deg
         res = cube.header['CDELT2']  # deg/pixel
@@ -150,9 +159,12 @@ class ClipCube:
         if np.sum(empty_y) > beam_pix:
             beam_pix = int(np.round(beam_pix))
             idx_false = [i for i, x in enumerate(empty_y) if not x]
-            first_false = idx_false[1] - 1
+            first_false = idx_false[0] - 1
             last_false = idx_false[-1] + 1
-            empty_y[first_false - beam_pix:first_false] = False
+            if first_false - beam_pix > 0:
+                empty_y[first_false - beam_pix:first_false] = False
+            else:
+                empty_y[0:first_false] = False
             empty_y[last_false:last_false + beam_pix] = False
 
             cube.data = cube.data[:, :, ~empty_y]
@@ -164,6 +176,9 @@ class ClipCube:
             cube.header['CRPIX1'] -= pix_shift
             if noisecube:
                 noisecube.header['CRPIX1'] -= pix_shift
+
+        if not noisecube:
+            noisecube = np.array([0])
 
         return cube, noisecube
 
@@ -228,33 +243,25 @@ class ClipCube:
         new_header['NAXIS1'] = cube_new.shape[2]
         new_header['NAXIS2'] = cube_new.shape[1]
 
-        print(shift_y)
-        print(shift_x)
-        print(cube.shape)
-        print(cube_new.shape)
-
-        print(cube.header['CRPIX1'])
-        print(new_header['CRPIX1'])
-
-        print(cube.header['CRPIX2'])
-        print(new_header['CRPIX2'])
-
         cube_hdu = fits.PrimaryHDU(cube_new, new_header)
 
-        noisecube_hdu = fits.PrimaryHDU(noisecube_new, new_header)
-        noisecube_hdu.header['NAXIS3'] = noisecube.header['NAXIS3']
+        if not noisecube:
+            noisecube_new = np.array([0])
 
-        return cube_hdu, cube_new.shape[1] / 2, cube_new.shape[2] / 2, noisecube_hdu
+        noisecube_hdu = fits.PrimaryHDU(noisecube_new, new_header)
+
+        if noisecube:
+            noisecube_hdu.header['NAXIS3'] = noisecube.header['NAXIS3']
+
+        return cube_hdu, noisecube_hdu
 
     def preprocess(self, cube, noisecube=None):
 
-        cube, centre_x, centre_y, noisecube = self.centre_data(cube, noisecube)
         cube, noisecube = self.cut_empty_rows(cube, noisecube)
         cube, noisecube = self.cut_empty_columns(cube, noisecube)
+        #cube, noisecube = self.centre_data(cube, noisecube)
 
-        centre_x = 1; centre_y = 1
-
-        return cube, centre_x, centre_y, noisecube
+        return cube, noisecube
 
     def split_cube(self, cube):
         """
@@ -494,13 +501,14 @@ class ClipCube:
         clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr.data, cube_pbcorr.header)
 
         # Do some pre-processing to make the creation of the moments easier
-        pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/' + str(self.galaxy.name) + '/' +
-                       str(self.galaxy.name) + '_7m_co21_pb_rebin.fits')[0]
+        #pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/' + str(self.galaxy.name) + '/' +
+        #               str(self.galaxy.name) + '_7m_co21_pb_rebin.fits')[0]
 
-        clipped_hdu, centre_x, centre_y, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=pb)
+        clipped_hdu, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=None)
 
         if self.tosave:
             clipped_hdu.writeto(self.savepath + 'clipped_cube.fits', overwrite=True)
-            noisecube_hdu.writeto(self.savepath + 'trimmed_noisecube.fits', overwrite=True)
+            if noisecube_hdu.shape[0] > 1:
+                noisecube_hdu.writeto(self.savepath + 'trimmed_noisecube.fits', overwrite=True)
 
-        return clipped_hdu, centre_x, centre_y, noisecube_hdu
+        return clipped_hdu, noisecube_hdu
