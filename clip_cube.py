@@ -6,6 +6,7 @@ from targets import galaxies
 from astropy import wcs
 from astropy.coordinates import SkyCoord
 from astropy import units as u
+from astroquery.ned import Ned
 
 
 class ClipCube:
@@ -109,6 +110,10 @@ class ClipCube:
 
     def cut_empty_rows(self, cube, noisecube=None):
 
+        w = wcs.WCS(cube.header, naxis=2)
+        centre_sky = SkyCoord(cube.header['OBSRA'], cube.header['OBSDEC'], unit=(u.deg, u.deg))
+        centre_pix = wcs.utils.skycoord_to_pixel(centre_sky, w)
+
         beam = cube.header['BMAJ']  # deg
         res = cube.header['CDELT2']  # deg/pixel
         beam_pix = beam / res
@@ -120,8 +125,10 @@ class ClipCube:
         if np.sum(empty_x) > beam_pix:
             beam_pix = int(np.round(beam_pix))
             idx_false = [i for i, x in enumerate(empty_x) if not x]
-            first_false = idx_false[0] - 1
-            last_false = idx_false[-1] + 1
+            first_false = idx_false[0]
+            last_false = idx_false[-1]
+            empty_x[first_false:last_false] = False  # Make sure empty rows in the middle of the data are not affected
+            last_false += 1
             if first_false - beam_pix > 0:
                 empty_x[first_false - beam_pix:first_false] = False
             else:
@@ -134,9 +141,12 @@ class ClipCube:
 
             # Adjust the central pixel in the image header correspondingly
             pix_shift = [i for i, x in enumerate(empty_x) if not x][1] - 1
-            cube.header['CRPIX2'] -= pix_shift
+            if empty_x[0]:
+                cube.header['CRPIX2'] -= pix_shift
+            cube.header['NAXIS2'] = cube.shape[1]
             if noisecube:
                 noisecube.header['CRPIX2'] -= pix_shift
+                noisecube.header['NAXIS2'] = noisecube.shape[1]
 
         if not noisecube:
             noisecube = np.array([0])
@@ -159,8 +169,10 @@ class ClipCube:
         if np.sum(empty_y) > beam_pix:
             beam_pix = int(np.round(beam_pix))
             idx_false = [i for i, x in enumerate(empty_y) if not x]
-            first_false = idx_false[0] - 1
-            last_false = idx_false[-1] + 1
+            first_false = idx_false[0]
+            last_false = idx_false[-1]
+            empty_y[first_false:last_false] = False  # Make sure empty rows in the middle of the data are not affected
+            last_false += 1
             if first_false - beam_pix > 0:
                 empty_y[first_false - beam_pix:first_false] = False
             else:
@@ -173,9 +185,12 @@ class ClipCube:
 
             # Adjust the header
             pix_shift = [i for i, x in enumerate(empty_y) if not x][1] - 1
-            cube.header['CRPIX1'] -= pix_shift
+            if empty_y[0]:
+                cube.header['CRPIX1'] -= pix_shift
+            cube.header['NAXIS1'] = cube.shape[2]
             if noisecube:
                 noisecube.header['CRPIX1'] -= pix_shift
+                cube.header['NAXIS1'] = noisecube.shape[2]
 
         if not noisecube:
             noisecube = np.array([0])
@@ -189,14 +204,18 @@ class ClipCube:
         :return:
         """
 
+        # Read in central coordinates from NED
+        ra = Ned.query_object(cube.header['OBJECT'])['RA'][0]
+        dec = Ned.query_object(cube.header['OBJECT'])['DEC'][0]
+
         # Find the central pixel based on these coordinates and WCS info
         w = wcs.WCS(cube.header, naxis=2)
-        centre_sky = SkyCoord(cube.header['OBSRA'], cube.header['OBSDEC'], unit=(u.deg, u.deg))
+        centre_sky = SkyCoord(ra, dec, unit=(u.deg, u.deg))
         centre_pix = wcs.utils.skycoord_to_pixel(centre_sky, w)
 
         # The amount the centre needs to shift to overlap with the central coordinates
-        shift_x = int(np.round(centre_pix[0] - cube.shape[2] / 2))
-        shift_y = int(np.round(centre_pix[1] - cube.shape[1] / 2))
+        shift_x = int(np.round(centre_pix[1] - cube.shape[1] / 2))
+        shift_y = int(np.round(centre_pix[0] - cube.shape[2] / 2))
 
         # Pad the image with twice the amount it has to shift, so that the new centre overlaps with the coordinates
         if shift_x > 0:
@@ -259,7 +278,7 @@ class ClipCube:
 
         cube, noisecube = self.cut_empty_rows(cube, noisecube)
         cube, noisecube = self.cut_empty_columns(cube, noisecube)
-        #cube, noisecube = self.centre_data(cube, noisecube)
+        cube, noisecube = self.centre_data(cube, noisecube)
 
         return cube, noisecube
 
