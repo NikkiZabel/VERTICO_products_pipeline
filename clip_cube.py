@@ -309,7 +309,7 @@ class ClipCube:
 
         cube_pbcorr, cube_uncorr = self.readfits()
 
-        emiscube, noisecube = self.split_cube(cube_pbcorr)
+        emiscube, noisecube = self.split_cube(cube_uncorr)
         inner_noisecube = self.innersquare(noisecube.data)
         rms = np.nanstd(inner_noisecube)
 
@@ -489,7 +489,7 @@ class ClipCube:
 
         return mask
 
-    def do_clip(self):
+    def do_clip(self, clip_also=None):
         """
         Clip the array, either according to the Sun method (if self.sun == True, which is default) or the smooth
         clipping method from Dame.
@@ -508,7 +508,7 @@ class ClipCube:
         emiscube_uncorr, noisecube_uncorr = self.split_cube(cube_uncorr_copy)
 
         if self.sun:
-            mask = self.sun_method(emiscube_uncorr, noisecube_pbcorr)
+            mask = self.sun_method(emiscube_uncorr, noisecube_uncorr)
             mask_hdu = fits.PrimaryHDU(mask.astype(int), cube_pbcorr.header)
             mask_hdu.writeto(self.savepath + 'mask_sun.fits', overwrite=True)
         else:
@@ -520,14 +520,9 @@ class ClipCube:
         clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr.data, cube_pbcorr.header)
 
         # Do some pre-processing to make the creation of the moments easier
-        #pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/' + str(self.galaxy.name) + '/' +
-        #               str(self.galaxy.name) + '_7m_co21_pb_rebin.fits')[0]
-
-        clipped_hdu, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=None)
+        clipped_hdu, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=clip_also)
 
         if self.tosave:
             clipped_hdu.writeto(self.savepath + 'clipped_cube.fits', overwrite=True)
-            if noisecube_hdu.shape[0] > 1:
-                noisecube_hdu.writeto(self.savepath + 'trimmed_noisecube.fits', overwrite=True)
 
         return clipped_hdu, noisecube_hdu

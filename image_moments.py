@@ -1,4 +1,4 @@
-import matplotlib; matplotlib.use('Agg')
+#import matplotlib; matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import aplpy as apl
 from astropy import wcs
@@ -525,11 +525,11 @@ class CreateImages:
 
         if self.refresh:
             if self.overwrite:
-                mom0_unc, mom0_SN = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                       tosave=True, savepath=self.savepath).mom0_uncertainty()
+                mom0_unc, mom0_SN, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                       tosave=True, savepath=self.savepath).uncertainty_maps()
             else:
-                mom0_unc, mom0_SN = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                       tosave=False).mom0_uncertainty()
+                mom0_unc, mom0_SN, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                       tosave=False).uncertainty_maps()
         else:
             mom0_unc = fits.open(path + 'mom0_unc.fits')[0]
             mom0_SN = fits.open(path + 'mom0_SN.fits')[0]
@@ -538,7 +538,7 @@ class CreateImages:
         f = plt.figure(figsize=self.galaxy.figsize)
         fig = apl.FITSFigure(mom0_unc, figure=f)
         fig.set_theme('publication')
-        fig.show_grayscale()
+        fig.show_colorscale(cmap='magma_r')
 
         # Add a colourbar
         fig.add_colorbar()
@@ -565,11 +565,11 @@ class CreateImages:
         f = plt.figure(figsize=self.galaxy.figsize)
         fig = apl.FITSFigure(mom0_SN, figure=f)
         fig.set_theme('publication')
-        fig.show_grayscale()
+        fig.show_colorscale(cmap='magma_r')
 
         # Add a colourbar
         fig.add_colorbar()
-        fig.colorbar.set_axis_label_text('log S/N')
+        fig.colorbar.set_axis_label_text('S/N')
         fig.colorbar.set_axis_label_font(size=30)
         fig.colorbar.set_axis_label_pad(15)
 
@@ -592,20 +592,21 @@ class CreateImages:
 
         if self.refresh:
             if self.overwrite:
-                mom1_unc, mom2_unc = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                               tosave=True, savepath=self.savepath).mom1_2_uncertainty()
+                mom0_unc, SN_hdu, mom1_unc, mom2_unc = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                               tosave=True, savepath=self.savepath).uncertainty_maps()
             else:
-                mom1_unc, mom2_unc = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                               tosave=False).mom1_2_uncertainty()
+                mom0_unc, SN_hdu, mom1_unc, mom2_unc = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                               tosave=False).uncertainty_maps()
         else:
             mom1_unc = fits.open(path + 'mom1_unc.fits')[0]
             mom2_unc = fits.open(path + 'mom2_unc.fits')[0]
 
         # Image the uncertainty maps
+        mom1_unc.data = np.log10(mom1_unc.data)
         f = plt.figure(figsize=self.galaxy.figsize)
         fig = apl.FITSFigure(mom1_unc, figure=f)
         fig.set_theme('publication')
-        fig.show_grayscale()
+        fig.show_colorscale(cmap='sauron')
 
         # Add a colourbar
         fig.add_colorbar()
@@ -629,14 +630,15 @@ class CreateImages:
             plt.savefig(self.savepath + 'moment1_uncertainty.pdf', bbox_inches='tight')
 
         # Moment 2
+        mom2_unc.data = np.log10(mom2_unc.data)
         f = plt.figure(figsize=self.galaxy.figsize)
         fig = apl.FITSFigure(mom2_unc, figure=f)
         fig.set_theme('publication')
-        fig.show_grayscale()
+        fig.show_colorscale(cmap='sauron')
 
         # Add a colourbar
         fig.add_colorbar()
-        fig.colorbar.set_axis_label_text(r'Log uncertainty (km s$^{-1}$)')
+        fig.colorbar.set_axis_label_text(r'log uncertainty (km s$^{-1}$)')
         fig.colorbar.set_axis_label_font(size=30)
         fig.colorbar.set_axis_label_pad(15)
 

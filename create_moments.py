@@ -651,83 +651,71 @@ class MomentMaps:
 
         return rad_prof_K, rms, rad_prof_Msun, rms_Msun, radii_deg * 3600, radii_kpc
 
-    def mom0_uncertainty(self):
-        rmscube = self.calc_noise_in_cube()
+    def uncertainty_maps(self):
 
-        from matplotlib import pyplot as plt
+        #rmscube = self.calc_noise_in_cube()
 
-        # Tim's method
-        _, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave).do_clip()
+        # Read in moment maps
+        cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = self.calc_moms()
+
+        # Read in masks used to clip
+        if self.sun:
+            mask = fits.open(self.savepath + 'mask_sun.fits')[0]
+        else:
+            mask = fits.open(self.savepath + 'mask_smooth.fits')[0]
+
+        # Map of the number of channels used to calculate the moments
+        _, mask_trimmed = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                    savepath=self.savepath, tosave=self.tosave).do_clip(clip_also=mask)
+        N_map = np.sum(mask_trimmed.data, axis=0)
+
+        # Read in the cubes, split into cubes containing line and line-free channels, take the inner cube and calculate
+        # the rms from that.
+        cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                            savepath=self.savepath,
+                                            tosave=self.tosave).readfits()
+        emiscube, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                            savepath=self.savepath,
+                                            tosave=self.tosave).split_cube(cube_uncorr)
         inner = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                             savepath=self.savepath,
                                             tosave=self.tosave).innersquare(noisecube.data)
-
         rms = np.nanstd(inner)
-        rms_map = np.median(rms / noisecube.data, axis=0)
 
-        cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = self.calc_moms()
+        # Read in the PB cube and use the middle channel to estimate the noise
+        pb_hdu = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/' + str(self.galaxy.name) + '/' +
+                       str(self.galaxy.name) + '_7m_co21_pb_rebin.fits')[0]
+        _, pb_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                    savepath=self.savepath, tosave=self.tosave).do_clip(clip_also=pb_hdu)
+        pb_map = pb_cube.data[int(pb_cube.shape[0] / 2), :, :]
 
-        #plt.imshow(rms_map)
+        # Total noise map is the rms divided by the PB map
+        noise_map = rms / pb_map
 
-        mom0_uncertainty = np.sum((rmscube.data * abs(rmscube.header['CDELT3']) / 1000), axis=0)
+        mom0_uncertainty = noise_map * np.sqrt(N_map) * abs(noisecube.header['CDELT3'] / 1000)
         mom0_uncertainty = np.where(mom0_hdu.data > 0, mom0_uncertainty, np.nan)
         mom0_uncertainty = fits.PrimaryHDU(mom0_uncertainty, mom0_hdu.header)
 
-        SN = np.log10(mom0_hdu.data / mom0_uncertainty.data)
+        SN = mom0_hdu.data / mom0_uncertainty.data
         SN_hdu = fits.PrimaryHDU(SN, mom0_hdu.header)
         SN_hdu.header.pop('BUNIT')
+
+        mom1_uncertainty = (N_map * abs(cube.header['CDELT3'] / 1000) / (2 * np.sqrt(3))) * \
+                           (mom0_uncertainty.data / mom0_hdu.data)  # Eqn 15 doc. Chris.
+
+        mom2_uncertainty = ((N_map * abs(cube.header['CDELT3'] / 1000)) ** 2 / (8 * np.sqrt(5))) * \
+                           (mom0_uncertainty.data / mom0_hdu.data) * (mom2_hdu.data) ** -1  # Eqn 30 doc. Chris.
+
+        mom1_uncertainty = fits.PrimaryHDU(mom1_uncertainty, mom1_hdu.header)
+        mom2_uncertainty = fits.PrimaryHDU(mom2_uncertainty, mom2_hdu.header)
 
         if self.tosave:
             mom0_uncertainty.writeto(self.savepath + 'mom0_unc.fits', overwrite=True)
             mom0_uncertainty.writeto(self.savepath + 'mom0_SN.fits', overwrite=True)
-
-        return mom0_uncertainty, SN_hdu
-
-    def mom1_uncertainty_old(self):
-
-        rmscube = self.calc_noise_in_cube()
-        rms_map = np.nanmedian(rmscube.data, axis=0)
-
-        cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = self.calc_moms()
-
-        rmscube = np.tile(rms_map, (cube.shape[0], 1, 1))#.transpose()
-
-        vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
-        mom1_low = np.sum((cube.data - rmscube) * vel_narray, axis=0) / np.sum((cube.data - rmscube), axis=0) - sysvel
-
-        mom1_uncertainty = np.log10(np.abs(mom1_hdu.data - mom1_low.data))
-        mom1_uncertainty = fits.PrimaryHDU(mom1_uncertainty, mom1_hdu.header)
-
-        if self.tosave:
-            mom1_uncertainty.writeto(self.savepath + 'mom1_unc.fits', overwrite=True)
-
-        return mom1_uncertainty
-
-    def mom1_2_uncertainty(self):
-
-        rmscube = self.calc_noise_in_cube()
-        rms_map = np.nanmedian(rmscube.data, axis=0)
-
-        cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = self.calc_moms()
-
-        vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
-
-        mom1_uncertainty = np.log10((cube.shape[0] * abs(cube.header['CDELT3'])) / (2 * np.sqrt(3)) * \
-                           (rms_map / np.sum(cube.data * vel_narray, axis=0)))  # Eqn 15 doc. Chris.
-
-        mom2_uncertainty = np.log10((cube.shape[0] * abs(cube.header['CDELT3'])) ** 2 / (8 * np.sqrt(5)) * \
-                           (rms_map / np.sum(cube.data * vel_narray, axis=0)) * \
-                           (mom2_hdu.data) ** -1)
-
-        mom1_uncertainty = fits.PrimaryHDU(mom1_uncertainty, mom1_hdu.header)
-        mom2_uncertainty = fits.PrimaryHDU(mom2_uncertainty, mom1_hdu.header)
-
-        if self.tosave:
             mom1_uncertainty.writeto(self.savepath + 'mom1_unc.fits', overwrite=True)
             mom2_uncertainty.writeto(self.savepath + 'mom2_unc.fits', overwrite=True)
 
-        return mom1_uncertainty, mom2_uncertainty
+        return mom0_uncertainty, SN_hdu, mom1_uncertainty, mom2_uncertainty
 
     def peak_temperature(self):
         cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,

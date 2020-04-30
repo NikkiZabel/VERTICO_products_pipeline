@@ -1198,7 +1198,7 @@ def parameters(galaxy):
         full_width = True
         distance = 16.5
         nchan_low = 2
-        cliplevel_low = 2
+        cliplevel_low = 1
         nchan_high = 3
         cliplevel_high = 3.5
         prune_by_npix = None
@@ -1208,7 +1208,7 @@ def parameters(galaxy):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        figsize = (10, 7)
+        figsize = (10, 6)
 
     name = galaxy
 
