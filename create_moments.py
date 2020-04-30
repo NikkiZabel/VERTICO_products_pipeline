@@ -656,7 +656,7 @@ class MomentMaps:
         #rmscube = self.calc_noise_in_cube()
 
         # Read in moment maps
-        cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = self.calc_moms()
+        cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = self.calc_moms(units='K km/s')
 
         # Read in masks used to clip
         if self.sun:
@@ -692,9 +692,15 @@ class MomentMaps:
         # Total noise map is the rms divided by the PB map
         noise_map = rms / pb_map
 
+        from matplotlib import pyplot as plt
+
         mom0_uncertainty = noise_map * np.sqrt(N_map) * abs(noisecube.header['CDELT3'] / 1000)
         mom0_uncertainty = np.where(mom0_hdu.data > 0, mom0_uncertainty, np.nan)
         mom0_uncertainty = fits.PrimaryHDU(mom0_uncertainty, mom0_hdu.header)
+
+        plt.imshow(mom0_hdu.data)
+        plt.figure()
+        plt.imshow(noise_map)
 
         SN = mom0_hdu.data / mom0_uncertainty.data
         SN_hdu = fits.PrimaryHDU(SN, mom0_hdu.header)
