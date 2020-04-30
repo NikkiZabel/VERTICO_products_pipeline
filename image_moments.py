@@ -1,4 +1,4 @@
-#import matplotlib; matplotlib.use('Agg')
+import matplotlib; matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import aplpy as apl
 from astropy import wcs
@@ -183,8 +183,11 @@ class CreateImages:
 
         cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                sun=self.sun, tosave=False).readfits()
+        emiscube, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                            savepath=self.savepath,
+                                            tosave=self.tosave).split_cube(cube_uncorr)
         vel_array, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                      tosave=False).create_vel_array(cube_pbcorr)
+                                      tosave=False).create_vel_array(emiscube)
 
         sysvel = (sysvel + 5) // 10 * 10
 
@@ -236,7 +239,6 @@ class CreateImages:
                              overlap=True)
             colors = plt.contourf([[0, 0], [0, 0]], levels=np.linspace(-vrange, vrange,
                                                                        len(vel_array)), cmap='sauron')
-
             if vrange < 16:
                 tickarr = np.arange(-vrange, 0, 3)
             elif vrange < 60:
