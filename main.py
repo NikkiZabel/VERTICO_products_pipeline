@@ -101,13 +101,14 @@ for i in range(len(galaxies)):
 
     if galaxy == 'NGC4561': continue
 
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave).moment_1_2()
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave).moment_1_2(moment=2)
-    '''
+    #reateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #             sun=sun, tosave=tosave).moment_1_2()
+    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #             sun=sun, tosave=tosave).moment_1_2(moment=2)
+
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave).mom1_2_noise_maps()
+    '''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).\
        PVD(axis='major', find_angle=False, check_slit=True)

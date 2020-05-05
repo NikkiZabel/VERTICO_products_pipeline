@@ -711,7 +711,7 @@ class MomentMaps:
 
         if self.tosave:
             mom0_uncertainty.writeto(self.savepath + 'mom0_unc.fits', overwrite=True)
-            mom0_uncertainty.writeto(self.savepath + 'mom0_SN.fits', overwrite=True)
+            SN_hdu.writeto(self.savepath + 'mom0_SN.fits', overwrite=True)
             mom1_uncertainty.writeto(self.savepath + 'mom1_unc.fits', overwrite=True)
             mom2_uncertainty.writeto(self.savepath + 'mom2_unc.fits', overwrite=True)
 
