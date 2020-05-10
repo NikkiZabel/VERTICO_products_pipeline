@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 # Set some parameters to apply to all images below
 refresh = True
 overwrite = True
-sun = False
+sun = True
 tosave = True
 pbcor = True
 
@@ -23,10 +23,9 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
             'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808', 'NGC4396',
             'NGC4567', 'NGC4772', 'NGC4580', 'NGC4450', 'NGC4694', 'NGC4561']
 
-#galaxies = ['NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
-#            'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689']
+galaxies = ['NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
+            'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689']
 
-galaxies = ['IC3392']
 
 for i in range(len(galaxies)):
 
@@ -34,6 +33,13 @@ for i in range(len(galaxies)):
 
     path = '/home/nikki/Documents/Data/VERTICO/'
     readpath = path + '/ReducedData/' + galaxy + '/'
+
+    try:
+        pb = fits.open(readpath + galaxy + '_7m_co21_pb_rebin.fits')[0]
+    except:
+        print('No PB info')
+        print(galaxy)
+        continue
 
     if sun:
         if not os.path.exists(path + 'Products/' + galaxy + '/Sun_method/'):
@@ -61,6 +67,13 @@ for i in range(len(galaxies)):
         cube_corr, cube_uncorr = ClipCube(galaxy, file_pbcorr, file_uncorr).readfits()
         savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_'
         TP = False
+
+    data = fits.open(file_pbcorr)[0]
+
+    if not pb.shape[1:3] == data.shape[1:3]:
+        print('Wrong PB shape:')
+        print(galaxy)
+        continue
 
     if not pbcor:
         file_pbcorr = file_uncorr
@@ -90,21 +103,21 @@ for i in range(len(galaxies)):
     #savepath = '/home/nikki/Desktop/vertico/' + galaxy + '/' + galaxy + '_'
 
     # Call these to create images of the moment maps
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #              sun=sun, tosave=tosave).moment_zero(units='K km/s')
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #              sun=sun, tosave=tosave).moment_zero()
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #            sun=sun, tosave=tosave).mom0_noise_maps()
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #              sun=sun, tosave=tosave).moment_zero(peak=True)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave).moment_zero(units='K km/s')
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave).moment_zero()
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                sun=sun, tosave=tosave).mom0_noise_maps()
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave).moment_zero(peak=True)
 
     if galaxy == 'NGC4561': continue
 
-    #reateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #             sun=sun, tosave=tosave).moment_1_2()
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #             sun=sun, tosave=tosave).moment_1_2(moment=2)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                 sun=sun, tosave=tosave).moment_1_2()
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                 sun=sun, tosave=tosave).moment_1_2(moment=2)
 
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave).mom1_2_noise_maps()

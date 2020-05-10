@@ -306,7 +306,6 @@ class MomentMaps:
         self.add_clipping_keywords(mom2_hdu.header)
 
         if self.tosave:
-            cube.writeto(self.savepath + 'clipped_cube.fits', overwrite=True)
             if units == 'M_Sun/pc^2':
                 mom0_hdu.writeto(self.savepath + 'moment0_M_Sun.fits', overwrite=True)
             if units == 'K km/s':
@@ -685,6 +684,7 @@ class MomentMaps:
         # Read in the PB cube and use the middle channel to estimate the noise
         pb_hdu = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/' + str(self.galaxy.name) + '/' +
                        str(self.galaxy.name) + '_7m_co21_pb_rebin.fits')[0]
+
         _, pb_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                     savepath=self.savepath, tosave=self.tosave).do_clip(clip_also=pb_hdu)
         pb_map = pb_cube.data[int(pb_cube.shape[0] / 2), :, :]

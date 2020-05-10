@@ -497,7 +497,6 @@ class ClipCube:
         :param cube_uncorr (HDU file): primary beam UNcorrected spectral cube, from which we want to make the mask
         :return: HDU file with the clipped, primary beam corrected spectral cube
         """
-        # copy the non-PB corrected datacube
 
         cube_pbcorr, cube_uncorr = self.readfits()
 
@@ -519,10 +518,13 @@ class ClipCube:
         emiscube_pbcorr.data *= mask
         clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr.data, cube_pbcorr.header)
 
+        if self.tosave:
+            clipped_hdu.writeto(self.savepath + 'cube_clipped.fits', overwrite=True)
+
         # Do some pre-processing to make the creation of the moments easier
         clipped_hdu, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=clip_also)
 
         if self.tosave:
-            clipped_hdu.writeto(self.savepath + 'clipped_cube.fits', overwrite=True)
+            clipped_hdu.writeto(self.savepath + 'cube_clipped_trimmed.fits', overwrite=True)
 
         return clipped_hdu, noisecube_hdu
