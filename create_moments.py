@@ -682,12 +682,15 @@ class MomentMaps:
         rms = np.nanstd(inner)
 
         # Read in the PB cube and use the middle channel to estimate the noise
-        pb_hdu = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/' + str(self.galaxy.name) + '/' +
-                       str(self.galaxy.name) + '_7m_co21_pb_rebin.fits')[0]
+        try:
+            pb_hdu = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/' + str(self.galaxy.name) + '/' +
+                           str(self.galaxy.name) + '_7m_co21_pb_rebin.fits')[0]
 
-        _, pb_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave).do_clip(clip_also=pb_hdu)
-        pb_map = pb_cube.data[int(pb_cube.shape[0] / 2), :, :]
+            _, pb_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                        savepath=self.savepath, tosave=self.tosave).do_clip(clip_also=pb_hdu)
+            pb_map = pb_cube.data[int(pb_cube.shape[0] / 2), :, :]
+        except:
+            pb_map = np.ones(mom0_hdu.shape)
 
         # Total noise map is the rms divided by the PB map
         noise_map = rms / pb_map

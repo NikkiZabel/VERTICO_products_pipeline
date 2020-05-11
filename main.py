@@ -26,6 +26,7 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
 galaxies = ['NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
             'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689']
 
+galaxies = ['NGC4254']
 
 for i in range(len(galaxies)):
 
@@ -33,13 +34,6 @@ for i in range(len(galaxies)):
 
     path = '/home/nikki/Documents/Data/VERTICO/'
     readpath = path + '/ReducedData/' + galaxy + '/'
-
-    try:
-        pb = fits.open(readpath + galaxy + '_7m_co21_pb_rebin.fits')[0]
-    except:
-        print('No PB info')
-        print(galaxy)
-        continue
 
     if sun:
         if not os.path.exists(path + 'Products/' + galaxy + '/Sun_method/'):
@@ -70,10 +64,10 @@ for i in range(len(galaxies)):
 
     data = fits.open(file_pbcorr)[0]
 
-    if not pb.shape[1:3] == data.shape[1:3]:
-        print('Wrong PB shape:')
-        print(galaxy)
-        continue
+    #if not pb.shape[1:3] == data.shape[1:3]:
+    #    print('Wrong PB shape:')
+    #    print(galaxy)
+    #    continue
 
     if not pbcor:
         file_pbcorr = file_uncorr
