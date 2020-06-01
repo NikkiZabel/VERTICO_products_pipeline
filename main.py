@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 refresh = True
 overwrite = True
 sun = True
-tosave = True
+tosave = False
 pbcor = True
 
 galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
@@ -18,15 +18,15 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
             'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689',
             'NGC4698']
 
-galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
-            'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
-            'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808', 'NGC4396',
-            'NGC4567', 'NGC4772', 'NGC4580', 'NGC4450', 'NGC4694', 'NGC4561']
+#galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
+#            'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
+#            'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808', 'NGC4396',
+#            'NGC4567', 'NGC4772', 'NGC4580', 'NGC4450', 'NGC4694', 'NGC4561']
 
-galaxies = ['NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
-            'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689']
+#galaxies = ['NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
+#            'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689']
 
-galaxies = ['NGC4254']
+#galaxies = ['NGC4698']
 
 for i in range(len(galaxies)):
 
@@ -96,7 +96,11 @@ for i in range(len(galaxies)):
     #os.mkdir('/home/nikki/Desktop/vertico/' + galaxy)
     #savepath = '/home/nikki/Desktop/vertico/' + galaxy + '/' + galaxy + '_'
 
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                 sun=sun, tosave=tosave).spectrum(x_axis='velocity')
+
     # Call these to create images of the moment maps
+    '''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).moment_zero(units='K km/s')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -106,7 +110,7 @@ for i in range(len(galaxies)):
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).moment_zero(peak=True)
 
-    if galaxy == 'NGC4561': continue
+    #if galaxy == 'NGC4561': continue
 
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).moment_1_2()
@@ -115,7 +119,7 @@ for i in range(len(galaxies)):
 
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave).mom1_2_noise_maps()
-    '''
+
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).\
        PVD(axis='major', find_angle=False, check_slit=True)

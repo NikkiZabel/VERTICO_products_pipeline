@@ -19,9 +19,10 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Test for PB information in main file, save cube before and after trimming.">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Work around for galaxies that have no PB information (set PB map to all ones)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +49,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Project3" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="SvnConfiguration">
@@ -61,13 +62,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00003" summary="Finished the docstrings.">
-      <created>1580220697889</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1580220697889</updated>
     </task>
     <task id="LOCAL-00004" summary="Some small bugs.">
       <created>1580312499270</created>
@@ -405,7 +399,14 @@
       <option name="project" value="LOCAL" />
       <updated>1589115782171</updated>
     </task>
-    <option name="localTasksCounter" value="52" />
+    <task id="LOCAL-00052" summary="Work around for galaxies that have no PB information (set PB map to all ones)">
+      <created>1589212936743</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1589212936743</updated>
+    </task>
+    <option name="localTasksCounter" value="53" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -421,7 +422,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Some tweaking of the PVD" />
     <MESSAGE value="New method for dealing with high inclinations for radial profile" />
     <MESSAGE value="Tweaked some galaxy parameters + new working code for padding the image to put the galaxy in the centre." />
     <MESSAGE value="New pre-processing function" />
@@ -446,7 +446,8 @@
     <MESSAGE value="Fixed bug in units uncertainty maps" />
     <MESSAGE value="Fixed bug in number of contour levels moment 1 and 2" />
     <MESSAGE value="Test for PB information in main file, save cube before and after trimming." />
-    <option name="LAST_COMMIT_MESSAGE" value="Test for PB information in main file, save cube before and after trimming." />
+    <MESSAGE value="Work around for galaxies that have no PB information (set PB map to all ones)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Work around for galaxies that have no PB information (set PB map to all ones)" />
   </component>
   <component name="WindowStateProjectService">
     <state x="600" y="147" width="912" height="819" key="CommitChangelistDialog2" timestamp="1588254540743">
@@ -456,22 +457,22 @@
     <state x="600" y="147" width="912" height="819" key="CommitChangelistDialog2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1588254540743" />
     <state x="600" y="147" width="782" height="924" key="CommitChangelistDialog2/67.27.1853.1053@67.27.1853.1053" timestamp="1581519376119" />
     <state x="600" y="1080" width="782" height="1080" key="CommitChangelistDialog2/67.27.1853.2133@67.27.1853.2133" timestamp="1585324284163" />
-    <state x="325" y="1125" width="424" height="484" key="FileChooserDialogImpl" timestamp="1588753061654">
-      <screen x="0" y="1080" width="1920" height="1080" />
+    <state x="458" y="62" width="424" height="484" key="FileChooserDialogImpl" timestamp="1589363821279">
+      <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="325" y="1125" width="424" height="484" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1588753061654" />
-    <state x="458" y="62" width="1102" height="751" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1588696801815" />
+    <state x="458" y="62" width="1102" height="751" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1589363821279" />
     <state x="776" y="311" width="424" height="491" key="FileChooserDialogImpl/67.27.1853.1053@67.27.1853.1053" timestamp="1584018065540" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor" timestamp="1588696810295">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="621" y="1156" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1588696459844" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1588696810295" />
-    <state x="588" y="289" width="800" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1589115783759">
+    <state x="588" y="289" width="800" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1589212937877">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="540" y="1349" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1581007711900" />
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1589115783759" />
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1589212937877" />
     <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053@67.27.1853.1053" timestamp="1581519377806" />
     <state x="588" y="1080" width="800" height="1080" key="Vcs.Push.Dialog.v2/67.27.1853.2133@67.27.1853.2133" timestamp="1585324286028" />
     <state x="648" y="379" key="com.intellij.ide.util.TipDialog" timestamp="1583253466522">

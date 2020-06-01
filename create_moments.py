@@ -271,7 +271,7 @@ class MomentMaps:
         mom0 = np.sum((cube.data * abs(cube.header['CDELT3']) / 1000), axis=0)
         if units == 'M_Sun/pc^2':
             mom0 = mom0 / cube.header['JTOK'] * 91.9 * alpha_co * (cube.header['BMAJ'] * 3600 * cube.header[
-                'BMIN'] * 3600) ** (-1)
+                'BMIN'] * 3600) ** (-1) / 4
         elif units == 'K km/s':
             pass
         else:
@@ -475,10 +475,15 @@ class MomentMaps:
         #rms = np.std(np.sum(noise, axis=(1, 2)))
         #np.savetxt(path + 'specnoise.txt', [rms / beamsize])
 
-        #psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
-        #beamsize = np.sum(psf)
-        #spectrum /= beamsize
-        #print(np.log10(3.93e-17 * 16.5 ** 2. * 2e20 / 0.7 * np.trapz(np.flip(spectrum), np.flip(spectrum_velocities)) / cube_pbcorr.header['JTOK']))
+        print(self.galaxy.name)
+
+        psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
+        beamsize = np.sum(psf)
+        spectrum /= beamsize
+        print(np.log10(abs(3.93e-17 * 16.5 ** 2 * 2e20 * (1.3 / 2.6) ** 2 / 0.7 * np.trapz(np.flip(spectrum), np.flip(spectrum_velocities)) / cube_pbcorr.header['JTOK'])))
+
+        #print(self.galaxy.name)
+        #print(np.trapz(np.flip(spectrum), np.flip(spectrum_velocities)) / cube_pbcorr.header['JTOK'])
 
         return spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies # / beamsize
 
