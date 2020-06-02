@@ -507,7 +507,7 @@ class MomentMaps:
         rms = np.nanstd(inner)
         rms_Msun = rms / cube_pbcorr.header['JTOK']
         rms_Msun = rms_Msun * abs(cube_pbcorr.header['CDELT3']) / 1000 * 91.9 * alpha_co * (cube_pbcorr.header['BMAJ'] * 3600 *
-                cube_pbcorr.header['BMIN'] * 3600) ** (-1)
+                cube_pbcorr.header['BMIN'] * 3600) ** (-1) / 4
 
         if self.galaxy.eccentricity:
             e = self.galaxy.eccentricity
@@ -545,7 +545,7 @@ class MomentMaps:
             plt.figure()
             plt.imshow(mom0_hdu_K.data)
 
-        while emission_Msun / area_temp > 1e-1:
+        while emission_Msun / area_temp > 2 * rms_Msun:
 
             b_in += beam_pix
             b_out += beam_pix
@@ -592,7 +592,7 @@ class MomentMaps:
             centre = (mom0_K_rot.shape[1]) / 2
             emission_Msun = 2112
 
-            while emission_Msun > 1e-1:
+            while emission_Msun > 2 * rms_Msun:
                 slice1_K = mom0_K_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
                 slice2_K = mom0_K_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
                 emission_K = np.average(np.average(slice1_K) + np.average(slice2_K))
