@@ -226,9 +226,17 @@ class MomentMaps:
         contain emission, the same velocity array but in the shape off the spectral cube, and the one-dimensional
         velocity array corresponding to the entire velocity axis of the cube (including line-free channels)
         """
-        v_val = cube.header['CRVAL3'] / 1000.  # Velocity in the reference channel, m/s to km/s
-        v_step = cube.header['CDELT3'] / 1000.  # Velocity step in each channel, m/s to km/s
+
         v_ref = cube.header['CRPIX3']  # Location of the reference channel
+        if cube.header['CTYPE3'] == 'VRAD':
+            v_val = cube.header['CRVAL3'] / 1000.  # Velocity in the reference channel, m/s to km/s
+            v_step = cube.header['CDELT3'] / 1000.  # Velocity step in each channel, m/s to km/s
+        elif cube.header['CTYPE3'] == 'FREQ':
+            v_val = 299792.458 * (230.538000 / (cube.header['CRVAL3'] / 1e9) - 1)
+            v_shift = 299792.458 * (230.538000 / ((cube.header['CRVAL3'] + cube.header['CDELT3']) / 1e9) - 1)
+            v_step = v_val - v_shift
+        else:
+            raise KeyError('Pipeline cannot deal with these units yet.')
 
         # Construct the velocity arrays (keep in mind that fits-files are 1 indexed)
         vel_array = (np.arange(0, len(cube.data[:, 0, 0])) - v_ref + 1 + self.galaxy.start) * v_step + v_val
@@ -475,14 +483,13 @@ class MomentMaps:
         #rms = np.std(np.sum(noise, axis=(1, 2)))
         #np.savetxt(path + 'specnoise.txt', [rms / beamsize])
 
-        print(self.galaxy.name)
-
         psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
         beamsize = np.sum(psf)
         spectrum /= beamsize
-        print(np.log10(abs(3.93e-17 * 16.5 ** 2 * 2e20 * (1.3 / 2.6) ** 2 / 0.7 * np.trapz(np.flip(spectrum), np.flip(spectrum_velocities)) / cube_pbcorr.header['JTOK'])))
 
-        #print(self.galaxy.name)
+        print(self.galaxy.name)
+        print(np.log10(abs(3.93e-17 * 16.5 ** 2 * 2e20 * (1.3 / 2.6) ** 2 / 0.7 * np.trapz(np.flip(spectrum), np.flip(
+            spectrum_velocities)) / cube_pbcorr.header['JTOK'])))
         #print(np.trapz(np.flip(spectrum), np.flip(spectrum_velocities)) / cube_pbcorr.header['JTOK'])
 
         return spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies # / beamsize

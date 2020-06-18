@@ -7,6 +7,7 @@ from astropy import wcs
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 from astroquery.ned import Ned
+from matplotlib import pyplot as plt
 
 
 class ClipCube:
@@ -205,8 +206,8 @@ class ClipCube:
         """
 
         # Read in central coordinates from NED
-        ra = Ned.query_object(cube.header['OBJECT'])['RA'][0]
-        dec = Ned.query_object(cube.header['OBJECT'])['DEC'][0]
+        ra = Ned.query_object(self.galaxy.name)['RA'][0]
+        dec = Ned.query_object(self.galaxy.name)['DEC'][0]
 
         # Find the central pixel based on these coordinates and WCS info
         w = wcs.WCS(cube.header, naxis=2)
@@ -517,6 +518,7 @@ class ClipCube:
 
         emiscube_pbcorr.data *= mask
         clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr.data, cube_pbcorr.header)
+
 
         if self.tosave:
             clipped_hdu.writeto(self.savepath + 'cube_clipped.fits', overwrite=True)

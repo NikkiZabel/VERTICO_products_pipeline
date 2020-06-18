@@ -19,9 +19,12 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Small change in edge radial profiles.">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Changed mosaic to include all galaxies">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mosaic.py" beforeDir="false" afterPath="$PROJECT_DIR$/mosaic.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clip_cube.py" beforeDir="false" afterPath="$PROJECT_DIR$/clip_cube.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_moments.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,13 +64,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00006" summary="Split up the PVD into creating it (+ saving it as a fits-file) and plotting it. Added the option to use the minor axis instead.">
-      <created>1580394656174</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1580394656174</updated>
     </task>
     <task id="LOCAL-00007" summary="Output all the desired fits and txt files with appropriate headers.">
       <created>1580400136967</created>
@@ -405,7 +401,14 @@
       <option name="project" value="LOCAL" />
       <updated>1591087631831</updated>
     </task>
-    <option name="localTasksCounter" value="55" />
+    <task id="LOCAL-00055" summary="Changed mosaic to include all galaxies">
+      <created>1591092388826</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1591092388826</updated>
+    </task>
+    <option name="localTasksCounter" value="56" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -421,7 +424,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="New pre-processing function" />
     <MESSAGE value="Finished and implemented pre-processing." />
     <MESSAGE value="Some small improvement - more things automated. Added info for 3 extra objects." />
     <MESSAGE value="Fixed a bug in the radial profiles" />
@@ -446,7 +448,8 @@
     <MESSAGE value="Work around for galaxies that have no PB information (set PB map to all ones)" />
     <MESSAGE value="Bug in the moment 0 map" />
     <MESSAGE value="Small change in edge radial profiles." />
-    <option name="LAST_COMMIT_MESSAGE" value="Small change in edge radial profiles." />
+    <MESSAGE value="Changed mosaic to include all galaxies" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed mosaic to include all galaxies" />
   </component>
   <component name="WindowStateProjectService">
     <state x="600" y="147" width="912" height="819" key="CommitChangelistDialog2" timestamp="1588254540743">
@@ -465,10 +468,10 @@
     </state>
     <state x="621" y="1156" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1588696459844" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1588696810295" />
-    <state x="588" y="289" width="800" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1591087633041">
+    <state x="588" y="289" width="800" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1591092390039">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1591087633041" />
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1591092390039" />
     <state x="588" y="1080" width="800" height="1080" key="Vcs.Push.Dialog.v2/67.27.1853.2133@67.27.1853.2133" timestamp="1585324286028" />
     <state x="648" y="379" key="com.intellij.ide.util.TipDialog" timestamp="1583253466522">
       <screen x="67" y="27" width="1853" height="1053" />

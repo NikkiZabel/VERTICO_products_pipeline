@@ -1,4 +1,4 @@
-#import matplotlib; matplotlib.use('Agg')
+import matplotlib; matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import aplpy as apl
 from astropy import wcs
