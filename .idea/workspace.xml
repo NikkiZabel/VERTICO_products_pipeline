@@ -19,10 +19,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Can now deal with 3rd axis in frequency and paths to data with different resolution.">
-      <change afterPath="$PROJECT_DIR$/plots_overview_paper.py" afterDir="false" />
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Added a script for the figures for the release paper">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots_overview_paper.py" beforeDir="false" afterPath="$PROJECT_DIR$/plots_overview_paper.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,13 +61,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00008" summary="Added radial profiles.">
-      <created>1580487283567</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1580487283567</updated>
     </task>
     <task id="LOCAL-00009" summary="Got rid of some warnings.">
       <created>1580489165939</created>
@@ -406,7 +398,14 @@
       <option name="project" value="LOCAL" />
       <updated>1592476008694</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="Added a script for the figures for the release paper">
+      <created>1592731665934</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1592731665934</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -422,7 +421,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Some small improvement - more things automated. Added info for 3 extra objects." />
     <MESSAGE value="Fixed a bug in the radial profiles" />
     <MESSAGE value="Small bug in inner square" />
     <MESSAGE value="New file structure + option to produce PB uncorrected files." />
@@ -447,7 +445,8 @@
     <MESSAGE value="Small change in edge radial profiles." />
     <MESSAGE value="Changed mosaic to include all galaxies" />
     <MESSAGE value="Can now deal with 3rd axis in frequency and paths to data with different resolution." />
-    <option name="LAST_COMMIT_MESSAGE" value="Can now deal with 3rd axis in frequency and paths to data with different resolution." />
+    <MESSAGE value="Added a script for the figures for the release paper" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added a script for the figures for the release paper" />
   </component>
   <component name="WindowStateProjectService">
     <state x="600" y="147" width="912" height="819" key="CommitChangelistDialog2" timestamp="1588254540743">
@@ -455,21 +454,20 @@
     </state>
     <state x="600" y="147" width="912" height="819" key="CommitChangelistDialog2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1588254540743" />
     <state x="600" y="1080" width="782" height="1080" key="CommitChangelistDialog2/67.27.1853.2133@67.27.1853.2133" timestamp="1585324284163" />
-    <state x="458" y="62" width="424" height="484" key="FileChooserDialogImpl" timestamp="1589363821279">
+    <state x="458" y="62" width="424" height="484" key="FileChooserDialogImpl" timestamp="1592731365677">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="325" y="1125" width="424" height="484" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1588753061654" />
-    <state x="458" y="62" width="1102" height="751" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1589363821279" />
-    <state x="776" y="311" width="424" height="491" key="FileChooserDialogImpl/67.27.1853.1053@67.27.1853.1053" timestamp="1584018065540" />
+    <state x="458" y="62" width="1102" height="751" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1592731365677" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor" timestamp="1588696810295">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="621" y="1156" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1588696459844" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1588696810295" />
-    <state x="588" y="289" width="800" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1592476011096">
+    <state x="588" y="289" width="800" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1592731667141">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1592476011096" />
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1592731667141" />
     <state x="588" y="1080" width="800" height="1080" key="Vcs.Push.Dialog.v2/67.27.1853.2133@67.27.1853.2133" timestamp="1585324286028" />
     <state x="215" y="236" width="620" height="642" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1587999745479">
       <screen x="67" y="27" width="1853" height="1053" />

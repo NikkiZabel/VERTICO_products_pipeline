@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib.gridspec import GridSpec
 from astropy.io import fits
 import aplpy as apl
-import matplotlib
+from matplotlib import rcParams
 from sauron_colormap import register_sauron_colormap; register_sauron_colormap()
 from gal_params import parameters
 
@@ -13,9 +13,30 @@ distance = 16.5  # Mpc
 
 
 def set_rc_params():
-    matplotlib.rcParams['xtick.direction'] = 'in'
-    matplotlib.rcParams['ytick.direction'] = 'in'
 
+    params = {
+        'text.usetex': True,
+        'font.family': 'serif',
+        'font.serif': 'Times New Roman',
+        'mathtext.fontset': 'custom',
+        'mathtext.rm': 'Times New Roman',
+        'mathtext.it': 'Times New Roman:italic',
+        'mathtext.bf': 'Times New Roman: bold',
+        'mathtext.sf': 'Times New Roman',
+        'mathtext.tt': 'Times New Roman',
+        'mathtext.cal': 'Times New Roman: italic',
+        'font.size': 13,
+        'xtick.labelsize': 12,
+        'xtick.minor.width': 1,
+        'ytick.minor.width': 1,
+        'xtick.direction': 'in',
+        'ytick.direction': 'in',
+
+    }
+
+    rcParams.update(params)
+
+    return
 
 def make_square(img):
     shape_diff = np.max(img.shape) - np.min(img.shape)
@@ -36,29 +57,37 @@ def make_square(img):
 def image_mom0(image, units='K km/s', peak=False, show_beam=True, show_scalebar=True):
 
     if peak:
-        fig = apl.FITSFigure(image, figure=f, subplot=list(gs[1, 3].get_position(f).bounds))
+        subplot = list(gs[1, 3].get_position(f).bounds)
+        subplot[1] -= 0.02
+        subplot[3] += 0.05
+        fig = apl.FITSFigure(image, figure=f, subplot=subplot)
         fig.axis_labels.set_yposition('right')
         fig.tick_labels.set_yposition('right')
     else:
-        fig = apl.FITSFigure(image, figure=f, subplot=list(gs[0, 2].get_position(f).bounds))
+        subplot = list(gs[0, 2].get_position(f).bounds)
+        subplot[1] -= 0.01
+        subplot[3] += 0.05
+        fig = apl.FITSFigure(image, figure=f, subplot=subplot)
         fig.axis_labels.hide_x()
         fig.axis_labels.hide_y()
         fig.tick_labels.hide_x()
         fig.tick_labels.hide_y()
 
     fig.set_theme('publication')
+    fig.add_grid()
+    fig.grid.set_color('grey')
+    fig.grid.set_alpha(0.5)
+    fig.grid.set_linestyle('--')
 
     fig.show_contour(image, cmap='magma_r', levels=np.linspace(np.nanmax(image.data) * 1e-9, np.nanmax(image.data), 20),
                      filled=True, overlap=True)
 
     # axes and ticks
     fig.ticks.set_color('black')
-    fig.ticks.set_length(10)
-    fig.ticks.set_linewidth(2)
+    #fig.ticks.set_length(10)
+    #fig.ticks.set_linewidth(2)
     fig.tick_labels.set_xformat('hh:mm:ss')
     fig.tick_labels.set_yformat('dd:mm:ss')
-    plt.rcParams['xtick.direction'] = 'in'
-    plt.rcParams['ytick.direction'] = 'in'
     fig.ticks.set_minor_frequency(5)
 
     # add a colourbar
@@ -89,7 +118,7 @@ def image_mom0(image, units='K km/s', peak=False, show_beam=True, show_scalebar=
     else:
         ticks = np.arange(0, np.nanmax(image.data) + 100, 200)
 
-    cbar = f.colorbar(colors, ticks=ticks, location='top')
+    cbar = f.colorbar(colors, ticks=ticks, location='top', pad=0)
     if peak:
         cbar.set_label('Peak temperature [K]')
     elif units == 'K km/s':
@@ -125,13 +154,19 @@ def image_mom1_2(image, sysvel, moment=1, show_beam=True, show_scalebar=True):
 
     # show the image in colour
     if moment == 1:
-        fig = apl.FITSFigure(image, figure=f, subplot=list(gs[0, 3].get_position(f).bounds))
+        subplot = list(gs[0, 3].get_position(f).bounds)
+        subplot[1] -= 0.01
+        subplot[3] += 0.05
+        fig = apl.FITSFigure(image, figure=f, subplot=subplot)
         fig.axis_labels.hide_x()
         fig.tick_labels.hide_x()
         fig.axis_labels.set_yposition('right')
         fig.tick_labels.set_yposition('right')
     elif moment == 2:
-        fig = apl.FITSFigure(image, figure=f, subplot=list(gs[1, 2].get_position(f).bounds))
+        subplot = list(gs[1, 2].get_position(f).bounds)
+        subplot[1] -= 0.02
+        subplot[3] += 0.05
+        fig = apl.FITSFigure(image, figure=f, subplot=subplot)
         fig.axis_labels.hide_y()
         fig.tick_labels.hide_y()
     else:
@@ -139,12 +174,16 @@ def image_mom1_2(image, sysvel, moment=1, show_beam=True, show_scalebar=True):
 
     # axes and ticks
     fig.ticks.set_color('black')
-    fig.ticks.set_length(10)
-    fig.ticks.set_linewidth(2)
+    #fig.ticks.set_length(10)
+    #fig.ticks.set_linewidth(2)
     fig.tick_labels.set_xformat('hh:mm:ss')
     fig.tick_labels.set_yformat('dd:mm:ss')
     fig.ticks.show()
     fig.ticks.set_minor_frequency(5)
+    fig.add_grid()
+    fig.grid.set_color('grey')
+    fig.grid.set_alpha(0.5)
+    fig.grid.set_linestyle('--')
 
     #add a colourbar
     if moment == 2:
@@ -163,7 +202,7 @@ def image_mom1_2(image, sysvel, moment=1, show_beam=True, show_scalebar=True):
             ticks = np.arange(0, vrange2 + 10, 10)
         else:
             ticks = np.arange(0, vrange2 + 20, 20)
-        cbar = f.colorbar(colors, ticks=ticks, location='top')
+        cbar = f.colorbar(colors, ticks=ticks, location='top', pad=0)
         cbar.set_label(r'Observed $\sigma_v$ [km s$^{-1}$]')
 
     else:
@@ -185,7 +224,7 @@ def image_mom1_2(image, sysvel, moment=1, show_beam=True, show_scalebar=True):
             tickarr = np.arange(-vrange, 0, 60)
 
         ticks = np.concatenate((tickarr, [0], abs(tickarr)))
-        cbar = f.colorbar(colors, ticks=ticks, location='top')
+        cbar = f.colorbar(colors, ticks=ticks, location='top', pad=0)
         cbar.set_label(r'Velocity [km s$^{-1}$]')
         cbar.ax.set_xticklabels(cbar.ax.get_xticklabels(), rotation=45)
 
@@ -213,7 +252,7 @@ def contour_plot(image, contours, number=10):
     fig = apl.FITSFigure(image, figure=f, subplot=list(gs[0:2, 0:2].get_position(f).bounds))
     fig.show_grayscale()
     fig.show_contour(contours, levels=np.linspace(0, np.nanmax(contours.data), number),
-                     cmap='winter')
+                     cmap='winter_r')
 
     # Show the beam
     fig.add_beam(frame=False)
@@ -224,8 +263,19 @@ def contour_plot(image, contours, number=10):
     # Show a scalebar
     length = np.degrees(1.e-3 / distance)
     fig.add_scalebar(length=length, label='1 kpc', frame=False)
-    fig.scalebar.set_linewidth(5)
+    fig.scalebar.set_linewidth(2)
     fig.scalebar.set_color('white')
+
+    # Add galaxy name in the upper left corner
+    fig.add_label(0.15, 0.9, 'NGC4216', color='white', relative=True, size=20)
+
+    # Make some adjustments
+    plt.gca().tick_params(which='both', length=10, width=1.5)
+    plt.gca().tick_params(which='minor', length=5)
+    fig.tick_labels.set_font(size=17)
+    fig.axis_labels.set_font(size=20)
+
+    return
 
 
 # Read in the desired data products CURRENTLY DAME VERSION
@@ -252,7 +302,7 @@ g_band = fits.open('/home/nikki/Documents/Data/VERTICO/SDSS/NGC4216_g.fits')[0]
 
 # Prepare the figure layout
 set_rc_params()
-f = plt.figure(figsize=(15, 7.5))
+f = plt.figure(figsize=(15, 7.2))
 gs = GridSpec(2, 4, figure=f)
 ax_sdss = f.add_subplot(gs[0:2, 0:2])
 ax_mom0 = f.add_subplot(gs[0, 2])
@@ -267,9 +317,9 @@ ax_peak.axis('off')
 
 # Fill the panels with the plots (position on the gridspec is currently hardcoded)
 contour_plot(g_band, mom0, number=8)
-image_mom0(mom0, units='K km/s')
-image_mom1_2(mom1, mom1.header['SYSVEL'], moment=1)
-image_mom1_2(mom2, mom1.header['SYSVEL'], moment=2)
-image_mom0(peak, peak=True)
+image_mom0(mom0, units='K km/s', show_beam=False, show_scalebar=False)
+image_mom1_2(mom1, mom1.header['SYSVEL'], moment=1, show_beam=False, show_scalebar=False)
+image_mom1_2(mom2, mom1.header['SYSVEL'], moment=2, show_beam=False, show_scalebar=False)
+image_mom0(peak, peak=True, show_beam=False, show_scalebar=False)
 
-plt.tight_layout()
+plt.savefig('/home/nikki/test.pdf', bbox_inches='tight')
