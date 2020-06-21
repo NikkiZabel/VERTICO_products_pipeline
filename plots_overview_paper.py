@@ -58,14 +58,14 @@ def image_mom0(image, units='K km/s', peak=False, show_beam=True, show_scalebar=
 
     if peak:
         subplot = list(gs[1, 3].get_position(f).bounds)
-        subplot[1] -= 0.02
+        subplot[1] -= 0.015
         subplot[3] += 0.05
         fig = apl.FITSFigure(image, figure=f, subplot=subplot)
         fig.axis_labels.set_yposition('right')
         fig.tick_labels.set_yposition('right')
     else:
         subplot = list(gs[0, 2].get_position(f).bounds)
-        subplot[1] -= 0.01
+        subplot[1] += 0.005
         subplot[3] += 0.05
         fig = apl.FITSFigure(image, figure=f, subplot=subplot)
         fig.axis_labels.hide_x()
@@ -155,7 +155,7 @@ def image_mom1_2(image, sysvel, moment=1, show_beam=True, show_scalebar=True):
     # show the image in colour
     if moment == 1:
         subplot = list(gs[0, 3].get_position(f).bounds)
-        subplot[1] -= 0.01
+        subplot[1] += 0.005
         subplot[3] += 0.05
         fig = apl.FITSFigure(image, figure=f, subplot=subplot)
         fig.axis_labels.hide_x()
@@ -164,7 +164,7 @@ def image_mom1_2(image, sysvel, moment=1, show_beam=True, show_scalebar=True):
         fig.tick_labels.set_yposition('right')
     elif moment == 2:
         subplot = list(gs[1, 2].get_position(f).bounds)
-        subplot[1] -= 0.02
+        subplot[1] -= 0.015
         subplot[3] += 0.05
         fig = apl.FITSFigure(image, figure=f, subplot=subplot)
         fig.axis_labels.hide_y()
@@ -249,7 +249,11 @@ def contour_plot(image, contours, number=10):
     image.header['BMIN'] = contours.header['BMIN']
     image.header['BPA'] = contours.header['BPA']
 
-    fig = apl.FITSFigure(image, figure=f, subplot=list(gs[0:2, 0:2].get_position(f).bounds))
+    subplot = list(gs[0:2, 0:2].get_position(f).bounds)
+    subplot[1] -= 0.015
+    subplot[2] += 0.015
+    subplot[3] += 0.03
+    fig = apl.FITSFigure(image, figure=f, subplot=subplot)
     fig.show_grayscale()
     fig.show_contour(contours, levels=np.linspace(0, np.nanmax(contours.data), number),
                      cmap='winter_r')
