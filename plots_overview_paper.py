@@ -173,6 +173,7 @@ def image_mom1_2(image, sysvel, moment=1, show_beam=True, show_scalebar=True):
         print('No.')
 
     # axes and ticks
+    fig.set_theme('publication')
     fig.ticks.set_color('black')
     #fig.ticks.set_length(10)
     #fig.ticks.set_linewidth(2)
@@ -242,7 +243,11 @@ def image_mom1_2(image, sysvel, moment=1, show_beam=True, show_scalebar=True):
     return
 
 
-def contour_plot(image, contours, number=10):
+def contour_plot(image, contours, number=3):
+
+    # Set nans in mom0 to a small value to make sure the contours close
+    contour_plot = contours.copy()
+    contour_plot.data[np.isnan(contour_plot.data)] = 1e-3
 
     # Set beam parameters to the ones of the CO image, so that the beam can be plotted
     image.header['BMAJ'] = contours.header['BMAJ']
@@ -250,13 +255,31 @@ def contour_plot(image, contours, number=10):
     image.header['BPA'] = contours.header['BPA']
 
     subplot = list(gs[0:2, 0:2].get_position(f).bounds)
-    subplot[1] -= 0.015
-    subplot[2] += 0.015
+    subplot[1] -= 0.014
+    subplot[2] += 0.014
     subplot[3] += 0.03
     fig = apl.FITSFigure(image, figure=f, subplot=subplot)
-    fig.show_grayscale()
-    fig.show_contour(contours, levels=np.linspace(0, np.nanmax(contours.data), number),
-                     cmap='winter_r')
+    fig.show_rgb('/home/nikki/Documents/Data/VERTICO/SDSS/gri/NGC4216_gri.tif')
+    fig.show_contour(contour_plot, levels=np.linspace(np.nanmax(contours.data)*0.001, np.nanmax(contours.data), number), cmap='winter_r',
+                              linewidths=1, returnlevels=True)
+
+    # Show FoV
+    pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/NGC4216/NGC4216_7m_co21_pb_rebin.fits')[0]
+    pb.data = np.sum(pb.data, axis=0)
+    pb.data[np.isfinite(pb.data)] = 1
+    pb.data[np.isnan(pb.data)] = 1e-3
+    pb.header['NAXIS'] = 2
+    pb.header.pop('PC3_1')
+    pb.header.pop('PC3_2')
+    pb.header.pop('PC1_3')
+    pb.header.pop('PC2_3')
+    pb.header.pop('PC3_3')
+    pb.header.pop('CTYPE3')
+    pb.header.pop('CRVAL3')
+    pb.header.pop('CDELT3')
+    pb.header.pop('CRPIX3')
+    pb.header.pop('CUNIT3')
+    fig.show_contour(pb, levels=1, colors='white', alpha=0.5, linewidths=1)
 
     # Show the beam
     fig.add_beam(frame=False)
@@ -302,13 +325,16 @@ mom2 = make_square(mom2)
 peak = make_square(peak)
 
 # Read in SDSS data
-g_band = fits.open('/home/nikki/Documents/Data/VERTICO/SDSS/NGC4216_g.fits')[0]
+g_band = fits.open('/home/nikki/Documents/Data/VERTICO/SDSS/g_band/NGC4216_g.fits')[0]
 
 # Prepare the figure layout
 set_rc_params()
 f = plt.figure(figsize=(15, 7.2))
 gs = GridSpec(2, 4, figure=f)
 ax_sdss = f.add_subplot(gs[0:2, 0:2])
+ax_sdss.tick_params(which='both', length=10, width=1.5)
+
+
 ax_mom0 = f.add_subplot(gs[0, 2])
 ax_mom1 = f.add_subplot(gs[0, 3])
 ax_mom2 = f.add_subplot(gs[1, 2])
@@ -320,8 +346,8 @@ ax_mom2.axis('off')
 ax_peak.axis('off')
 
 # Fill the panels with the plots (position on the gridspec is currently hardcoded)
-contour_plot(g_band, mom0, number=8)
-image_mom0(mom0, units='K km/s', show_beam=False, show_scalebar=False)
+contour_plot(g_band, mom0, number=4)
+image_mom0(mom0, units='K km/s', show_beam=True, show_scalebar=False)
 image_mom1_2(mom1, mom1.header['SYSVEL'], moment=1, show_beam=False, show_scalebar=False)
 image_mom1_2(mom2, mom1.header['SYSVEL'], moment=2, show_beam=False, show_scalebar=False)
 image_mom0(peak, peak=True, show_beam=False, show_scalebar=False)
