@@ -19,7 +19,8 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Some more tweaks to the plots">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Some small tweaks">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plots_overview_paper.py" beforeDir="false" afterPath="$PROJECT_DIR$/plots_overview_paper.py" afterDir="false" />
     </list>
@@ -48,7 +49,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Project1" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Downloads/panel_plots.py" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="SvnConfiguration">
@@ -61,13 +62,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00011" summary="Fixed bug in RMS estimate">
-      <created>1581007710912</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1581007710912</updated>
     </task>
     <task id="LOCAL-00012" summary="Updated convolution kernel smooth masking, updated header keywords, implemented automatic rotation around galaxy centre PVD, and some other things.">
       <created>1581351482255</created>
@@ -405,7 +399,14 @@
       <option name="project" value="LOCAL" />
       <updated>1592739365357</updated>
     </task>
-    <option name="localTasksCounter" value="60" />
+    <task id="LOCAL-00060" summary="Some small tweaks">
+      <created>1592840660212</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1592840660212</updated>
+    </task>
+    <option name="localTasksCounter" value="61" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -421,7 +422,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="New file structure + option to produce PB uncorrected files." />
     <MESSAGE value="Added 2 galaxies, fixed a bug in the centring of the image." />
     <MESSAGE value="Tried to image NGC4561" />
     <MESSAGE value="Added archival galaxies" />
@@ -446,7 +446,8 @@
     <MESSAGE value="Added a script for the figures for the release paper" />
     <MESSAGE value="Some tweaks to the plots" />
     <MESSAGE value="Some more tweaks to the plots" />
-    <option name="LAST_COMMIT_MESSAGE" value="Some more tweaks to the plots" />
+    <MESSAGE value="Some small tweaks" />
+    <option name="LAST_COMMIT_MESSAGE" value="Some small tweaks" />
   </component>
   <component name="WindowStateProjectService">
     <state x="600" y="147" width="912" height="819" key="CommitChangelistDialog2" timestamp="1588254540743">
@@ -454,20 +455,20 @@
     </state>
     <state x="600" y="147" width="912" height="819" key="CommitChangelistDialog2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1588254540743" />
     <state x="600" y="1080" width="782" height="1080" key="CommitChangelistDialog2/67.27.1853.2133@67.27.1853.2133" timestamp="1585324284163" />
-    <state x="458" y="62" width="424" height="484" key="FileChooserDialogImpl" timestamp="1592731365677">
+    <state x="458" y="62" width="424" height="484" key="FileChooserDialogImpl" timestamp="1592845407196">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="325" y="1125" width="424" height="484" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1588753061654" />
-    <state x="458" y="62" width="1102" height="751" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1592731365677" />
-    <state x="482" y="188" width="1022" height="737" key="SettingsEditor" timestamp="1588696810295">
-      <screen x="67" y="27" width="1853" height="1053" />
+    <state x="458" y="62" width="1102" height="751" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1592845407196" />
+    <state x="621" y="1156" width="1022" height="737" key="SettingsEditor" timestamp="1592905880666">
+      <screen x="0" y="1080" width="1920" height="1080" />
     </state>
-    <state x="621" y="1156" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1588696459844" />
+    <state x="621" y="1156" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1592905880666" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1588696810295" />
-    <state x="588" y="289" width="800" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1592739368029">
+    <state x="588" y="289" width="800" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1592840661433">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1592739368029" />
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1592840661433" />
     <state x="588" y="1080" width="800" height="1080" key="Vcs.Push.Dialog.v2/67.27.1853.2133@67.27.1853.2133" timestamp="1585324286028" />
     <state x="215" y="236" width="620" height="642" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1587999745479">
       <screen x="67" y="27" width="1853" height="1053" />

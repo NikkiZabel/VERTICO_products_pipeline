@@ -1,6 +1,4 @@
 from matplotlib import pyplot as plt
-import os
-from glob import glob
 import numpy as np
 from matplotlib.gridspec import GridSpec
 from astropy.io import fits
@@ -8,6 +6,8 @@ import aplpy as apl
 from matplotlib import rcParams
 from sauron_colormap import register_sauron_colormap; register_sauron_colormap()
 from gal_params import parameters
+from astropy.wcs.utils import proj_plane_pixel_scales, skycoord_to_pixel, pixel_to_skycoord
+from astropy.wcs import WCS
 
 distance = 16.5  # Mpc
 
@@ -30,13 +30,13 @@ def set_rc_params():
         'xtick.minor.width': 1,
         'ytick.minor.width': 1,
         'xtick.direction': 'in',
-        'ytick.direction': 'in',
-
+        'ytick.direction': 'in'
     }
 
     rcParams.update(params)
 
     return
+
 
 def make_square(img):
     shape_diff = np.max(img.shape) - np.min(img.shape)
@@ -54,7 +54,46 @@ def make_square(img):
     return fits.PrimaryHDU(square_img, new_header)
 
 
-def image_mom0(image, units='K km/s', peak=False, show_beam=True, show_scalebar=True):
+def linear_offset_coords(wcs, center):
+    """
+    Returns a locally linear offset coordinate system.
+
+    Given a 2-d celestial WCS object and a central coordinate, return a WCS
+    that describes an 'offset' coordinate system, assuming that the
+    coordinates are locally linear (that is, the grid lines of this offset
+    coordinate system are always aligned with the pixel coordinates, and
+    distortions from spherical projections and distortion terms are not taken
+    into account)
+
+    Parameters
+    ----------
+    wcs : `~astropy.wcs.WCS`
+        The original WCS, which should be a 2-d celestial WCS
+    center : `~astropy.coordinates.SkyCoord`
+        The coordinates on which the offset coordinate system should be
+        centered.
+    """
+
+    # Convert center to pixel coordinates
+    xp, yp = skycoord_to_pixel(center, wcs)
+
+    # Set up new WCS
+    new_wcs = WCS(naxis=2)
+    new_wcs.wcs.crpix = xp + 1, yp + 1
+    new_wcs.wcs.crval = 0, 0
+    new_wcs.wcs.cdelt = proj_plane_pixel_scales(wcs) * 3600
+    new_wcs.wcs.ctype = 'XOFFSET', 'YOFFSET'
+    new_wcs.wcs.cunit = 'arcsec', 'arcsec'
+
+    return new_wcs
+
+
+def image_mom0(hdu, units='K km/s', peak=False, show_beam=True, show_scalebar=True):
+
+    image = hdu.copy()
+    centre_sky = pixel_to_skycoord(image.shape[0] / 2, image.shape[1] / 2, wcs=WCS(image))
+    wcs_offset = linear_offset_coords(WCS(image), centre_sky)
+    image.header.update(wcs_offset.to_header())
 
     if peak:
         subplot = list(gs[1, 3].get_position(f).bounds)
@@ -79,15 +118,16 @@ def image_mom0(image, units='K km/s', peak=False, show_beam=True, show_scalebar=
     fig.grid.set_alpha(0.5)
     fig.grid.set_linestyle('--')
 
-    fig.show_contour(image, cmap='magma_r', levels=np.linspace(np.nanmax(image.data) * 1e-9, np.nanmax(image.data), 20),
+    fig.show_contour(image, cmap='magma_r',
+                     levels=np.linspace(np.nanmax(image.data) * 1e-9, np.nanmax(image.data), 20),
                      filled=True, overlap=True)
 
     # axes and ticks
     fig.ticks.set_color('black')
     #fig.ticks.set_length(10)
     #fig.ticks.set_linewidth(2)
-    fig.tick_labels.set_xformat('hh:mm:ss')
-    fig.tick_labels.set_yformat('dd:mm:ss')
+    #fig.tick_labels.set_xformat('hh:mm:ss')
+    #fig.tick_labels.set_yformat('dd:mm:ss')
     fig.ticks.set_minor_frequency(5)
 
     # add a colourbar
@@ -129,10 +169,17 @@ def image_mom0(image, units='K km/s', peak=False, show_beam=True, show_scalebar=
         raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
 
     if show_beam:
-        fig.add_beam(frame=False)  # automatically imports BMAJ, BMIN, and BPA
-        fig.beam.set_edgecolor('k')
-        fig.beam.set_color('k')
-        fig.beam.set_borderpad(1)
+        # Calculate the desired beam location based on the image dimensions
+        beam_x = image.header['CRVAL1'] - image.header['CDELT1'] * (image.shape[1] / 2.33)
+        beam_y = image.header['CRVAL2'] - image.header['CDELT2'] * (image.shape[0] / 2.33)
+
+        # Calculate the beam size in arcseconds and the position angle in degrees
+        beam_width = hdu.header['BMIN'] * 3600
+        beam_height = hdu.header['BMAJ'] * 3600
+        beam_angle = hdu.header['BPA']
+
+        # Show the beam
+        fig.show_ellipses(beam_x, beam_y, beam_width, beam_height, angle=beam_angle, facecolor='k', zorder=5)
 
     if show_scalebar:
         length = np.degrees(1.e-3 / distance)  # length of the scalebar in degrees, corresponding to 1 kpc
@@ -140,7 +187,12 @@ def image_mom0(image, units='K km/s', peak=False, show_beam=True, show_scalebar=
         fig.scalebar.set_linewidth(5)
 
 
-def image_mom1_2(image, sysvel, moment=1, show_beam=True, show_scalebar=True):
+def image_mom1_2(hdu, sysvel, moment=1, show_beam=True, show_scalebar=True):
+
+    image = hdu.copy()
+    centre_sky = pixel_to_skycoord(image.shape[0] / 2, image.shape[1] / 2, wcs=WCS(image))
+    wcs_offset = linear_offset_coords(WCS(image), centre_sky)
+    image.header.update(wcs_offset.to_header())
 
     name, vrange, vrange2, cliplevel, stokes, start, stop, sysvel_offset, angle, \
     full_width, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \
@@ -177,8 +229,8 @@ def image_mom1_2(image, sysvel, moment=1, show_beam=True, show_scalebar=True):
     fig.ticks.set_color('black')
     #fig.ticks.set_length(10)
     #fig.ticks.set_linewidth(2)
-    fig.tick_labels.set_xformat('hh:mm:ss')
-    fig.tick_labels.set_yformat('dd:mm:ss')
+    #fig.tick_labels.set_xformat('hh:mm:ss')
+    #fig.tick_labels.set_yformat('dd:mm:ss')
     fig.ticks.show()
     fig.ticks.set_minor_frequency(5)
     fig.add_grid()
@@ -332,9 +384,6 @@ set_rc_params()
 f = plt.figure(figsize=(15, 7.2))
 gs = GridSpec(2, 4, figure=f)
 ax_sdss = f.add_subplot(gs[0:2, 0:2])
-ax_sdss.tick_params(which='both', length=10, width=1.5)
-
-
 ax_mom0 = f.add_subplot(gs[0, 2])
 ax_mom1 = f.add_subplot(gs[0, 3])
 ax_mom2 = f.add_subplot(gs[1, 2])
@@ -352,4 +401,4 @@ image_mom1_2(mom1, mom1.header['SYSVEL'], moment=1, show_beam=False, show_scaleb
 image_mom1_2(mom2, mom1.header['SYSVEL'], moment=2, show_beam=False, show_scalebar=False)
 image_mom0(peak, peak=True, show_beam=False, show_scalebar=False)
 
-plt.savefig('/home/nikki/test.pdf', bbox_inches='tight')
+plt.savefig('/home/nikki/test.png', bbox_inches='tight')
