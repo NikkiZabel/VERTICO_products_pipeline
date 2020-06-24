@@ -19,9 +19,10 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Plots in offset, manually add in beam information">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Small tweaks to the figures">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots_overview_paper.py" beforeDir="false" afterPath="$PROJECT_DIR$/plots_overview_paper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,13 +62,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00013" summary="Finished PVD headers, updated some galaxy parameters.">
-      <created>1581518753990</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1581518753990</updated>
     </task>
     <task id="LOCAL-00014" summary="Fixed shift in PVD">
       <created>1581519376179</created>
@@ -405,7 +399,14 @@
       <option name="project" value="LOCAL" />
       <updated>1592909550404</updated>
     </task>
-    <option name="localTasksCounter" value="62" />
+    <task id="LOCAL-00062" summary="Small tweaks to the figures">
+      <created>1592986104294</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1592986104294</updated>
+    </task>
+    <option name="localTasksCounter" value="63" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -421,7 +422,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Tried to image NGC4561" />
     <MESSAGE value="Added archival galaxies" />
     <MESSAGE value="Added another galaxy and started on error maps" />
     <MESSAGE value="Finished and imaged moment 0 uncertainties." />
@@ -446,7 +446,8 @@
     <MESSAGE value="Some more tweaks to the plots" />
     <MESSAGE value="Some small tweaks" />
     <MESSAGE value="Plots in offset, manually add in beam information" />
-    <option name="LAST_COMMIT_MESSAGE" value="Plots in offset, manually add in beam information" />
+    <MESSAGE value="Small tweaks to the figures" />
+    <option name="LAST_COMMIT_MESSAGE" value="Small tweaks to the figures" />
   </component>
   <component name="WindowStateProjectService">
     <state x="600" y="147" width="912" height="819" key="CommitChangelistDialog2" timestamp="1588254540743">
@@ -464,10 +465,10 @@
     </state>
     <state x="621" y="1156" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1592905880666" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1588696810295" />
-    <state x="588" y="289" width="800" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1592909551678">
+    <state x="588" y="289" width="800" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1592986105476">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1592909551678" />
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1592986105476" />
     <state x="588" y="1080" width="800" height="1080" key="Vcs.Push.Dialog.v2/67.27.1853.2133@67.27.1853.2133" timestamp="1585324286028" />
     <state x="215" y="236" width="620" height="642" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1587999745479">
       <screen x="67" y="27" width="1853" height="1053" />

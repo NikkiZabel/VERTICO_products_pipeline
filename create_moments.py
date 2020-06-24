@@ -276,7 +276,16 @@ class MomentMaps:
 
         vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
 
-        mom0 = np.sum((cube.data * abs(cube.header['CDELT3']) / 1000), axis=0)
+        if cube.header['CTYPE3'] == 'VRAD':
+            mom0 = np.sum((cube.data * abs(cube.header['CDELT3']) / 1000), axis=0)
+        elif cube.header['CTYPE3'] == 'FREQ':
+            v_val = 299792.458 * (230.538000 / (cube.header['CRVAL3'] / 1e9) - 1)
+            v_shift = 299792.458 * (230.538000 / ((cube.header['CRVAL3'] + cube.header['CDELT3']) / 1e9) - 1)
+            v_step = v_val - v_shift
+            mom0 = np.sum(cube.data * abs(v_step), axis=0)
+        else:
+            raise AttributeError("Can't deal with these units yet.")
+
         if units == 'M_Sun/pc^2':
             mom0 = mom0 / cube.header['JTOK'] * 91.9 * alpha_co * (cube.header['BMAJ'] * 3600 * cube.header[
                 'BMIN'] * 3600) ** (-1) / 4
