@@ -186,6 +186,10 @@ def image_mom0(hdu, units='K km/s', peak=False, show_beam=True, show_scalebar=Tr
         fig.add_scalebar(length=length, label='1 kpc', frame=False)
         fig.scalebar.set_linewidth(5)
 
+    fig.axis_labels.set_xtext('x-offset [arcsec]')
+    fig.axis_labels.set_ytext('y-offset [arcsec]')
+    fig.axis_labels.set_font(size=16)
+
 
 def image_mom1_2(hdu, sysvel, moment=1, show_beam=True, show_scalebar=True):
 
@@ -282,15 +286,26 @@ def image_mom1_2(hdu, sysvel, moment=1, show_beam=True, show_scalebar=True):
         cbar.ax.set_xticklabels(cbar.ax.get_xticklabels(), rotation=45)
 
     if show_beam:
-        fig.add_beam(frame=False)  # automatically imports BMAJ, BMIN, and BPA
-        fig.beam.set_edgecolor('k')
-        fig.beam.set_color('k')
-        fig.beam.set_borderpad(1)
+        # Calculate the desired beam location based on the image dimensions
+        beam_x = image.header['CRVAL1'] - image.header['CDELT1'] * (image.shape[1] / 2.33)
+        beam_y = image.header['CRVAL2'] - image.header['CDELT2'] * (image.shape[0] / 2.33)
+
+        # Calculate the beam size in arcseconds and the position angle in degrees
+        beam_width = hdu.header['BMIN'] * 3600
+        beam_height = hdu.header['BMAJ'] * 3600
+        beam_angle = hdu.header['BPA']
+
+        # Show the beam
+        fig.show_ellipses(beam_x, beam_y, beam_width, beam_height, angle=beam_angle, facecolor='k', zorder=5)
 
     if show_scalebar:
         length = np.degrees(1.e-3 / distance)  # length of the scalebar in degrees, corresponding to 1 kpc
         fig.add_scalebar(length=length, label='1 kpc', frame=False)
         fig.scalebar.set_linewidth(5)
+
+    fig.axis_labels.set_xtext('x-offset [arcsec]')
+    fig.axis_labels.set_ytext('y-offset [arcsec]')
+    fig.axis_labels.set_font(size=16)
 
     return
 
@@ -340,8 +355,8 @@ def contour_plot(image, contours, number=3):
     fig.beam.set_borderpad(1)
 
     # Show a scalebar
-    length = np.degrees(1.e-3 / distance)
-    fig.add_scalebar(length=length, label='1 kpc', frame=False)
+    length = np.degrees(2e-3 / distance)
+    fig.add_scalebar(length=length, label='2 kpc', frame=False)
     fig.scalebar.set_linewidth(2)
     fig.scalebar.set_color('white')
 
