@@ -19,6 +19,18 @@ class MomentMaps:
         self.sun = sun
         self.tosave = tosave
 
+    def pixel_size_check(self, header, key="CDELT1", expected_pix_size=2, raise_exception=True):
+        # check the pixel size is what's expected modulo some floating point error
+        pixel_size_arcsec = abs(header[key] * 3600)
+        pixel_size_error_message = self.galaxy.name + ": " + key + " = " + str(pixel_size_arcsec) + "arcsec" + \
+                                   " not " + str(expected_pix_size) + "arcsec"
+        if not np.max(np.abs(pixel_size_arcsec - expected_pix_size)) < 1e-6:
+            if raise_exception == True:
+                raise Exception(pixel_size_error_message)
+            else:
+                print(pixel_size_error_message)
+                pass
+
     def calc_noise_in_cube(self,
             masking_scheme='simple', mask=None,
             spatial_average_npix=None, spatial_average_nbeam=5.0,
@@ -293,6 +305,8 @@ class MomentMaps:
             pass
         else:
             raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
+
+        self.pixel_size_check(header=mom0.header)
 
         mom1 = np.sum(cube.data * vel_narray, axis=0) / np.sum(cube.data, axis=0)
         mom2 = np.sqrt(np.sum(abs(cube.data) * (vel_narray - mom1) ** 2, axis=0) / np.sum(abs(cube.data), axis=0))

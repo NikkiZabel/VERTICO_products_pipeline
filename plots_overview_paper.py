@@ -8,6 +8,7 @@ from sauron_colormap import register_sauron_colormap; register_sauron_colormap()
 from gal_params import parameters
 from astropy.wcs.utils import proj_plane_pixel_scales, skycoord_to_pixel, pixel_to_skycoord
 from astropy.wcs import WCS
+import yt; cmap_name = 'RED TEMPERATURE_r'
 
 distance = 16.5  # Mpc
 
@@ -118,7 +119,7 @@ def image_mom0(hdu, units='K km/s', peak=False, show_beam=True, show_scalebar=Tr
     fig.grid.set_alpha(0.5)
     fig.grid.set_linestyle('--')
 
-    fig.show_contour(image, cmap='magma_r',
+    fig.show_contour(image, cmap='RED TEMPERATURE_r',
                      levels=np.linspace(np.nanmax(image.data) * 1e-9, np.nanmax(image.data), 20),
                      filled=True, overlap=True)
 
@@ -133,7 +134,7 @@ def image_mom0(hdu, units='K km/s', peak=False, show_beam=True, show_scalebar=Tr
     # add a colourbar
     colors = plt.contourf([[0, 0], [0, 0]],
                           levels=np.linspace(0, np.nanmax(image.data) + np.nanmax(image.data) * 0.05, 20),
-                          cmap='magma_r')
+                          cmap='RED TEMPERATURE_r')
 
     if np.nanmax(image.data) < 0.1:
         ticks = np.arange(0, np.nanmax(image.data) + 0.015, 0.005)
@@ -312,7 +313,7 @@ def image_mom1_2(hdu, sysvel, moment=1, show_beam=True, show_scalebar=True):
 
 def contour_plot(image, contours, number=3):
 
-    # Set nans in mom0 to a small value to make sure the contours close
+    # Set nans in mom0 to a small value to close contours
     contour_plot = contours.copy()
     contour_plot.data[np.isnan(contour_plot.data)] = 1e-3
 
@@ -327,14 +328,14 @@ def contour_plot(image, contours, number=3):
     subplot[3] += 0.03
     fig = apl.FITSFigure(image, figure=f, subplot=subplot)
     fig.show_rgb('/home/nikki/Documents/Data/VERTICO/SDSS/gri/NGC4216_gri.tif')
-    fig.show_contour(contour_plot, levels=np.linspace(np.nanmax(contours.data)*0.001, np.nanmax(contours.data), number), cmap='winter_r',
-                              linewidths=1, returnlevels=True)
+    fig.show_contour(contour_plot, levels=np.linspace(np.nanmax(contours.data)*0.001, np.nanmax(contours.data), number),
+                     cmap='winter_r', linewidths=1)
 
     # Show FoV
     pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/NGC4216/NGC4216_7m_co21_pb_rebin.fits')[0]
     pb.data = np.sum(pb.data, axis=0)
     pb.data[np.isfinite(pb.data)] = 1
-    pb.data[np.isnan(pb.data)] = 1e-3
+    pb.data[np.isnan(pb.data)] = 0
     pb.header['NAXIS'] = 2
     pb.header.pop('PC3_1')
     pb.header.pop('PC3_2')
@@ -346,6 +347,12 @@ def contour_plot(image, contours, number=3):
     pb.header.pop('CDELT3')
     pb.header.pop('CRPIX3')
     pb.header.pop('CUNIT3')
+
+    # Add some whitespace around the data to artificially close the contours
+    temp = pb.data
+    pb.data = np.zeros((pb.shape[0] + 2, pb.shape[1] + 2))
+    pb.data[1:-1, 1:-1] = temp
+
     fig.show_contour(pb, levels=1, colors='white', alpha=0.5, linewidths=1)
 
     # Show the beam
@@ -360,8 +367,9 @@ def contour_plot(image, contours, number=3):
     fig.scalebar.set_linewidth(2)
     fig.scalebar.set_color('white')
 
-    # Add galaxy name in the upper left corner
-    fig.add_label(0.15, 0.9, 'NGC4216', color='white', relative=True, size=20)
+    # Add galaxy name and some other stuff in the upper left corner
+    fig.add_label(0.06, 0.87, 'NGC4216 \n SDSS $\it{gri}$ \n CO(2-1)', color='white', relative=True, size=20,
+                  horizontalalignment='left')
 
     # Make some adjustments
     plt.gca().tick_params(which='both', length=10, width=1.5)
