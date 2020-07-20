@@ -10,7 +10,7 @@ overwrite = True
 sun = False
 tosave = True
 pbcor = True
-resolution = 15
+resolution = 9
 
 galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
             'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
@@ -19,15 +19,15 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
             'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689',
             'NGC4698']
 
-galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
-            'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
-            'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808', 'NGC4396',
-            'NGC4567', 'NGC4772', 'NGC4580', 'NGC4450', 'NGC4694', 'NGC4561']
+#galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
+#            'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
+#            'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808', 'NGC4396',
+#            'NGC4567', 'NGC4772', 'NGC4580', 'NGC4450', 'NGC4694', 'NGC4561']
 
 #galaxies = ['NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
 #            'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689']
 
-#galaxies = ['NGC4298']
+galaxies = ['NGC4302']
 
 for i in range(len(galaxies)):
 
@@ -117,12 +117,19 @@ for i in range(len(galaxies)):
     #file_pbcorr = '/home/nikki/Documents/Data/VERTICO/ReducedData/test/NGC4222_tapered/NGC4222_7m_co21_pbcorr_round_k.fits'
     #file_uncorr = '/home/nikki/Documents/Data/VERTICO/ReducedData/test/NGC4222_tapered/NGC4222_7m_co21_flat_round_k.fits'
     #savepath = '/home/nikki/Documents/Data/VERTICO/ReducedData/test/NGC4222_tapered/Products/Dame_method/'
-    #data = fits.open(file_pbcorr)[0]
 
-    #if not pb.shape[1:3] == data.shape[1:3]:
-    #    print('Wrong PB shape:')
-    #    print(galaxy)
-    #    continue
+    try:
+        data = fits.open(file_pbcorr)[0]
+        pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/' + galaxy + '/' +
+                           galaxy + '_7m_co21_pb_rebin.fits')[0]
+
+        if not pb.shape[1:3] == data.shape[1:3]:
+            print('Wrong PB shape:')
+            print(galaxy)
+            continue
+    except:
+        print('No PB info: ')
+        print(galaxy)
 
     '''
     if not pbcor:
@@ -148,7 +155,7 @@ for i in range(len(galaxies)):
 
 
     # Moment maps
-
+    '''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).moment_zero(units='K km/s')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -159,8 +166,9 @@ for i in range(len(galaxies)):
     #             sun=sun, tosave=tosave).moment_1_2()
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
     #             sun=sun, tosave=tosave).moment_1_2(moment=2)
-
+    '''
     # Uncertainty maps
+
     #'''
     try:
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,

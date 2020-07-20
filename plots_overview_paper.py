@@ -1,3 +1,4 @@
+import matplotlib; matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import numpy as np
 from matplotlib.gridspec import GridSpec
@@ -11,7 +12,6 @@ from astropy.wcs import WCS
 import yt; cmap_name = 'RED TEMPERATURE_r'
 
 distance = 16.5  # Mpc
-
 
 def set_rc_params():
 
@@ -192,7 +192,7 @@ def image_mom0(hdu, units='K km/s', peak=False, show_beam=True, show_scalebar=Tr
     fig.axis_labels.set_font(size=16)
 
 
-def image_mom1_2(hdu, sysvel, moment=1, show_beam=True, show_scalebar=True):
+def image_mom1_2(hdu, galaxy, sysvel, moment=1, show_beam=True, show_scalebar=True):
 
     image = hdu.copy()
     centre_sky = pixel_to_skycoord(image.shape[0] / 2, image.shape[1] / 2, wcs=WCS(image))
@@ -202,10 +202,22 @@ def image_mom1_2(hdu, sysvel, moment=1, show_beam=True, show_scalebar=True):
     name, vrange, vrange2, cliplevel, stokes, start, stop, sysvel_offset, angle, \
     full_width, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \
     prune_by_fracbeam, expand_by_fracbeam, expand_by_npix, expand_by_nchan, inclination, eccentricity, \
-    figsize = parameters('NGC4216')
+    figsize = parameters(galaxy)
 
-    vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/Products/NGC4216/Smooth_method/NGC4216_7m+tp_co21_pbcorr_round_k_spectrum.csv',
-                               delimiter=',', skip_header=1)[:, 1][start:stop]
+    if sun:
+        try:
+            vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/Products/' + galaxy + '/Sun_method/' + galaxy +
+                                      '_7m+tp_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=1)[:, 1]
+        except:
+            vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/Products/' + galaxy + '/Sun_method/' + galaxy +
+                                      '_7m_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=1)[:, 1]
+    else:
+        try:
+            vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/Products/' + galaxy + '/Smooth_method/' + galaxy +
+                                      '_7m+tp_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=1)[:, 1]
+        except:
+            vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/Products/' + galaxy + '/Smooth_method/' + galaxy +
+                                      '_7m_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=1)[:, 1]
 
     sysvel = (sysvel + 5) // 10 * 10
 
@@ -268,8 +280,7 @@ def image_mom1_2(hdu, sysvel, moment=1, show_beam=True, show_scalebar=True):
             vrange = 1.5 * (np.nanmax(image.data) - sysvel)
 
         fig.show_contour(image, cmap='sauron', levels=np.linspace(-vrange, vrange,
-            len(vel_array)), vmin=-vrange, vmax=vrange, extend='both', filled=True,
-                         overlap=True)
+            len(vel_array)), vmin=-vrange, vmax=vrange, extend='both', filled=True, overlap=True)
         colors = plt.contourf([[0, 0], [0, 0]], levels=np.linspace(-vrange, vrange,
                                                                    len(vel_array)), cmap='sauron')
         if vrange < 16:
@@ -311,7 +322,7 @@ def image_mom1_2(hdu, sysvel, moment=1, show_beam=True, show_scalebar=True):
     return
 
 
-def contour_plot(image, contours, number=3):
+def contour_plot(image, contours, galaxy, number=3):
 
     # Set nans in mom0 to a small value to close contours
     contour_plot = contours.copy()
@@ -327,33 +338,36 @@ def contour_plot(image, contours, number=3):
     subplot[2] += 0.014
     subplot[3] += 0.03
     fig = apl.FITSFigure(image, figure=f, subplot=subplot)
-    fig.show_rgb('/home/nikki/Documents/Data/VERTICO/SDSS/gri/NGC4216_gri.tif')
-    fig.show_contour(contour_plot, levels=np.linspace(np.nanmax(contours.data)*0.001, np.nanmax(contours.data), number),
+    fig.show_rgb('/home/nikki/Documents/Data/VERTICO/SDSS/gri/' + galaxy + '_gri.tif')
+    fig.show_contour(contour_plot, levels=np.linspace(np.nanmax(contours.data)*1e-1, np.nanmax(contours.data), number),
                      cmap='winter_r', linewidths=1)
 
     # Show FoV
-    pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/NGC4216/NGC4216_7m_co21_pb_rebin.fits')[0]
-    pb.data = np.sum(pb.data, axis=0)
-    pb.data[np.isfinite(pb.data)] = 1
-    pb.data[np.isnan(pb.data)] = 0
-    pb.header['NAXIS'] = 2
-    pb.header.pop('PC3_1')
-    pb.header.pop('PC3_2')
-    pb.header.pop('PC1_3')
-    pb.header.pop('PC2_3')
-    pb.header.pop('PC3_3')
-    pb.header.pop('CTYPE3')
-    pb.header.pop('CRVAL3')
-    pb.header.pop('CDELT3')
-    pb.header.pop('CRPIX3')
-    pb.header.pop('CUNIT3')
+    try:
+        pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/' + galaxy + '/' + galaxy + '_7m_co21_pb_rebin.fits')[0]
+        pb.data = np.sum(pb.data, axis=0)
+        pb.data[np.isfinite(pb.data)] = 1
+        pb.data[np.isnan(pb.data)] = 0
+        pb.header['NAXIS'] = 2
+        pb.header.pop('PC3_1')
+        pb.header.pop('PC3_2')
+        pb.header.pop('PC1_3')
+        pb.header.pop('PC2_3')
+        pb.header.pop('PC3_3')
+        pb.header.pop('CTYPE3')
+        pb.header.pop('CRVAL3')
+        pb.header.pop('CDELT3')
+        pb.header.pop('CRPIX3')
+        pb.header.pop('CUNIT3')
 
-    # Add some whitespace around the data to artificially close the contours
-    temp = pb.data
-    pb.data = np.zeros((pb.shape[0] + 2, pb.shape[1] + 2))
-    pb.data[1:-1, 1:-1] = temp
+        # Add some whitespace around the data to artificially close the contours
+        temp = pb.data
+        pb.data = np.zeros((pb.shape[0] + 2, pb.shape[1] + 2))
+        pb.data[1:-1, 1:-1] = temp
 
-    fig.show_contour(pb, levels=1, colors='white', alpha=0.5, linewidths=1)
+        fig.show_contour(pb, levels=1, colors='white', alpha=0.5, linewidths=1)
+    except:
+        pass
 
     # Show the beam
     fig.add_beam(frame=False)
@@ -368,7 +382,7 @@ def contour_plot(image, contours, number=3):
     fig.scalebar.set_color('white')
 
     # Add galaxy name and some other stuff in the upper left corner
-    fig.add_label(0.06, 0.87, 'NGC4216 \n SDSS $\it{gri}$ \n CO(2-1)', color='white', relative=True, size=20,
+    fig.add_label(0.06, 0.87, galaxy + '\n SDSS $\it{gri}$ \n CO(2-1)', color='white', relative=True, size=20,
                   horizontalalignment='left')
 
     # Make some adjustments
@@ -379,49 +393,80 @@ def contour_plot(image, contours, number=3):
 
     return
 
-
-# Read in the desired data products CURRENTLY DAME VERSION
-path = '/home/nikki/Documents/Data/VERTICO/Products/NGC4216/Smooth_method/'
-mom0 = fits.open(path + 'NGC4216_7m+tp_co21_pbcorr_round_k_moment0_K.fits')[0]
-mom1 = fits.open(path + 'NGC4216_7m+tp_co21_pbcorr_round_k_moment1.fits')[0]
-mom2 = fits.open(path + 'NGC4216_7m+tp_co21_pbcorr_round_k_moment2.fits')[0]
-peak = fits.open(path + 'NGC4216_7m+tp_co21_pbcorr_round_k_peak_temperature.fits')[0]
-
-# Set zeros to nans
-mom0.data[mom0.data == 0] = np.nan
-mom1.data[mom1.data == 0] = np.nan
-mom2.data[mom2.data == 0] = np.nan
-peak.data[peak.data == 0] = np.nan
-
-# Make those images square
-mom0 = make_square(mom0)
-mom1 = make_square(mom1)
-mom2 = make_square(mom2)
-peak = make_square(peak)
-
-# Read in SDSS data
-g_band = fits.open('/home/nikki/Documents/Data/VERTICO/SDSS/g_band/NGC4216_g.fits')[0]
-
-# Prepare the figure layout
+### MAIN ###
 set_rc_params()
-f = plt.figure(figsize=(15, 7.2))
-gs = GridSpec(2, 4, figure=f)
-ax_sdss = f.add_subplot(gs[0:2, 0:2])
-ax_mom0 = f.add_subplot(gs[0, 2])
-ax_mom1 = f.add_subplot(gs[0, 3])
-ax_mom2 = f.add_subplot(gs[1, 2])
-ax_peak = f.add_subplot(gs[1, 3])
-ax_sdss.axis('off')
-ax_mom0.axis('off')
-ax_mom1.axis('off')
-ax_mom2.axis('off')
-ax_peak.axis('off')
 
-# Fill the panels with the plots (position on the gridspec is currently hardcoded)
-contour_plot(g_band, mom0, number=4)
-image_mom0(mom0, units='K km/s', show_beam=True, show_scalebar=False)
-image_mom1_2(mom1, mom1.header['SYSVEL'], moment=1, show_beam=False, show_scalebar=False)
-image_mom1_2(mom2, mom1.header['SYSVEL'], moment=2, show_beam=False, show_scalebar=False)
-image_mom0(peak, peak=True, show_beam=False, show_scalebar=False)
+sun = True
 
-plt.savefig('/home/nikki/test.png', bbox_inches='tight')
+galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
+            'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
+            'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808', 'NGC4396',
+            'NGC4567', 'NGC4772', 'NGC4580', 'NGC4450', 'NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
+            'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689',
+            'NGC4698']
+
+#galaxies = ['NGC4064']
+
+for i in range(len(galaxies)):
+
+    print(galaxies[i])
+
+    # Read in the desired data products
+    if sun:
+        path = '/home/nikki/Documents/Data/VERTICO/Products/' + galaxies[i] + '/Sun_method/'
+    else:
+        path = '/home/nikki/Documents/Data/VERTICO/Products/' + galaxies[i] + '/Smooth_method/'
+
+    try:
+        mom0 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_moment0_K.fits')[0]
+        mom1 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_moment1.fits')[0]
+        mom2 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_moment2.fits')[0]
+        peak = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_peak_temperature.fits')[0]
+    except:
+        mom0 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_moment0_K.fits')[0]
+        mom1 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_moment1.fits')[0]
+        mom2 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_moment2.fits')[0]
+        peak = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_peak_temperature.fits')[0]
+
+    # Set zeros to nans
+    mom0.data[mom0.data == 0] = np.nan
+    mom1.data[mom1.data == 0] = np.nan
+    mom2.data[mom2.data == 0] = np.nan
+    peak.data[peak.data == 0] = np.nan
+
+    # Make those images square
+    mom0 = make_square(mom0)
+    mom1 = make_square(mom1)
+    mom2 = make_square(mom2)
+    peak = make_square(peak)
+
+    # Read in SDSS data
+    g_band = fits.open('/home/nikki/Documents/Data/VERTICO/SDSS/g_band/' + galaxies[i] + '_g.fits')[0]
+
+    # Prepare the figure layout
+    f = plt.figure(figsize=(15, 7.2))
+    gs = GridSpec(2, 4, figure=f)
+    ax_sdss = f.add_subplot(gs[0:2, 0:2])
+    ax_mom0 = f.add_subplot(gs[0, 2])
+    ax_mom1 = f.add_subplot(gs[0, 3])
+    ax_mom2 = f.add_subplot(gs[1, 2])
+    ax_peak = f.add_subplot(gs[1, 3])
+    ax_sdss.axis('off')
+    ax_mom0.axis('off')
+    ax_mom1.axis('off')
+    ax_mom2.axis('off')
+    ax_peak.axis('off')
+
+    # Fill the panels with the plots (position on the gridspec is currently hardcoded)
+    contour_plot(g_band, mom0, galaxies[i], number=4)
+    image_mom0(mom0, units='K km/s', show_beam=True, show_scalebar=False)
+    image_mom1_2(mom1, galaxies[i], mom1.header['SYSVEL'], moment=1, show_beam=False, show_scalebar=False)
+    image_mom1_2(mom2, galaxies[i], mom1.header['SYSVEL'], moment=2, show_beam=False, show_scalebar=False)
+    image_mom0(peak, peak=True, show_beam=False, show_scalebar=False)
+
+    if sun:
+        plt.savefig('/home/nikki/Documents/Data/VERTICO/Products/Overview_plots/Sun_method/' + galaxies[i] + '.pdf',
+                    bbox_inches='tight')
+    else:
+        plt.savefig('/home/nikki/Documents/Data/VERTICO/Products/Overview_plots/Dame_method/' + galaxies[i] + '.pdf',
+                    bbox_inches='tight')

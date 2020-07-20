@@ -306,8 +306,6 @@ class MomentMaps:
         else:
             raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
 
-        self.pixel_size_check(header=mom0.header)
-
         mom1 = np.sum(cube.data * vel_narray, axis=0) / np.sum(cube.data, axis=0)
         mom2 = np.sqrt(np.sum(abs(cube.data) * (vel_narray - mom1) ** 2, axis=0) / np.sum(abs(cube.data), axis=0))
 
@@ -321,6 +319,8 @@ class MomentMaps:
         mom0_hdu = fits.PrimaryHDU(mom0, self.new_header(cube.header))
         mom1_hdu = fits.PrimaryHDU(mom1, self.new_header(cube.header))
         mom2_hdu = fits.PrimaryHDU(mom2, self.new_header(cube.header))
+
+        self.pixel_size_check(header=mom0_hdu.header)
 
         # Change or add any (additional) keywords to the headers
         if units == 'M_Sun/pc^2': mom0_hdu.header['BTYPE'] = 'Column density'
@@ -724,6 +724,7 @@ class MomentMaps:
             _, pb_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                         savepath=self.savepath, tosave=self.tosave).do_clip(clip_also=pb_hdu)
             pb_map = pb_cube.data[int(pb_cube.shape[0] / 2), :, :]
+
         except:
             pb_map = np.ones(mom0_hdu.shape)
 
