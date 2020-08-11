@@ -500,7 +500,6 @@ class ClipCube:
         """
 
         cube_pbcorr, cube_uncorr = self.readfits()
-
         cube_uncorr_copy = cube_uncorr.copy()
 
         # get part of the cube that has emission from the PB corrected datacube
@@ -511,14 +510,17 @@ class ClipCube:
             mask = self.sun_method(emiscube_uncorr, noisecube_uncorr)
             mask_hdu = fits.PrimaryHDU(mask.astype(int), cube_pbcorr.header)
             mask_hdu.writeto(self.savepath + 'mask_sun.fits', overwrite=True)
+            mask_full = self.sun_method(cube_uncorr_copy, noisecube_uncorr)
+            mask_full_hdu = fits.PrimaryHDU(mask_full.astype(int), cube_pbcorr.header)
+            mask_full_hdu.writeto(self.savepath + 'mask_sun_full_cube_' + self.galaxy.name + '.fits', overwrite=True)
+            mask_full_hdu.writeto('/home/nikki/Desktop/Masks_for_Toby/' + 'mask_sun_full_cube_' + self.galaxy.name + '.fits', overwrite=True)
         else:
             mask = self.smooth_mask(cube_uncorr_copy)
             mask_hdu = fits.PrimaryHDU(mask.astype(int), cube_pbcorr.header)
-            mask_hdu.writeto(self.savepath + 'mask_smooth.fits', overwrite=True)
+            mask_hdu.writeto(self.savepath + 'mask_dame.fits', overwrite=True)
 
         emiscube_pbcorr.data *= mask
         clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr.data, cube_pbcorr.header)
-
 
         if self.tosave:
             clipped_hdu.writeto(self.savepath + 'cube_clipped.fits', overwrite=True)

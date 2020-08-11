@@ -299,8 +299,10 @@ class MomentMaps:
             raise AttributeError("Can't deal with these units yet.")
 
         if units == 'M_Sun/pc^2':
-            mom0 = mom0 / cube.header['JTOK'] * 91.9 * alpha_co * (cube.header['BMAJ'] * 3600 * cube.header[
-                'BMIN'] * 3600) ** (-1) / 4
+            from matplotlib import pyplot as plt
+            #mom0 = mom0 / cube.header['JTOK'] * 91.7 * alpha_co * (cube.header['BMAJ'] * 3600 * cube.header[
+            #    'BMIN'] * 3600) ** (-1) / 4
+            mom0 *= alpha_co
         elif units == 'K km/s':
             pass
         else:
@@ -320,7 +322,7 @@ class MomentMaps:
         mom1_hdu = fits.PrimaryHDU(mom1, self.new_header(cube.header))
         mom2_hdu = fits.PrimaryHDU(mom2, self.new_header(cube.header))
 
-        self.pixel_size_check(header=mom0_hdu.header)
+        #self.pixel_size_check(header=mom0_hdu.header)
 
         # Change or add any (additional) keywords to the headers
         if units == 'M_Sun/pc^2': mom0_hdu.header['BTYPE'] = 'Column density'
@@ -535,9 +537,9 @@ class MomentMaps:
                                             savepath=self.savepath,
                                             tosave=self.tosave).innersquare(noisecube.data)
         rms = np.nanstd(inner)
-        rms_Msun = rms / cube_pbcorr.header['JTOK']
-        rms_Msun = rms_Msun * abs(cube_pbcorr.header['CDELT3']) / 1000 * 91.9 * alpha_co * (cube_pbcorr.header['BMAJ'] * 3600 *
-                cube_pbcorr.header['BMIN'] * 3600) ** (-1) / 4
+        rms_Msun = rms * alpha_co
+        #rms_Msun = rms_Msun * abs(cube_pbcorr.header['CDELT3']) / 1000 * 91.7 * alpha_co * (cube_pbcorr.header['BMAJ'] * 3600 *
+        #        cube_pbcorr.header['BMIN'] * 3600) ** (-1) / 4
 
         if self.galaxy.eccentricity:
             e = self.galaxy.eccentricity

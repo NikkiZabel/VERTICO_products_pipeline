@@ -7,17 +7,17 @@ from matplotlib import pyplot as plt
 # Set some parameters to apply to all images below
 refresh = True
 overwrite = True
-sun = False
+sun = True
 tosave = True
 pbcor = True
-resolution = 9
+resolution = 0
 
 galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
             'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
             'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808', 'NGC4396',
             'NGC4567', 'NGC4772', 'NGC4580', 'NGC4450', 'NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
             'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689',
-            'NGC4698']
+            'NGC4691', 'NGC4698']
 
 #galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
 #            'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
@@ -27,7 +27,10 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
 #galaxies = ['NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
 #            'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689']
 
-galaxies = ['NGC4302']
+#galaxies = ['NGC4064', 'NGC4222', 'NGC4294', 'NGC4330', 'NGC4388', 'NGC4394', 'NGC4402', 'NGC4405', 'NGC4419',
+#            'NGC4522', 'NGC4533', 'NGC4567', 'NGC4606', 'NGC4607', 'NGC4772']  # These are the 7m only detections
+
+#galaxies = ['NGC4222']
 
 for i in range(len(galaxies)):
 
@@ -106,6 +109,8 @@ for i in range(len(galaxies)):
             file_uncorr = readpath + galaxy + '_7m_co21_flat_round_k_9arcsec_gauss_temp_rc.fits'
             savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_9_arcsec_'
         else:
+            file_pbcorr = readpath + galaxy + '_7m_co21_pbcorr_round_k.fits'
+            file_uncorr = readpath + galaxy + '_7m_co21_flat_round_k.fits'
             savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_'
         try:
             cube_corr, cube_uncorr = ClipCube(galaxy, file_pbcorr, file_uncorr).readfits()
@@ -118,6 +123,7 @@ for i in range(len(galaxies)):
     #file_uncorr = '/home/nikki/Documents/Data/VERTICO/ReducedData/test/NGC4222_tapered/NGC4222_7m_co21_flat_round_k.fits'
     #savepath = '/home/nikki/Documents/Data/VERTICO/ReducedData/test/NGC4222_tapered/Products/Dame_method/'
 
+    '''
     try:
         data = fits.open(file_pbcorr)[0]
         pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/' + galaxy + '/' +
@@ -130,6 +136,7 @@ for i in range(len(galaxies)):
     except:
         print('No PB info: ')
         print(galaxy)
+    '''
 
     '''
     if not pbcor:
@@ -153,23 +160,25 @@ for i in range(len(galaxies)):
     #x = np.arange(0, len(spec), 1)
     #plt.plot(x, std * np.ones(len(x)))
 
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave).moment_zero()
 
     # Moment maps
-    '''
+    #'''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).moment_zero(units='K km/s')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).moment_zero()
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).moment_zero(peak=True)
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #             sun=sun, tosave=tosave).moment_1_2()
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #             sun=sun, tosave=tosave).moment_1_2(moment=2)
-    '''
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                 sun=sun, tosave=tosave).moment_1_2()
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                 sun=sun, tosave=tosave).moment_1_2(moment=2)
+    #'''
     # Uncertainty maps
 
-    #'''
+    '''
     try:
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                     sun=sun, tosave=tosave).mom0_noise_maps()
@@ -177,7 +186,7 @@ for i in range(len(galaxies)):
                     sun=sun, tosave=tosave).mom1_2_noise_maps()
     except:
         pass
-    #'''
+    '''
     #if galaxy == 'NGC4561': continue
 
     # PVDs
