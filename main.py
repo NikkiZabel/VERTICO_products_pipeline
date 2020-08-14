@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 refresh = True
 overwrite = True
 sun = True
-tosave = True
+tosave = False
 pbcor = True
 resolution = 0
 
@@ -30,7 +30,7 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
 #galaxies = ['NGC4064', 'NGC4222', 'NGC4294', 'NGC4330', 'NGC4388', 'NGC4394', 'NGC4402', 'NGC4405', 'NGC4419',
 #            'NGC4522', 'NGC4533', 'NGC4567', 'NGC4606', 'NGC4607', 'NGC4772']  # These are the 7m only detections
 
-#galaxies = ['NGC4222']
+#galaxies = ['NGC4394']
 
 for i in range(len(galaxies)):
 
@@ -160,11 +160,8 @@ for i in range(len(galaxies)):
     #x = np.arange(0, len(spec), 1)
     #plt.plot(x, std * np.ones(len(x)))
 
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave).moment_zero()
-
     # Moment maps
-    #'''
+    '''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).moment_zero(units='K km/s')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -175,7 +172,7 @@ for i in range(len(galaxies)):
                  sun=sun, tosave=tosave).moment_1_2()
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).moment_1_2(moment=2)
-    #'''
+    '''
     # Uncertainty maps
 
     '''
@@ -229,3 +226,7 @@ for i in range(len(galaxies)):
                                                                             check_aperture=False)
     '''
 
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                sun=sun, tosave=tosave).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
+                                   alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
+                                                                            check_aperture=True)

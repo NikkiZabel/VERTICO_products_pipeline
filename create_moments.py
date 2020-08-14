@@ -558,14 +558,15 @@ class MomentMaps:
                 inc = [1]
             e = np.sin(np.deg2rad(inc))[0]
 
-        centre = (int(mom0_hdu_K.shape[0]/2), int(mom0_hdu_K.shape[1]/2))
+        centre = (int(mom0_hdu_K.shape[1]/2), int(mom0_hdu_K.shape[0]/2))
         hi_inc = False
         rad_prof_K = []
         rad_prof_Msun = []
         radius = []
         area = []
 
-        b_in = -beam_pix + 0.000000000001
+        #b_in = -beam_pix + 0.000000000001
+        b_in = -1 + 0.0000000001
         b_out = 0
         theta = np.deg2rad(self.galaxy.angle + 90)
 
@@ -577,10 +578,14 @@ class MomentMaps:
             plt.figure()
             plt.imshow(mom0_hdu_K.data)
 
-        while emission_Msun / area_temp > 2 * rms_Msun:
+        #while emission_Msun / area_temp > 2 * rms_Msun:
+        while emission_Msun / area_temp > 0:
 
-            b_in += beam_pix
-            b_out += beam_pix
+            #b_in += beam_pix
+            #b_out += beam_pix
+
+            b_in += 1
+            b_out += 1
 
             if emission_Msun == 2112:
                 a_in = 0.0000000000001
@@ -606,7 +611,8 @@ class MomentMaps:
             rad_prof_Msun.append(emission_Msun / area_temp)
             radius.append(a_out)
 
-        if ((len(radius) < 5) & (e > 0.7)) or ((len(np.array(rad_prof_K)[np.log10(np.array(rad_prof_K)) < 0]) > 2) & (e > 0.7)):
+        #if ((len(radius) < 5) & (e > 0.7)) or ((len(np.array(rad_prof_K)[np.log10(np.array(rad_prof_K)) < 0]) > 2) & (e > 0.7)):
+        if ((len(radius) < 5) & (e > 0.7)):
 
             hi_inc = True
 
@@ -624,7 +630,8 @@ class MomentMaps:
             centre = (mom0_K_rot.shape[1]) / 2
             emission_Msun = 2112
 
-            while emission_Msun > 2 * rms_Msun:
+            #while emission_Msun > 2 * rms_Msun:
+            while emission_Msun > 0:
                 slice1_K = mom0_K_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
                 slice2_K = mom0_K_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
                 emission_K = np.average(np.average(slice1_K) + np.average(slice2_K))
@@ -646,7 +653,8 @@ class MomentMaps:
 
                 area.append(len(slice1_K[slice1_K > 0]) + len(slice2_K[slice2_K > 0]))
 
-                inner += beam_pix
+                #inner += beam_pix
+                inner += 1
 
         rad_prof_K = rad_prof_K[:-1]
         rad_prof_Msun = rad_prof_Msun[:-1]
@@ -682,8 +690,10 @@ class MomentMaps:
                                         np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
                                         delimiter=',', header=csv_header)
 
-        #from matplotlib import pyplot as plt
-        #plt.scatter(radii_deg * 3600, rad_prof_K)
+        np.savetxt('/home/nikki/Documents/Data/VERTICO/QuenchMechs/' + 'radial_profile_' + self.galaxy.name + '.csv',
+                   np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * error_K, rad_prof_Msun,
+                                    np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
+                   delimiter=',', header=csv_header)
 
         return rad_prof_K, rms, rad_prof_Msun, rms_Msun, radii_deg * 3600, radii_kpc
 

@@ -19,9 +19,8 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Loop over overview_plots to create them for all galaxies.">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Updated mass estimation, saving out masks for the entire cube for the Sun method.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clip_cube.py" beforeDir="false" afterPath="$PROJECT_DIR$/clip_cube.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -50,7 +49,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../proposals" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Project1" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -64,13 +63,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00017" summary="Save Sun mask as fits.">
-      <created>1582044320221</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1582044320221</updated>
     </task>
     <task id="LOCAL-00018" summary="Corrected uncertainty radial profile.">
       <created>1582110219031</created>
@@ -408,7 +400,14 @@
       <option name="project" value="LOCAL" />
       <updated>1595242456338</updated>
     </task>
-    <option name="localTasksCounter" value="66" />
+    <task id="LOCAL-00066" summary="Updated mass estimation, saving out masks for the entire cube for the Sun method.">
+      <created>1597159308189</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1597159308190</updated>
+    </task>
+    <option name="localTasksCounter" value="67" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -424,7 +423,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Stab at moment 1 uncertainties" />
     <MESSAGE value="Made uncertainty maps for all moments" />
     <MESSAGE value="Added peak temperature maps" />
     <MESSAGE value="Added radial profiles in K km/s" />
@@ -449,23 +447,24 @@
     <MESSAGE value="Correction bug in mom0 when 3rd axis is given in frequency." />
     <MESSAGE value="Some tweaks to SDSS overplot" />
     <MESSAGE value="Loop over overview_plots to create them for all galaxies." />
-    <option name="LAST_COMMIT_MESSAGE" value="Loop over overview_plots to create them for all galaxies." />
+    <MESSAGE value="Updated mass estimation, saving out masks for the entire cube for the Sun method." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated mass estimation, saving out masks for the entire cube for the Sun method." />
   </component>
   <component name="WindowStateProjectService">
-    <state x="325" y="1125" width="1040" height="882" key="FileChooserDialogImpl" timestamp="1597054540043">
+    <state x="325" y="1125" width="1040" height="882" key="FileChooserDialogImpl" timestamp="1597245154498">
       <screen x="0" y="1080" width="1920" height="1080" />
     </state>
-    <state x="325" y="1125" width="1040" height="882" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1597054540043" />
+    <state x="325" y="1125" width="1040" height="882" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1597245154498" />
     <state x="458" y="62" width="1102" height="751" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1596114890727" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor" timestamp="1593424411298">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="621" y="1156" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1592905880666" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1593424411298" />
-    <state x="588" y="289" width="829" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1595242462050">
-      <screen x="67" y="27" width="1853" height="1053" />
+    <state x="540" y="1080" width="829" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1597159309723">
+      <screen x="0" y="1080" width="1920" height="1080" />
     </state>
-    <state x="540" y="1080" width="829" height="1080" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1592988369367" />
+    <state x="540" y="1080" width="829" height="1080" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1597159309723" />
     <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1595242462050" />
   </component>
 </project>
