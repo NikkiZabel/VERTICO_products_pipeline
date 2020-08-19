@@ -690,7 +690,7 @@ class MomentMaps:
                                         np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
                                         delimiter=',', header=csv_header)
 
-        np.savetxt('/home/nikki/Documents/Data/VERTICO/QuenchMechs/' + 'radial_profile_' + self.galaxy.name + '.csv',
+        np.savetxt('/home/nikki/Documents/Data/VERTICO/QuenchMechs/radial_profiles/' + 'radial_profile_' + self.galaxy.name + '.csv',
                    np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * error_K, rad_prof_Msun,
                                     np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
                    delimiter=',', header=csv_header)

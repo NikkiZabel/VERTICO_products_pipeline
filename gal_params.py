@@ -395,9 +395,9 @@ def parameters(galaxy):
         angle = 0
         full_width = False
         distance = 16.5
-        nchan_low = 2
+        nchan_low = 1
         cliplevel_low = 2
-        nchan_high = 3
+        nchan_high = 2
         cliplevel_high = 3.5
         prune_by_npix = None
         prune_by_fracbeam = 1
