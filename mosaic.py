@@ -6,6 +6,7 @@ from matplotlib.gridspec import GridSpec
 from astropy.io import fits
 from sauron_colormap import register_sauron_colormap; register_sauron_colormap()
 from gal_params import parameters
+import yt; cmap_name = 'RED TEMPERATURE_r'
 
 # Read in the Smooth version of the moment 0 map for each galaxy
 path = '/home/nikki/Documents/Data/VERTICO/Products/'
@@ -13,6 +14,7 @@ files_mom0 = [y for x in os.walk(path) for y in glob(os.path.join(x[0], '*/Sun_m
 files_mom1 = [y for x in os.walk(path) for y in glob(os.path.join(x[0], '*/Sun_method/*moment1.fits'))]
 files_mom2 = [y for x in os.walk(path) for y in glob(os.path.join(x[0], '*/Sun_method/*moment2.fits'))]
 files_vel = [y for x in os.walk(path) for y in glob(os.path.join(x[0], '*/Sun_method/*spectrum.csv'))]
+files_peak = [y for x in os.walk(path) for y in glob(os.path.join(x[0], '*/Sun_method/*peak_temperature.fits'))]
 
 def make_square(img):
     shape_diff = np.max(img.shape) - np.min(img.shape)
@@ -30,7 +32,7 @@ def make_square(img):
 
 count = 0
 
-moment = 1
+moment = 'peak'
 
 f, axarr = plt.subplots(7, 7, figsize=(10, 10))
 gs = GridSpec(7, 7, figure=f)
@@ -71,6 +73,10 @@ for i in range(axarr.shape[0]):
                 axarr[i, j].contourf(img, cmap='sauron', levels=np.linspace(0, vrange2, len(vel_array)), vmin=0, vmax=vrange2)
             except:
                 pass
+        elif moment == 'peak':
+            img = make_square(fits.open(files_mom0[count])[0].data)
+            levels = np.linspace(np.std(img) / 1e5, np.max(img), 50)
+            axarr[i, j].contourf(img, cmap='RED TEMPERATURE_r', levels=levels)
 
         count += 1
 
