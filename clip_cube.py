@@ -388,7 +388,7 @@ class ClipCube:
 
         return mask
 
-    def sun_method(self, emiscube, noisecube):
+    def sun_method(self, emiscube, noisecube, calc_rms=False):
         """
         Apply the clipping method from Sun, possibly prune detections with small areas on the sky and/or expand the
         mask in the spatial/velocity directions.
@@ -410,6 +410,9 @@ class ClipCube:
         # Estimate the rms from the spatial inner part of the cube
         inner = self.innersquare(noisecube.data)
         rms = np.nanstd(inner)
+
+        if calc_rms:
+            return rms
 
         snr = emiscube.data / rms
 
@@ -508,27 +511,45 @@ class ClipCube:
 
         if self.sun:
             mask = self.sun_method(emiscube_uncorr, noisecube_uncorr)
-            mask_hdu = fits.PrimaryHDU(mask.astype(int), cube_pbcorr.header)
-            mask_hdu.writeto(self.savepath + 'mask_sun.fits', overwrite=True)
             mask_full = self.sun_method(cube_uncorr_copy, noisecube_uncorr)
-            mask_full_hdu = fits.PrimaryHDU(mask_full.astype(int), cube_pbcorr.header)
-            mask_full_hdu.writeto(self.savepath + 'mask_sun_full_cube_' + self.galaxy.name + '.fits', overwrite=True)
-            mask_full_hdu.writeto('/home/nikki/Desktop/Masks_for_Toby/' + 'mask_sun_full_cube_' + self.galaxy.name + '.fits', overwrite=True)
+            mask_hdu = fits.PrimaryHDU(mask_full.astype(int), cube_pbcorr.header)
+            if self.tosave:
+                mask_hdu.header.add_comment('Cube was clipped using the Sun+18 masking method', before='BUNIT')
+                mask_hdu.header.pop('BTYPE')
+                mask_hdu.header.pop('BUNIT')
+                mask_hdu.header.pop('DATAMAX')
+                mask_hdu.header.pop('DATAMIN')
+                mask_hdu.header.pop('JTOK')
+                mask_hdu.header.pop('RESTFRQ')
+                mask_hdu.header['CLIP_RMS'] = self.sun_method(emiscube_uncorr, noisecube_uncorr, calc_rms=True)
+                mask_hdu.header.comments['CLIP_RMS'] = 'rms value used for clipping in K km/s'
+                mask_hdu.writeto(self.savepath + 'mask_cube.fits', overwrite=True)
+            #mask_full_hdu.writeto('/home/nikki/Desktop/Masks_for_Toby/' + 'mask_sun_full_cube_' + self.galaxy.name + '.fits', overwrite=True)
         else:
             mask = self.smooth_mask(cube_uncorr_copy)
             mask_hdu = fits.PrimaryHDU(mask.astype(int), cube_pbcorr.header)
-            mask_hdu.writeto(self.savepath + 'mask_dame.fits', overwrite=True)
+            if self.tosave:
+                mask_hdu.header.add_comment('Cube was clipped using the Dame11 masking method', before='BUNIT')
+                mask_hdu.header.pop('BTYPE')
+                mask_hdu.header.pop('BUNIT')
+                mask_hdu.header.pop('DATAMAX')
+                mask_hdu.header.pop('DATAMIN')
+                mask_hdu.header.pop('JTOK')
+                mask_hdu.header.pop('RESTFRQ')
+                mask_hdu.header['CLIP_RMS'] = self.sun_method(emiscube_uncorr, noisecube_uncorr, calc_rms=True)
+                mask_hdu.header.comments['CLIP_RMS'] = 'rms value used for clipping in K km/s'
+                mask_hdu.writeto(self.savepath + 'mask_cube.fits', overwrite=True)
 
         emiscube_pbcorr.data *= mask
         clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr.data, cube_pbcorr.header)
 
-        if self.tosave:
-            clipped_hdu.writeto(self.savepath + 'cube_clipped.fits', overwrite=True)
+        #if self.tosave:
+        #    clipped_hdu.writeto(self.savepath + 'cube_clipped.fits', overwrite=True)
 
         # Do some pre-processing to make the creation of the moments easier
         clipped_hdu, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=clip_also)
 
-        if self.tosave:
-            clipped_hdu.writeto(self.savepath + 'cube_clipped_trimmed.fits', overwrite=True)
+        #if self.tosave:
+        #    clipped_hdu.writeto(self.savepath + 'cube_clipped_trimmed.fits', overwrite=True)
 
         return clipped_hdu, noisecube_hdu

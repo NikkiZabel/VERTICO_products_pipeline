@@ -53,7 +53,7 @@ class CreateImages:
                     image = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                                     tosave=False).peak_temperature()
             else:
-                image = fits.open(path + 'peak_temperature.fits')[0]
+                image = fits.open(path + 'peak_temp.fits')[0]
 
         elif self.refresh:
             if units == 'M_Sun/pc^2':
@@ -73,7 +73,7 @@ class CreateImages:
             else:
                 raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
         else:
-            image = fits.open(path + 'moment0.fits')[0]
+            image = fits.open(path + 'mom0.fits')[0]
 
         f = plt.figure(figsize=self.galaxy.figsize)
 
@@ -136,9 +136,9 @@ class CreateImages:
             raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
 
         # show the beam of the observations
-        fig.add_beam(frame=False)  # automatically imports BMAJ, BMIN, and BPA
+        fig.add_beam(frame=False, linewidth=5)  # automatically imports BMAJ, BMIN, and BPA
         fig.beam.set_edgecolor('k')
-        fig.beam.set_color('k')
+        fig.beam.set_facecolor('None')
         fig.beam.set_borderpad(1)
 
         # show a scalebar
@@ -150,11 +150,11 @@ class CreateImages:
 
         if self.tosave:
             if peak:
-                plt.savefig(self.savepath + 'peak_temperature.pdf', bbox_inches='tight')
+                plt.savefig(self.savepath + 'peak_temp.pdf', bbox_inches='tight')
             elif units == 'K km/s':
-                plt.savefig(self.savepath + 'moment0_K.pdf', bbox_inches='tight')
+                plt.savefig(self.savepath + 'mom0_Kkms-1.pdf', bbox_inches='tight')
             elif units == 'M_Sun/pc^2':
-                plt.savefig(self.savepath + 'moment0_M_Sun.pdf', bbox_inches='tight')
+                plt.savefig(self.savepath + 'mom0_Msun.pdf', bbox_inches='tight')
         return
 
     def moment_1_2(self, moment=1):
@@ -168,7 +168,7 @@ class CreateImages:
                     _, _, image, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                          sun=self.sun, tosave=False).calc_moms()
             else:
-                image = fits.open(self.path + 'moment1.fits')[0]
+                image = fits.open(self.path + 'mom1.fits')[0]
 
         elif moment == 2:
             if self.refresh:
@@ -179,7 +179,7 @@ class CreateImages:
                     _, _, _, image, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                          sun=self.sun, tosave=False).calc_moms()
             else:
-                image = fits.open(self.path + 'moment2.fits')[0]
+                image = fits.open(self.path + 'mom2.fits')[0]
 
         cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                sun=self.sun, tosave=False).readfits()
@@ -253,9 +253,9 @@ class CreateImages:
             cbar.set_label(r'Velocity [km s$^{-1}$]')
 
         # show the beam of the observations
-        fig.add_beam(frame=False)  # automatically imports BMAJ, BMIN, and BPA
+        fig.add_beam(frame=False, linewidth=5)  # automatically imports BMAJ, BMIN, and BPA
         fig.beam.set_edgecolor('k')
-        fig.beam.set_color('k')
+        fig.beam.set_facecolor('None')
         fig.beam.set_borderpad(1)
 
         # show a scalebar
@@ -268,9 +268,9 @@ class CreateImages:
 
         if self.tosave:
             if moment == 2:
-                plt.savefig(self.savepath+'moment2.pdf', bbox_inches='tight',)
+                plt.savefig(self.savepath+'mom2.pdf', bbox_inches='tight',)
             else:
-                plt.savefig(self.savepath+'moment1.pdf', bbox_inches='tight')
+                plt.savefig(self.savepath+'mom1.pdf', bbox_inches='tight')
 
         return
 
@@ -297,7 +297,7 @@ class CreateImages:
             PV = fits.open(self.path + 'PVD.fits')[0]
 
         clipped_cube, _, _, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                               sun=self.sun, tosave=False).calc_moms()
+                                               sun=self.sun, tosave=False, savepath=self.savepath).calc_moms()
 
         # Create a physical position axis using the middle found and the spatial resolution, in arc seconds
         res = clipped_cube.header['CDELT2']
@@ -415,7 +415,7 @@ class CreateImages:
             frequency = temp[:, 3]
 
         clipped_cube, _, _, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                               sun=self.sun, tosave=False).calc_moms()
+                                               sun=self.sun, tosave=False, savepath=self.savepath).calc_moms()
 
         fig, ax = plt.subplots(figsize=(7, 7))
 
@@ -449,9 +449,9 @@ class CreateImages:
 
         if self.tosave:
             if x_axis == 'frequency':
-                plt.savefig(self.savepath + 'spectrum_frequency.pdf', bbox_inches='tight')
+                plt.savefig(self.savepath + 'spectrum_freq.pdf', bbox_inches='tight')
             if x_axis == 'velocity':
-                plt.savefig(self.savepath + 'spectrum_velocity.pdf', bbox_inches='tight')
+                plt.savefig(self.savepath + 'spectrum_vel.pdf', bbox_inches='tight')
             if x_axis == 'vel_offset':
                 plt.savefig(self.savepath + 'spectrum_vel_offset.pdf', bbox_inches='tight')
 
@@ -472,7 +472,7 @@ class CreateImages:
                         self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=False).\
                     radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture)
         else:
-            temp = np.loadtxt(self.savepath + 'radial_profile.csv', delimiter=',')
+            temp = np.loadtxt(self.savepath + 'rad_prof.csv', delimiter=',')
             rad_prof_K = temp[:, 0]
             rad_prof_K_err = temp[:, 1]
             rad_prof_Msun = temp[:, 2]
@@ -514,14 +514,14 @@ class CreateImages:
         if self.tosave:
             if x_units == 'kpc':
                 if y_units == 'K km/s':
-                    plt.savefig(self.savepath + 'radial_profile_kpc_Kkms-1.pdf', bbox_inches='tight')
+                    plt.savefig(self.savepath + 'rad_prof_kpc_Kkms-1.pdf', bbox_inches='tight')
                 else:
-                    plt.savefig(self.savepath + 'radial_profile_kpc_Msun_pc-2.pdf', bbox_inches='tight')
+                    plt.savefig(self.savepath + 'radi_prof_kpc_Msun_pc-2.pdf', bbox_inches='tight')
             if x_units == 'arcsec':
                 if y_units == 'K km/s':
-                    plt.savefig(self.savepath + 'radial_profile_arcsec_Kkms-1.pdf', bbox_inches='tight')
+                    plt.savefig(self.savepath + 'rad_prof_arcsec_Kkms-1.pdf', bbox_inches='tight')
                 else:
-                    plt.savefig(self.savepath + 'radial_profile_arcsec_Msun_pc-2.pdf', bbox_inches='tight')
+                    plt.savefig(self.savepath + 'rad_prof_arcsec_Msun_pc-2.pdf', bbox_inches='tight')
 
     def mom0_noise_maps(self, path=''):
 
@@ -561,7 +561,7 @@ class CreateImages:
         plt.tight_layout()
 
         if self.tosave:
-            plt.savefig(self.savepath + 'moment0_uncertainty.pdf', bbox_inches='tight')
+            plt.savefig(self.savepath + 'mom0_unc.pdf', bbox_inches='tight')
 
         # Image the S/N map
         f = plt.figure(figsize=self.galaxy.figsize)
@@ -588,7 +588,7 @@ class CreateImages:
         plt.tight_layout()
 
         if self.tosave:
-            plt.savefig(self.savepath + 'moment0_SN.pdf', bbox_inches='tight')
+            plt.savefig(self.savepath + 'mom0_SN.pdf', bbox_inches='tight')
 
     def mom1_2_noise_maps(self, path=''):
 
@@ -629,7 +629,7 @@ class CreateImages:
         plt.tight_layout()
 
         if self.tosave:
-            plt.savefig(self.savepath + 'moment1_uncertainty.pdf', bbox_inches='tight')
+            plt.savefig(self.savepath + 'mom1_unc.pdf', bbox_inches='tight')
 
         # Moment 2
         mom2_unc.data = np.log10(mom2_unc.data)
@@ -657,4 +657,4 @@ class CreateImages:
         plt.tight_layout()
 
         if self.tosave:
-            plt.savefig(self.savepath + 'moment2_uncertainty.pdf', bbox_inches='tight')
+            plt.savefig(self.savepath + 'mom2_unc.pdf', bbox_inches='tight')

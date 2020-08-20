@@ -259,17 +259,22 @@ class MomentMaps:
 
     def add_clipping_keywords(self, header):
         if self.sun:
+            header.add_comment('Cube was clipped using the Sun+18 masking method', before='BUNIT')
             header['CLIPL_L'] = self.galaxy.cliplevel_low
-            header.comments['CLIPL_L'] = 'Lower clip level (Sun method)'
+            header.comments['CLIPL_L'] = 'Lower clip SNR (Sun method)'
             header['CLIPL_H'] = self.galaxy.cliplevel_high
-            header.comments['CLIPL_H'] = 'Higher clip level (Sun method)'
+            header.comments['CLIPL_H'] = 'Higher clip SNR (Sun method)'
             header['NCHAN_L'] = self.galaxy.cliplevel_low
             header.comments['NCHAN_L'] = 'Lower number of consec. chans (Sun method)'
             header['NCHAN_H'] = self.galaxy.cliplevel_high
             header.comments['NCHAN_H'] = 'Higher number of consec. chans (Sun method)'
         else:
+            header.add_comment('Cube was clipped using the Dame11 masking method', before='BUNIT')
             header['CLIPL'] = self.galaxy.cliplevel
-            header.comments['CLIPL'] = 'SNR for smooth clip (Dame11)' \
+            header.comments['CLIPL'] = 'SNR used for clip (Dame11)'
+
+        header['CLIP_RMS'] = self.uncertainty_maps(calc_rms=True)
+        header.comments['CLIP_RMS'] = 'rms value used for clipping in K km/s'
 
         return header
 
@@ -299,7 +304,6 @@ class MomentMaps:
             raise AttributeError("Can't deal with these units yet.")
 
         if units == 'M_Sun/pc^2':
-            from matplotlib import pyplot as plt
             #mom0 = mom0 / cube.header['JTOK'] * 91.7 * alpha_co * (cube.header['BMAJ'] * 3600 * cube.header[
             #    'BMIN'] * 3600) ** (-1) / 4
             mom0 *= alpha_co
@@ -325,26 +329,31 @@ class MomentMaps:
         #self.pixel_size_check(header=mom0_hdu.header)
 
         # Change or add any (additional) keywords to the headers
-        if units == 'M_Sun/pc^2': mom0_hdu.header['BTYPE'] = 'Column density'
-        else: mom0_hdu.header['BTYPE'] = 'Integrated intensity'
+        if units == 'M_Sun/pc^2':
+            mom0_hdu.header['BTYPE'] = 'Column density'
+            mom0_hdu.header.comments['BTYPE'] = 'Total molecular gas (H_2 + He)'
+        else:
+            mom0_hdu.header['BTYPE'] = 'Integrated intensity'
+
         mom1_hdu.header['BTYPE'] = 'Velocity'
         mom2_hdu.header['BTYPE'] = 'Linewidth'
         mom0_hdu.header['BUNIT'] = units; mom0_hdu.header.comments['BUNIT'] = ''
         mom1_hdu.header['BUNIT'] = 'km/s'; mom1_hdu.header.comments['BUNIT'] = ''
         mom2_hdu.header['BUNIT'] = 'km/s'; mom2_hdu.header.comments['BUNIT'] = ''
-        mom0_hdu.header['ALPHA_CO'] = alpha_co; mom0_hdu.header.comments['ALPHA_CO'] = 'Assuming a line ratio of 0.7'
+        mom0_hdu.header['ALPHA_CO'] = alpha_co; #mom0_hdu.header.comments['ALPHA_CO'] = 'Assuming a line ratio of 0.7'
         mom1_hdu.header['SYSVEL'] = sysvel; mom1_hdu.header.comments['SYSVEL'] = 'km/s'
+
         self.add_clipping_keywords(mom0_hdu.header)
         self.add_clipping_keywords(mom1_hdu.header)
         self.add_clipping_keywords(mom2_hdu.header)
 
         if self.tosave:
             if units == 'M_Sun/pc^2':
-                mom0_hdu.writeto(self.savepath + 'moment0_M_Sun.fits', overwrite=True)
+                mom0_hdu.writeto(self.savepath + 'mom0_Msun.fits', overwrite=True)
             if units == 'K km/s':
-                mom0_hdu.writeto(self.savepath + 'moment0_K.fits', overwrite=True)
-            mom1_hdu.writeto(self.savepath + 'moment1.fits', overwrite=True)
-            mom2_hdu.writeto(self.savepath + 'moment2.fits', overwrite=True)
+                mom0_hdu.writeto(self.savepath + 'mom0_Kkms-1.fits', overwrite=True)
+            mom1_hdu.writeto(self.savepath + 'mom1.fits', overwrite=True)
+            mom2_hdu.writeto(self.savepath + 'mom2.fits', overwrite=True)
 
         return cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel
 
@@ -455,6 +464,8 @@ class MomentMaps:
         pvd_header['DISTANCE'] = self.galaxy.distance
         pvd_header.comments['DISTANCE'] = 'Mpc'
         pvd_header['ORIGIN'] = clipped_cube.header['ORIGIN']
+        pvd_header['BUNIT'] = 'K km/s'
+        self.add_clipping_keywords(pvd_header)
 
         pvd_hdu = fits.PrimaryHDU(PV, pvd_header)
 
@@ -499,9 +510,17 @@ class MomentMaps:
         spectrum_frequencies = cube_pbcorr.header['RESTFRQ'] * (1 - spectrum_velocities / 299792.458) / 1e9
 
         if self.tosave:
-            np.savetxt(self.savepath + 'spectrum.csv',
-                       np.column_stack((spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies)),
-                       delimiter=',', header='Spectrum (K), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)')
+            clip_rms = self.uncertainty_maps(calc_rms=True)
+            if self.sun:
+                np.savetxt(self.savepath + 'spectrum.csv',
+                           np.column_stack((spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies)),
+                           delimiter=',', header='Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n '
+                            'Spectrum (K), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)')
+            else:
+                np.savetxt(self.savepath + 'spectrum.csv',
+                           np.column_stack((spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies)),
+                           delimiter=',', header='Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n '
+                            'Spectrum (K), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)')
 
         # Estimate the rms in the spectrum
         #emis, noise = self.splitCube(cutout, self.galaxy.start, self.galaxy.stop)
@@ -519,7 +538,7 @@ class MomentMaps:
 
         return spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies # / beamsize
 
-    def radial_profile(self, alpha_co=6.25, table_path=None, check_aperture=False):
+    def radial_profile(self, alpha_co=6.25, table_path=None, check_aperture=False, hires=False):
 
         _, mom0_hdu_Msun, _, _, _ = self.calc_moms(units='M_Sun/pc^2', alpha_co=alpha_co)
         _, mom0_hdu_K, _, _, _ = self.calc_moms(units='K km/s', alpha_co=alpha_co)
@@ -541,6 +560,11 @@ class MomentMaps:
         #rms_Msun = rms_Msun * abs(cube_pbcorr.header['CDELT3']) / 1000 * 91.7 * alpha_co * (cube_pbcorr.header['BMAJ'] * 3600 *
         #        cube_pbcorr.header['BMIN'] * 3600) ** (-1) / 4
 
+        if hires:
+            limit = 0
+        else:
+            limit = 2 * rms_Msun
+
         if self.galaxy.eccentricity:
             e = self.galaxy.eccentricity
         elif self.galaxy.inclination:
@@ -558,15 +582,16 @@ class MomentMaps:
                 inc = [1]
             e = np.sin(np.deg2rad(inc))[0]
 
-        centre = (int(mom0_hdu_K.shape[1]/2), int(mom0_hdu_K.shape[0]/2))
+        centre = (int(mom0_hdu_K.shape[1] / 2), int(mom0_hdu_K.shape[0] / 2))
         hi_inc = False
         rad_prof_K = []
         rad_prof_Msun = []
         radius = []
         area = []
 
-        #b_in = -beam_pix + 0.000000000001
-        b_in = -1 + 0.0000000001
+        b_in = -beam_pix + 0.000000000001
+        if hires:
+            b_in = -1 + 0.0000000001
         b_out = 0
         theta = np.deg2rad(self.galaxy.angle + 90)
 
@@ -578,14 +603,14 @@ class MomentMaps:
             plt.figure()
             plt.imshow(mom0_hdu_K.data)
 
-        #while emission_Msun / area_temp > 2 * rms_Msun:
-        while emission_Msun / area_temp > 0:
+        while emission_Msun / area_temp > limit:
 
-            #b_in += beam_pix
-            #b_out += beam_pix
-
-            b_in += 1
-            b_out += 1
+            if hires:
+                b_in += 1
+                b_out += 1
+            else:
+                b_in += beam_pix
+                b_out += beam_pix
 
             if emission_Msun == 2112:
                 a_in = 0.0000000000001
@@ -630,8 +655,7 @@ class MomentMaps:
             centre = (mom0_K_rot.shape[1]) / 2
             emission_Msun = 2112
 
-            #while emission_Msun > 2 * rms_Msun:
-            while emission_Msun > 0:
+            while emission_Msun > limit:
                 slice1_K = mom0_K_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
                 slice2_K = mom0_K_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
                 emission_K = np.average(np.average(slice1_K) + np.average(slice2_K))
@@ -653,8 +677,10 @@ class MomentMaps:
 
                 area.append(len(slice1_K[slice1_K > 0]) + len(slice2_K[slice2_K > 0]))
 
-                #inner += beam_pix
-                inner += 1
+                if hires:
+                    inner += 1
+                else:
+                    inner += beam_pix
 
         rad_prof_K = rad_prof_K[:-1]
         rad_prof_Msun = rad_prof_Msun[:-1]
@@ -669,46 +695,62 @@ class MomentMaps:
         w = wcs.WCS(mom0_hdu_K.header, naxis=2)
         centre_sky = wcs.utils.pixel_to_skycoord(mom0_hdu_K.shape[0] / 2, mom0_hdu_K.shape[1] / 2, wcs=w)
 
+        clip_rms = self.uncertainty_maps(calc_rms=True)
+
         if hi_inc:
-            csv_header = 'Slices parallel to the minor axis centered around (RA, Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
-                         ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
-                         ', ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
-                        'Radii are equal to one beamsize. \n \n' \
-                         'Surface density (K km/s), RMS error (K km/s), ' \
-                         'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+            if self.sun:
+                csv_header = 'Slices parallel to the minor axis centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                             '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
+                             '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
+                            'Radii are equal to one beamsize.  \n ' \
+                             'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n' \
+                             'Surface density (K km/s), RMS error (K km/s), ' \
+                             'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+            else:
+                csv_header = 'Slices parallel to the minor axis centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                             '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
+                             '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
+                            'Radii are equal to one beamsize. \n' \
+                             'Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n' \
+                             'Surface density (K km/s), RMS error (K km/s), ' \
+                             'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
         else:
-            csv_header = 'Elliptical apertures centered around (RA, Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
-                         ', ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
-                         ', ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
-                        'Radii are defined as the semi-major axes of these apertures. \n \n' \
-                        'Surface density (K km/s), RMS error (K km/s), ' \
-                         'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+            if self.sun:
+                csv_header = 'Elliptical apertures centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                             '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
+                             '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
+                            'Radii are defined as the semi-major axes of these apertures. \n ' \
+                            'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n' \
+                            'Surface density (K km/s), RMS error (K km/s), ' \
+                             'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+            else:
+                csv_header = 'Elliptical apertures centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                             '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
+                             '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
+                            'Radii are defined as the semi-major axes of these apertures. \n' \
+                            'Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n' \
+                            'Surface density (K km/s), RMS error (K km/s), ' \
+                             'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
 
         if self.tosave:
-            np.savetxt(self.savepath + 'radial_profile.csv',
+            np.savetxt(self.savepath + 'rad_prof.csv',
                        np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * error_K, rad_prof_Msun,
                                         np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
                                         delimiter=',', header=csv_header)
 
-        np.savetxt('/home/nikki/Documents/Data/VERTICO/QuenchMechs/radial_profiles/' + 'radial_profile_' + self.galaxy.name + '.csv',
-                   np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * error_K, rad_prof_Msun,
-                                    np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
-                   delimiter=',', header=csv_header)
+        #np.savetxt('/home/nikki/Documents/Data/VERTICO/QuenchMechs/radial_profiles/' + 'radial_profile_' + self.galaxy.name + '.csv',
+        #           np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * error_K, rad_prof_Msun,
+        #                            np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
+        #           delimiter=',', header=csv_header)
 
         return rad_prof_K, rms, rad_prof_Msun, rms_Msun, radii_deg * 3600, radii_kpc
 
-    def uncertainty_maps(self):
+    def uncertainty_maps(self, calc_rms=False):
 
         #rmscube = self.calc_noise_in_cube()
 
-        # Read in moment maps
-        cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = self.calc_moms(units='K km/s')
-
         # Read in masks used to clip
-        if self.sun:
-            mask = fits.open(self.savepath + 'mask_sun.fits')[0]
-        else:
-            mask = fits.open(self.savepath + 'mask_smooth.fits')[0]
+        mask = fits.open(self.savepath + 'mask_cube.fits')[0]
 
         # Map of the number of channels used to calculate the moments
         _, mask_trimmed = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
@@ -727,6 +769,12 @@ class MomentMaps:
                                             savepath=self.savepath,
                                             tosave=self.tosave).innersquare(noisecube.data)
         rms = np.nanstd(inner)
+
+        if calc_rms:
+            return rms
+
+        # Read in moment maps
+        cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel = self.calc_moms(units='K km/s')
 
         # Read in the PB cube and use the middle channel to estimate the noise
         try:
@@ -760,6 +808,11 @@ class MomentMaps:
         mom1_uncertainty = fits.PrimaryHDU(mom1_uncertainty, mom1_hdu.header)
         mom2_uncertainty = fits.PrimaryHDU(mom2_uncertainty, mom2_hdu.header)
 
+        self.add_clipping_keywords(mom0_uncertainty.header)
+        self.add_clipping_keywords(SN_hdu.header)
+        self.add_clipping_keywords(mom1_uncertainty.header)
+        self.add_clipping_keywords(mom2_uncertainty.header)
+
         if self.tosave:
             mom0_uncertainty.writeto(self.savepath + 'mom0_unc.fits', overwrite=True)
             SN_hdu.writeto(self.savepath + 'mom0_SN.fits', overwrite=True)
@@ -780,6 +833,6 @@ class MomentMaps:
         self.add_clipping_keywords(peak_temp_hdu.header)
 
         if self.tosave:
-            peak_temp_hdu.writeto(self.savepath + 'peak_temperature.fits', overwrite=True)
+            peak_temp_hdu.writeto(self.savepath + 'peak_temp.fits', overwrite=True)
 
         return peak_temp_hdu

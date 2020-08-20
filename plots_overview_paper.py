@@ -206,18 +206,18 @@ def image_mom1_2(hdu, galaxy, sysvel, moment=1, show_beam=True, show_scalebar=Tr
 
     if sun:
         try:
-            vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/Products/' + galaxy + '/Sun_method/' + galaxy +
-                                      '_7m+tp_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=1)[:, 1]
+            vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/Products/' + galaxy + '/sun18_method/' + galaxy +
+                                      '_7m+tp_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
         except:
-            vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/Products/' + galaxy + '/Sun_method/' + galaxy +
-                                      '_7m_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=1)[:, 1]
+            vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/Products/' + galaxy + '/sun18_method/' + galaxy +
+                                      '_7m_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
     else:
         try:
-            vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/Products/' + galaxy + '/Smooth_method/' + galaxy +
-                                      '_7m+tp_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=1)[:, 1]
+            vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/Products/' + galaxy + '/dame11_method/' + galaxy +
+                                      '_7m+tp_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
         except:
-            vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/Products/' + galaxy + '/Smooth_method/' + galaxy +
-                                      '_7m_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=1)[:, 1]
+            vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/Products/' + galaxy + '/dame11_method/' + galaxy +
+                                      '_7m_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
 
     sysvel = (sysvel + 5) // 10 * 10
 
@@ -403,9 +403,9 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
             'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808', 'NGC4396',
             'NGC4567', 'NGC4772', 'NGC4580', 'NGC4450', 'NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
             'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689',
-            'NGC4698']
+            'NGC4698', 'NGC4561']
 
-#galaxies = ['NGC4064']
+#galaxies = ['NGC4561']
 
 for i in range(len(galaxies)):
 
