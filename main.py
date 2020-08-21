@@ -11,7 +11,7 @@ sun = True
 tosave = True
 pbcor = True
 resolution = 0
-version = '1-0'
+version = '1_0'
 
 galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
             'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
@@ -42,44 +42,44 @@ for i in range(len(galaxies)):
     if resolution == 15:
         #readpath = path + '/ReducedData/15_arcsec/' + galaxy + '/'
         readpath = path + '/ReducedData/15_arcsec/'
-        if not os.path.exists(path + 'products-v' + version + '/15_arcsec/' + galaxy):
-            os.mkdir(path + 'products-v' + version + '/15_arcsec/' + galaxy)
+        if not os.path.exists(path + 'products_v' + version + '/15_arcsec/' + galaxy):
+            os.mkdir(path + 'products_v' + version + '/15_arcsec/' + galaxy)
     elif resolution == 9:
         #readpath = path + '/ReducedData/9_arcsec/' + galaxy + '/'
         readpath = path + '/ReducedData/9_arcsec/'
-        if not os.path.exists('products-v' + version + '9_arcsec/' + galaxy):
-            os.mkdir('products-v' + version + '9_arcsec/' + galaxy)
+        if not os.path.exists('products_v' + version + '9_arcsec/' + galaxy):
+            os.mkdir('products_v' + version + '9_arcsec/' + galaxy)
     else:
         readpath = path + '/ReducedData/' + galaxy + '/'
-        if not os.path.exists(path + 'products-v' + version + '/native/' + galaxy):
-            os.mkdir(path + 'products-v' + version + '/native/' + galaxy)
+        if not os.path.exists(path + 'products_v' + version + '/native/' + galaxy):
+            os.mkdir(path + 'products_v' + version + '/native/' + galaxy)
 
     if sun:
         if resolution == 15:
-            if not os.path.exists(path + 'products-v' + version + '15_arcsec/' + galaxy + '/sun18_method/'):
-                os.mkdir(path + 'products-v' + version + '/15_arcsec/' + galaxy + '/sun18_method/')
-            savepath_temp = path + 'products-v' + version + '/15_arcsec/' + galaxy + '/sun18_method/'
+            if not os.path.exists(path + 'products_v' + version + '15_arcsec/' + galaxy + '/sun18_method/'):
+                os.mkdir(path + 'products_v' + version + '/15_arcsec/' + galaxy + '/sun18_method/')
+            savepath_temp = path + 'products_v' + version + '/15_arcsec/' + galaxy + '/sun18_method/'
         elif resolution == 9:
-            if not os.path.exists(path + 'products-v' + version + '/9_arcsec/' + galaxy + '/sun18_method/'):
-                os.mkdir(path + 'products-v' + version + '9_arcsec/' + galaxy + '/sun18_method/')
-            savepath_temp = path + 'products-v' + version + '9_arcsec/' + galaxy + '/sun18_method/'
+            if not os.path.exists(path + 'products_v' + version + '/9_arcsec/' + galaxy + '/sun18_method/'):
+                os.mkdir(path + 'products_v' + version + '9_arcsec/' + galaxy + '/sun18_method/')
+            savepath_temp = path + 'products_v' + version + '9_arcsec/' + galaxy + '/sun18_method/'
         else:
-            if not os.path.exists(path + 'products-v' + version + '/native/' + galaxy + '/sun18_method/'):
-                os.mkdir(path + 'products-v' + version + '/native/' + galaxy + '/sun18_method/')
-            savepath_temp = path + 'products-v' + version + '/native/' + galaxy + '/sun18_method/'
+            if not os.path.exists(path + 'products_v' + version + '/native/' + galaxy + '/sun18_method/'):
+                os.mkdir(path + 'products_v' + version + '/native/' + galaxy + '/sun18_method/')
+            savepath_temp = path + 'products_v' + version + '/native/' + galaxy + '/sun18_method/'
     else:
         if resolution == 15:
-            if not os.path.exists(path + 'products-v' + version + '/15_arcsec/' + galaxy + '/dame11_method/'):
-                os.mkdir(path + 'products-v' + version + '/15_arcsec/' + galaxy + '/dame11_method/')
-            savepath_temp = path + 'products-v' + version + '15_arcsec/' + galaxy + '/dame11_method/'
+            if not os.path.exists(path + 'products_v' + version + '/15_arcsec/' + galaxy + '/dame11_method/'):
+                os.mkdir(path + 'products_v' + version + '/15_arcsec/' + galaxy + '/dame11_method/')
+            savepath_temp = path + 'products_v' + version + '15_arcsec/' + galaxy + '/dame11_method/'
         elif resolution == 9:
-            if not os.path.exists(path + 'products-v' + version + '/9_arcsec/' + galaxy + '/dame11_method/'):
-                os.mkdir(path + 'products-v' + version + '/9_arcsec/' + galaxy + '/dame11_method/')
-            savepath_temp = path + 'products-v' + version + '/9_arcsec/' + galaxy + '/dame11_method/'
+            if not os.path.exists(path + 'products_v' + version + '/9_arcsec/' + galaxy + '/dame11_method/'):
+                os.mkdir(path + 'products_v' + version + '/9_arcsec/' + galaxy + '/dame11_method/')
+            savepath_temp = path + 'products_v' + version + '/9_arcsec/' + galaxy + '/dame11_method/'
         else:
-            if not os.path.exists(path + 'products-v' + version + '/native/' + galaxy + '/dame11_method/'):
-                os.mkdir(path + 'products-v' + version + '/native/' + galaxy + '/dame11_method/')
-            savepath_temp = path + 'products-v' + version + '/native/' + galaxy + '/dame11_method/'
+            if not os.path.exists(path + 'products_v' + version + '/native/' + galaxy + '/dame11_method/'):
+                os.mkdir(path + 'products_v' + version + '/native/' + galaxy + '/dame11_method/')
+            savepath_temp = path + 'products_v' + version + '/native/' + galaxy + '/dame11_method/'
 
     if galaxy == 'NGC4606' or galaxy == 'NGC4351':
         import matplotlib
