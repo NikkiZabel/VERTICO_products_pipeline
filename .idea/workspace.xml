@@ -19,9 +19,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="products-v1-0 has become products_v1_0">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Changed directory structure and some comments on the headers">
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -63,13 +61,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00023" summary="Added velocity offset option to plot the spectrum.">
-      <created>1582282916815</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1582282916815</updated>
     </task>
     <task id="LOCAL-00024" summary="Fixed bug in radial profile radius calculation.">
       <created>1582285874151</created>
@@ -407,7 +398,14 @@
       <option name="project" value="LOCAL" />
       <updated>1597998871682</updated>
     </task>
-    <option name="localTasksCounter" value="72" />
+    <task id="LOCAL-00072" summary="Changed directory structure and some comments on the headers">
+      <created>1598196013396</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1598196013396</updated>
+    </task>
+    <option name="localTasksCounter" value="73" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -423,7 +421,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed centring" />
     <MESSAGE value="Corrected error maps" />
     <MESSAGE value="Fixed bug in units uncertainty maps" />
     <MESSAGE value="Fixed bug in number of contour levels moment 1 and 2" />
@@ -448,7 +445,8 @@
     <MESSAGE value="Peak temperature mosaic" />
     <MESSAGE value="Changed directory structure, headers, filenames, etc." />
     <MESSAGE value="products-v1-0 has become products_v1_0" />
-    <option name="LAST_COMMIT_MESSAGE" value="products-v1-0 has become products_v1_0" />
+    <MESSAGE value="Changed directory structure and some comments on the headers" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed directory structure and some comments on the headers" />
   </component>
   <component name="WindowStateProjectService">
     <state x="325" y="1125" width="1040" height="882" key="FileChooserDialogImpl" timestamp="1597245154498">
@@ -461,10 +459,10 @@
     </state>
     <state x="621" y="1156" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1592905880666" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1593424411298" />
-    <state x="588" y="289" width="829" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1597998872988">
+    <state x="588" y="289" width="829" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1598196014609">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="540" y="1080" width="829" height="1080" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1597159309723" />
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1597998872988" />
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1598196014609" />
   </component>
 </project>
