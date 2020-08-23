@@ -41,16 +41,16 @@ for i in range(len(galaxies)):
 
     if resolution == 15:
         #readpath = path + '/ReducedData/15_arcsec/' + galaxy + '/'
-        readpath = path + '/ReducedData/15_arcsec/'
+        readpath = path + '/ReducedData/v1/15_arcsec/'
         if not os.path.exists(path + 'products_v' + version + '/15_arcsec/' + galaxy):
             os.mkdir(path + 'products_v' + version + '/15_arcsec/' + galaxy)
     elif resolution == 9:
         #readpath = path + '/ReducedData/9_arcsec/' + galaxy + '/'
-        readpath = path + '/ReducedData/9_arcsec/'
+        readpath = path + '/ReducedData/v1/9_arcsec/'
         if not os.path.exists('products_v' + version + '9_arcsec/' + galaxy):
             os.mkdir('products_v' + version + '9_arcsec/' + galaxy)
     else:
-        readpath = path + '/ReducedData/' + galaxy + '/'
+        readpath = path + '/ReducedData/v1/' + galaxy + '/'
         if not os.path.exists(path + 'products_v' + version + '/native/' + galaxy):
             os.mkdir(path + 'products_v' + version + '/native/' + galaxy)
 
@@ -58,28 +58,28 @@ for i in range(len(galaxies)):
         if resolution == 15:
             if not os.path.exists(path + 'products_v' + version + '15_arcsec/' + galaxy + '/sun18_method/'):
                 os.mkdir(path + 'products_v' + version + '/15_arcsec/' + galaxy + '/sun18_method/')
-            savepath_temp = path + 'products_v' + version + '/15_arcsec/' + galaxy + '/sun18_method/'
+            savepath_temp = path + 'products_v' + version + '/15_arcsec/sun18_method/' + galaxy + '/'
         elif resolution == 9:
             if not os.path.exists(path + 'products_v' + version + '/9_arcsec/' + galaxy + '/sun18_method/'):
                 os.mkdir(path + 'products_v' + version + '9_arcsec/' + galaxy + '/sun18_method/')
-            savepath_temp = path + 'products_v' + version + '9_arcsec/' + galaxy + '/sun18_method/'
+            savepath_temp = path + 'products_v' + version + '9_arcsec/sun18_method/' + galaxy + '/'
         else:
             if not os.path.exists(path + 'products_v' + version + '/native/' + galaxy + '/sun18_method/'):
                 os.mkdir(path + 'products_v' + version + '/native/' + galaxy + '/sun18_method/')
-            savepath_temp = path + 'products_v' + version + '/native/' + galaxy + '/sun18_method/'
+            savepath_temp = path + 'products_v' + version + '/native/sun18_method/' + galaxy + '/'
     else:
         if resolution == 15:
             if not os.path.exists(path + 'products_v' + version + '/15_arcsec/' + galaxy + '/dame11_method/'):
                 os.mkdir(path + 'products_v' + version + '/15_arcsec/' + galaxy + '/dame11_method/')
-            savepath_temp = path + 'products_v' + version + '15_arcsec/' + galaxy + '/dame11_method/'
+            savepath_temp = path + 'products_v' + version + '15_arcsec/dame11_method/' + galaxy + '/'
         elif resolution == 9:
             if not os.path.exists(path + 'products_v' + version + '/9_arcsec/' + galaxy + '/dame11_method/'):
                 os.mkdir(path + 'products_v' + version + '/9_arcsec/' + galaxy + '/dame11_method/')
-            savepath_temp = path + 'products_v' + version + '/9_arcsec/' + galaxy + '/dame11_method/'
+            savepath_temp = path + 'products_v' + version + '/9_arcsec/dame11_method/' + galaxy + '/'
         else:
             if not os.path.exists(path + 'products_v' + version + '/native/' + galaxy + '/dame11_method/'):
                 os.mkdir(path + 'products_v' + version + '/native/' + galaxy + '/dame11_method/')
-            savepath_temp = path + 'products_v' + version + '/native/' + galaxy + '/dame11_method/'
+            savepath_temp = path + 'products_v' + version + '/native/dame11_method/' + galaxy + '/'
 
     if galaxy == 'NGC4606' or galaxy == 'NGC4351':
         import matplotlib

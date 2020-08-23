@@ -261,20 +261,20 @@ class MomentMaps:
         if self.sun:
             header.add_comment('Cube was clipped using the Sun+18 masking method', before='BUNIT')
             header['CLIPL_L'] = self.galaxy.cliplevel_low
-            header.comments['CLIPL_L'] = 'Lower clip SNR (Sun method)'
+            header.comments['CLIPL_L'] = 'S/N threshold specified for the "wing mask"'
             header['CLIPL_H'] = self.galaxy.cliplevel_high
-            header.comments['CLIPL_H'] = 'Higher clip SNR (Sun method)'
+            header.comments['CLIPL_H'] = 'S/N threshold specified for the "core mask"'
             header['NCHAN_L'] = self.galaxy.cliplevel_low
-            header.comments['NCHAN_L'] = 'Lower number of consec. chans (Sun method)'
+            header.comments['NCHAN_L'] = '# of consecutive channels specified for the "core mask"'
             header['NCHAN_H'] = self.galaxy.cliplevel_high
-            header.comments['NCHAN_H'] = 'Higher number of consec. chans (Sun method)'
+            header.comments['NCHAN_H'] = '# of consecutive channels specified for the "wing mask"'
         else:
             header.add_comment('Cube was clipped using the Dame11 masking method', before='BUNIT')
             header['CLIPL'] = self.galaxy.cliplevel
             header.comments['CLIPL'] = 'SNR used for clip (Dame11)'
 
         header['CLIP_RMS'] = self.uncertainty_maps(calc_rms=True)
-        header.comments['CLIP_RMS'] = 'rms value used for clipping in K km/s'
+        header.comments['CLIP_RMS'] = 'rms noise level used in masking (K km/s)'
 
         return header
 
