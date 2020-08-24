@@ -175,7 +175,7 @@ for i in range(len(galaxies)):
 
 
     # Moment maps
-    '''
+    #'''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).moment_zero(units='K km/s')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -186,7 +186,7 @@ for i in range(len(galaxies)):
                  sun=sun, tosave=tosave).moment_1_2()
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).moment_1_2(moment=2)
-    '''
+    #'''
     # Uncertainty maps
 
     '''

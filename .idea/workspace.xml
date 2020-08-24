@@ -19,10 +19,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Automated finding channels with emission and estimating the noise.">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Updated some figure parameters">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,13 +62,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00026" summary="Put all the different plots in the main">
-      <created>1582301148361</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1582301148361</updated>
     </task>
     <task id="LOCAL-00027" summary="Some tweaking of the PVD">
       <created>1582539979304</created>
@@ -407,7 +399,14 @@
       <option name="project" value="LOCAL" />
       <updated>1598263033788</updated>
     </task>
-    <option name="localTasksCounter" value="75" />
+    <task id="LOCAL-00075" summary="Updated some figure parameters">
+      <created>1598265105412</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1598265105412</updated>
+    </task>
+    <option name="localTasksCounter" value="76" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -423,7 +422,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed bug in number of contour levels moment 1 and 2" />
     <MESSAGE value="Test for PB information in main file, save cube before and after trimming." />
     <MESSAGE value="Work around for galaxies that have no PB information (set PB map to all ones)" />
     <MESSAGE value="Bug in the moment 0 map" />
@@ -448,7 +446,8 @@
     <MESSAGE value="Changed directory structure and some comments on the headers" />
     <MESSAGE value="Small change in directory structure" />
     <MESSAGE value="Automated finding channels with emission and estimating the noise." />
-    <option name="LAST_COMMIT_MESSAGE" value="Automated finding channels with emission and estimating the noise." />
+    <MESSAGE value="Updated some figure parameters" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated some figure parameters" />
   </component>
   <component name="WindowStateProjectService">
     <state x="325" y="1125" width="1040" height="882" key="FileChooserDialogImpl" timestamp="1597245154498">
@@ -461,11 +460,11 @@
     </state>
     <state x="621" y="1156" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1592905880666" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1593424411298" />
-    <state x="588" y="289" width="829" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1598263034825">
+    <state x="588" y="289" width="829" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1598265111318">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="540" y="1080" width="829" height="1080" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1597159309723" />
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1598263034825" />
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1598265111318" />
     <state x="656" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1598261749214">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
