@@ -533,6 +533,16 @@ class ClipCube:
             start = mask_idx[0]
             stop = mask_idx[-1]
 
+            if self.galaxy.name == 'NGC4533':
+                start = 43
+                stop = 55
+            elif self.galaxy.name == 'NGC4694':
+                start = 27
+                stop = 41
+            elif self.galaxy.name == 'NGC4606':
+                start = 42
+                stop = 58
+
             if get_chans:
                 return start, stop
 
