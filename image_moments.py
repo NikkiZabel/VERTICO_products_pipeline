@@ -299,6 +299,7 @@ class CreateImages:
         clipped_cube, _, _, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                sun=self.sun, tosave=False, savepath=self.savepath).calc_moms()
 
+
         # Create a physical position axis using the middle found and the spatial resolution, in arc seconds
         res = clipped_cube.header['CDELT2']
         vres = clipped_cube.header['CDELT3'] / 1000  # velocity resolution

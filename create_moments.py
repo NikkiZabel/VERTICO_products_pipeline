@@ -18,6 +18,10 @@ class MomentMaps:
         self.savepath = savepath or './'
         self.sun = sun
         self.tosave = tosave
+        self.galaxy.start = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                    savepath=self.savepath, tosave=self.tosave).do_clip(get_chans=True)[0]
+        self.galaxy.stop = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                    savepath=self.savepath, tosave=self.tosave).do_clip(get_chans=True)[1]
 
     def pixel_size_check(self, header, key="CDELT1", expected_pix_size=2, raise_exception=True):
         # check the pixel size is what's expected modulo some floating point error
@@ -259,17 +263,23 @@ class MomentMaps:
 
     def add_clipping_keywords(self, header):
         if self.sun:
-            header.add_comment('Cube was clipped using the Sun+18 masking method', before='BUNIT')
+            try:
+                header.add_comment('Cube was clipped using the Sun+18 masking method', before='BUNIT')
+            except:
+                header.add_comment('Cube was clipped using the Sun+18 masking method', after='NAXIS2')
             header['CLIPL_L'] = self.galaxy.cliplevel_low
             header.comments['CLIPL_L'] = 'S/N threshold specified for the "wing mask"'
             header['CLIPL_H'] = self.galaxy.cliplevel_high
             header.comments['CLIPL_H'] = 'S/N threshold specified for the "core mask"'
-            header['NCHAN_L'] = self.galaxy.cliplevel_low
+            header['NCHAN_L'] = self.galaxy.nchan_low
             header.comments['NCHAN_L'] = '# of consecutive channels specified for the "core mask"'
-            header['NCHAN_H'] = self.galaxy.cliplevel_high
+            header['NCHAN_H'] = self.galaxy.nchan_high
             header.comments['NCHAN_H'] = '# of consecutive channels specified for the "wing mask"'
         else:
-            header.add_comment('Cube was clipped using the Dame11 masking method', before='BUNIT')
+            try:
+                header.add_comment('Cube was clipped using the Dame11 masking method', before='BUNIT')
+            except:
+                header.add_comment('Cube was clipped using the Dame11 masking method', after='NAXIS2')
             header['CLIPL'] = self.galaxy.cliplevel
             header.comments['CLIPL'] = 'SNR used for clip (Dame11)'
 
@@ -488,6 +498,7 @@ class MomentMaps:
                         tosave=self.tosave).readfits()
 
         clipped_cube, _, _, _, sysvel = self.calc_moms()
+
         #cube_pbcorr = clipped_cube
 
         # Calculate the beam size, so we can divide by this to get rid of the beam^-1 in the units.
@@ -531,9 +542,6 @@ class MomentMaps:
         beamsize = np.sum(psf)
         spectrum /= beamsize
 
-        print(self.galaxy.name)
-        print(np.log10(abs(3.93e-17 * 16.5 ** 2 * 2e20 * (1.3 / 2.6) ** 2 / 0.7 * np.trapz(np.flip(spectrum), np.flip(
-            spectrum_velocities)) / cube_pbcorr.header['JTOK'])))
         #print(np.trapz(np.flip(spectrum), np.flip(spectrum_velocities)) / cube_pbcorr.header['JTOK'])
 
         return spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies # / beamsize

@@ -171,8 +171,9 @@ for i in range(len(galaxies)):
     #x = np.arange(0, len(spec), 1)
     #plt.plot(x, std * np.ones(len(x)))
 
+
     # Moment maps
-    #'''
+    '''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).moment_zero(units='K km/s')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -183,7 +184,7 @@ for i in range(len(galaxies)):
                  sun=sun, tosave=tosave).moment_1_2()
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).moment_1_2(moment=2)
-    #'''
+    '''
     # Uncertainty maps
 
     '''
@@ -218,7 +219,7 @@ for i in range(len(galaxies)):
     '''
 
     # Radial profiles
-    '''
+    #'''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
                                     alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
@@ -235,4 +236,4 @@ for i in range(len(galaxies)):
                 sun=sun, tosave=tosave).radial_profile(y_units='K km/s', x_units='arcsec',
                                    alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
                                                                             check_aperture=False)
-    '''
+    #'''

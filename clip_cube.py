@@ -289,8 +289,11 @@ class ClipCube:
         :param cube (HDU file): input HDU file containing the spectral cube and its header
         :return: two HDU files containing the cube channels with emission and the line-free channels, respectively
         """
-        emiscube = cube.data[self.galaxy.start:self.galaxy.stop, :, :]
-        noisecube = np.concatenate((cube.data[:self.galaxy.start, :, :], cube.data[self.galaxy.stop:, :, :]), axis=0)
+
+        start, stop = self.do_clip(get_chans=True)
+
+        emiscube = cube.data[start:stop, :, :]
+        noisecube = np.concatenate((cube.data[:start, :, :], cube.data[stop:, :, :]), axis=0)
 
         emiscube_hdu = fits.PrimaryHDU(emiscube, cube.header)
         emiscube_hdu.header['NAXIS3'] = emiscube.shape[0]
@@ -493,7 +496,7 @@ class ClipCube:
 
         return mask
 
-    def do_clip(self, clip_also=None):
+    def do_clip(self, clip_also=None, get_chans=False):
         """
         Clip the array, either according to the Sun method (if self.sun == True, which is default) or the smooth
         clipping method from Dame.
@@ -505,14 +508,48 @@ class ClipCube:
         cube_pbcorr, cube_uncorr = self.readfits()
         cube_uncorr_copy = cube_uncorr.copy()
 
-        # get part of the cube that has emission from the PB corrected datacube
-        emiscube_pbcorr, noisecube_pbcorr = self.split_cube(cube_pbcorr)
-        emiscube_uncorr, noisecube_uncorr = self.split_cube(cube_uncorr_copy)
-
         if self.sun:
-            mask = self.sun_method(emiscube_uncorr, noisecube_uncorr)
-            mask_full = self.sun_method(cube_uncorr_copy, noisecube_uncorr)
+
+            # Get a rough estimate of the noise in order to do the clipping
+            noisecube_temp = np.concatenate((cube_uncorr_copy.data[:10, :, :], cube_uncorr_copy.data[-10:, :, :]),
+                                            axis=0)
+            noisecube_temp_hdu = fits.PrimaryHDU(noisecube_temp, cube_uncorr_copy.header)
+
+            # Create an initial mask and identify first and last channel containing emission
+            mask_full = self.sun_method(cube_uncorr_copy, noisecube_temp_hdu)
+            mask_idx = np.where(mask_full == 1)[0]
+            start = mask_idx[0]
+            stop = mask_idx[-1]
+
+            # Create an updated noise cube
+            noisecube_uncorr = np.concatenate((cube_uncorr_copy.data[:start, :, :],
+                                               cube_uncorr_copy.data[stop:, :, :]), axis=0)
+            noisecube_uncorr_hdu = fits.PrimaryHDU(noisecube_uncorr, cube_uncorr_copy.header)
+
+            # Make a more accurate mask based on the new noise cube
+            mask_full = self.sun_method(cube_uncorr_copy, noisecube_uncorr_hdu)
             mask_hdu = fits.PrimaryHDU(mask_full.astype(int), cube_pbcorr.header)
+            mask_idx = np.where(mask_full == 1)[0]
+            start = mask_idx[0]
+            stop = mask_idx[-1]
+
+            if get_chans:
+                return start, stop
+
+            # Spit the cube in an emission and noise part
+            emiscube_pbcorr = cube_pbcorr.data[start:stop, :, :]
+            emiscube_uncorr = cube_uncorr.data[start:stop, :, :]
+
+            noisecube_pbcorr = np.concatenate((cube_pbcorr.data[:start, :, :],
+                                               cube_pbcorr.data[stop:, :, :]), axis=0)
+            noisecube_uncorr = np.concatenate((cube_uncorr_copy.data[:start, :, :],
+                                               cube_uncorr_copy.data[stop:, :, :]), axis=0)
+
+            emiscube_uncorr_hdu = fits.PrimaryHDU(emiscube_uncorr, cube_uncorr_copy.header)
+            noisecube_uncorr_hdu = fits.PrimaryHDU(noisecube_uncorr, cube_uncorr_copy.header)
+
+            mask = self.sun_method(emiscube_uncorr_hdu, noisecube_uncorr_hdu)
+
             if self.tosave:
                 mask_hdu.header.add_comment('Cube was clipped using the Sun+18 masking method', before='BUNIT')
                 mask_hdu.header.pop('BTYPE')
@@ -521,12 +558,17 @@ class ClipCube:
                 mask_hdu.header.pop('DATAMIN')
                 mask_hdu.header.pop('JTOK')
                 mask_hdu.header.pop('RESTFRQ')
-                mask_hdu.header['CLIP_RMS'] = self.sun_method(emiscube_uncorr, noisecube_uncorr, calc_rms=True)
+                mask_hdu.header['CLIP_RMS'] = self.sun_method(emiscube_uncorr_hdu, noisecube_uncorr_hdu, calc_rms=True)
                 mask_hdu.header.comments['CLIP_RMS'] = 'rms value used for clipping in K km/s'
                 mask_hdu.writeto(self.savepath + 'mask_cube.fits', overwrite=True)
-            #mask_full_hdu.writeto('/home/nikki/Desktop/Masks_for_Toby/' + 'mask_sun_full_cube_' + self.galaxy.name + '.fits', overwrite=True)
+
         else:
             mask = self.smooth_mask(cube_uncorr_copy)
+
+            mask_idx = np.where(mask == 1)[0]
+            self.galaxy.start = mask_idx[0]
+            self.galaxy.stop = mask_idx[-1]
+
             mask_hdu = fits.PrimaryHDU(mask.astype(int), cube_pbcorr.header)
             if self.tosave:
                 mask_hdu.header.add_comment('Cube was clipped using the Dame11 masking method', before='BUNIT')
@@ -540,8 +582,8 @@ class ClipCube:
                 mask_hdu.header.comments['CLIP_RMS'] = 'rms value used for clipping in K km/s'
                 mask_hdu.writeto(self.savepath + 'mask_cube.fits', overwrite=True)
 
-        emiscube_pbcorr.data *= mask
-        clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr.data, cube_pbcorr.header)
+        emiscube_pbcorr[mask == 0] = 0
+        clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr, cube_pbcorr.header)
 
         #if self.tosave:
         #    clipped_hdu.writeto(self.savepath + 'cube_clipped.fits', overwrite=True)
