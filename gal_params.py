@@ -23,8 +23,8 @@ def parameters(galaxy):
         figsize = (7, 10)
 
     if galaxy == 'NGC4694':
-        vrange = 50
-        vrange_2 = 35
+        vrange = 200
+        vrange_2 = 200
         cliplevel = 1.5
         stokes = False
         sysvel_offset = 0
@@ -551,8 +551,8 @@ def parameters(galaxy):
         figsize = (8, 10)
 
     if galaxy == 'NGC4606':
-        vrange = 80
-        vrange_2 = 40
+        vrange = 200
+        vrange_2 = 200
         cliplevel = 3
         stokes = False
         sysvel_offset = 0
@@ -573,8 +573,8 @@ def parameters(galaxy):
         figsize = (10, 7.5)
 
     if galaxy == 'NGC4533':
-        vrange = 80
-        vrange_2 = 30
+        vrange = 300
+        vrange_2 = 400
         cliplevel = 3
         stokes = False
         sysvel_offset = 0
