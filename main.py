@@ -10,7 +10,7 @@ overwrite = True
 sun = True
 tosave = True
 pbcor = True
-resolution = 0
+resolution = 9
 version = '1_0'
 
 galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
@@ -31,7 +31,7 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
 #galaxies = ['NGC4064', 'NGC4222', 'NGC4294', 'NGC4330', 'NGC4388', 'NGC4394', 'NGC4402', 'NGC4405', 'NGC4419',
 #            'NGC4522', 'NGC4533', 'NGC4567', 'NGC4606', 'NGC4607', 'NGC4772']  # These are the 7m only detections
 
-galaxies = ['NGC4533']
+galaxies = ['IC3392']
 
 for i in range(len(galaxies)):
 
@@ -42,21 +42,21 @@ for i in range(len(galaxies)):
     path = '/home/nikki/Documents/Data/VERTICO/'
 
     if resolution == 15:
-        readpath = path + '/ReducedData/v1/15_arcsec/'
+        readpath = path + 'ReducedData/v1/15arcsec/' + galaxy + '/'
     elif resolution == 9:
-        readpath = path + '/ReducedData/v1/9_arcsec/'
+        readpath = path + 'ReducedData/v1/9arcsec/' + galaxy + '/'
     else:
-        readpath = path + '/ReducedData/v1/' + galaxy + '/'
+        readpath = path + 'ReducedData/v1/native/' + galaxy + '/'
 
     if sun:
         if resolution == 15:
-            if not os.path.exists(path + 'products_v' + version + '15_arcsec/' + galaxy + '/sun18_method/'):
+            if not os.path.exists(path + 'products_v' + version + '/15_arcsec/' + galaxy + '/sun18_method/'):
                 os.mkdir(path + 'products_v' + version + '/15_arcsec/sun18_method/' + galaxy + '/')
             savepath_temp = path + 'products_v' + version + '/15_arcsec/sun18_method/' + galaxy + '/'
         elif resolution == 9:
             if not os.path.exists(path + 'products_v' + version + '/9_arcsec/sun18_method/' + galaxy + '/'):
-                os.mkdir(path + 'products_v' + version + '9_arcsec/sun18_method/' + galaxy + '/')
-            savepath_temp = path + 'products_v' + version + '9_arcsec/sun18_method/' + galaxy + '/'
+                os.mkdir(path + 'products_v' + version + '/9_arcsec/sun18_method/' + galaxy + '/')
+            savepath_temp = path + 'products_v' + version + '/9_arcsec/sun18_method/' + galaxy + '/'
         else:
             if not os.path.exists(path + 'products_v' + version + '/native/sun18_method/' + galaxy + '/'):
                 os.mkdir(path + 'products_v' + version + '/native/sun18_method/' + galaxy + '/')
@@ -65,7 +65,7 @@ for i in range(len(galaxies)):
         if resolution == 15:
             if not os.path.exists(path + 'products_v' + version + '/15_arcsec/dame11_method/' + galaxy + '/'):
                 os.mkdir(path + 'products_v' + version + '/15_arcsec/dame11_method/' + galaxy + '/')
-            savepath_temp = path + 'products_v' + version + '15_arcsec/dame11_method/' + galaxy + '/'
+            savepath_temp = path + 'products_v' + version + '/15_arcsec/dame11_method/' + galaxy + '/'
         elif resolution == 9:
             if not os.path.exists(path + 'products_v' + version + '/9_arcsec/dame11_method/' + galaxy + '/'):
                 os.mkdir(path + 'products_v' + version + '/9_arcsec/dame11_method/' + galaxy + '/')
@@ -81,51 +81,43 @@ for i in range(len(galaxies)):
 
     TP = True
     if resolution == 15:
-        file_pbcorr = readpath + galaxy + '_7m+tp_co21_pbcorr_round_k_15arcsec_gauss_temp_rc.fits'
-        file_uncorr = readpath + galaxy + '_7m+tp_co21_flat_round_k_15arcsec_gauss_temp_rc.fits'
         if sun:
             savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_15_arcsec_sun18_'
         else:
             savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_15_arcsec_dame11_'
     elif resolution == 9:
-        file_pbcorr = readpath + galaxy + '_7m+tp_co21_pbcorr_round_k_9arcsec_gauss_temp_rc.fits'
-        file_uncorr = readpath + galaxy + '_7m+tp_co21_flat_round_k_9arcsec_gauss_temp_rc.fits'
         if sun:
             savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_9_arcsec_sun18_'
         else:
             savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_9_arcsec_dame11_'
     else:
-        file_pbcorr = readpath + galaxy + '_7m+tp_co21_pbcorr_round_k.fits'
-        file_uncorr = readpath + galaxy + '_7m+tp_co21_flat_round_k.fits'
         if sun:
             savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_sun18_'
         else:
             savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_dame11_'
     try:
+        file_pbcorr = readpath + galaxy + '_7m+tp_co21_pbcorr_round_k.fits'
+        file_uncorr = readpath + galaxy + '_7m+tp_co21_flat_round_k.fits'
         cube_corr, cube_uncorr = ClipCube(galaxy, file_pbcorr, file_uncorr).readfits()
     except:
         if resolution == 15:
-            file_pbcorr = readpath + galaxy + '_7m_co21_pbcorr_round_k_15arcsec_gauss_temp_rc.fits'
-            file_uncorr = readpath + galaxy + '_7m_co21_flat_round_k_15arcsec_gauss_temp_rc.fits'
             if sun:
                 savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_15_arcsec_sun18_'
             else:
                 savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_15_arcsec_dame11_'
         elif resolution == 9:
-            file_pbcorr = readpath + galaxy + '_7m_co21_pbcorr_round_k_9arcsec_gauss_temp_rc.fits'
-            file_uncorr = readpath + galaxy + '_7m_co21_flat_round_k_9arcsec_gauss_temp_rc.fits'
             if sun:
                 savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_9_arcsec_sun18_'
             else:
                 savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_9_arcsec_dame11_'
         else:
-            file_pbcorr = readpath + galaxy + '_7m_co21_pbcorr_round_k.fits'
-            file_uncorr = readpath + galaxy + '_7m_co21_flat_round_k.fits'
             if sun:
                 savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_sun18_'
             else:
                 savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_dame11_'
         try:
+            file_pbcorr = readpath + galaxy + '_7m_co21_pbcorr_round_k.fits'
+            file_uncorr = readpath + galaxy + '_7m_co21_flat_round_k.fits'
             cube_corr, cube_uncorr = ClipCube(galaxy, file_pbcorr, file_uncorr).readfits()
         except:
             continue

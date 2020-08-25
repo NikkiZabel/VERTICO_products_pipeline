@@ -19,10 +19,8 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Updated some figure parameters">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Overwriting some parameters manually for some galaxies">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clip_cube.py" beforeDir="false" afterPath="$PROJECT_DIR$/clip_cube.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -50,7 +48,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Project1" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Project2" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -64,13 +62,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00029" summary="Tweaked some galaxy parameters + new working code for padding the image to put the galaxy in the centre.">
-      <created>1582825063926</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1582825063926</updated>
     </task>
     <task id="LOCAL-00030" summary="New pre-processing function">
       <created>1582895783785</created>
@@ -408,7 +399,14 @@
       <option name="project" value="LOCAL" />
       <updated>1598266724854</updated>
     </task>
-    <option name="localTasksCounter" value="78" />
+    <task id="LOCAL-00078" summary="Overwriting some parameters manually for some galaxies">
+      <created>1598269221901</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1598269221901</updated>
+    </task>
+    <option name="localTasksCounter" value="79" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -424,7 +422,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Test for PB information in main file, save cube before and after trimming." />
     <MESSAGE value="Work around for galaxies that have no PB information (set PB map to all ones)" />
     <MESSAGE value="Bug in the moment 0 map" />
     <MESSAGE value="Small change in edge radial profiles." />
@@ -449,24 +446,25 @@
     <MESSAGE value="Small change in directory structure" />
     <MESSAGE value="Automated finding channels with emission and estimating the noise." />
     <MESSAGE value="Updated some figure parameters" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated some figure parameters" />
+    <MESSAGE value="Overwriting some parameters manually for some galaxies" />
+    <option name="LAST_COMMIT_MESSAGE" value="Overwriting some parameters manually for some galaxies" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="325" y="1125" width="1040" height="882" key="FileChooserDialogImpl" timestamp="1597245154498">
-      <screen x="0" y="1080" width="1920" height="1080" />
+    <state x="458" y="62" width="1040" height="882" key="FileChooserDialogImpl" timestamp="1598346918061">
+      <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="325" y="1125" width="1040" height="882" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1597245154498" />
-    <state x="458" y="62" width="1102" height="751" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1596114890727" />
+    <state x="458" y="62" width="1102" height="751" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1598346918061" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor" timestamp="1593424411298">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="621" y="1156" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1592905880666" />
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1593424411298" />
-    <state x="588" y="289" width="829" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1598266725945">
+    <state x="588" y="289" width="829" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1598269223619">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="540" y="1080" width="829" height="1080" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1597159309723" />
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1598266725945" />
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1598269223619" />
     <state x="656" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1598261749214">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
