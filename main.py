@@ -31,7 +31,7 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
 #galaxies = ['NGC4064', 'NGC4222', 'NGC4294', 'NGC4330', 'NGC4388', 'NGC4394', 'NGC4402', 'NGC4405', 'NGC4419',
 #            'NGC4522', 'NGC4533', 'NGC4567', 'NGC4606', 'NGC4607', 'NGC4772']  # These are the 7m only detections
 
-galaxies = ['IC3392']
+#galaxies = ['IC3392']
 
 for i in range(len(galaxies)):
 
@@ -50,7 +50,7 @@ for i in range(len(galaxies)):
 
     if sun:
         if resolution == 15:
-            if not os.path.exists(path + 'products_v' + version + '/15_arcsec/' + galaxy + '/sun18_method/'):
+            if not os.path.exists(path + 'products_v' + version + '/15_arcsec/sun18_method/' + galaxy + '/'):
                 os.mkdir(path + 'products_v' + version + '/15_arcsec/sun18_method/' + galaxy + '/')
             savepath_temp = path + 'products_v' + version + '/15_arcsec/sun18_method/' + galaxy + '/'
         elif resolution == 9:
@@ -167,7 +167,7 @@ for i in range(len(galaxies)):
 
 
     # Moment maps
-    #'''
+    '''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).moment_zero(units='K km/s')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -178,7 +178,7 @@ for i in range(len(galaxies)):
                  sun=sun, tosave=tosave).moment_1_2()
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).moment_1_2(moment=2)
-    #'''
+    '''
     # Uncertainty maps
 
     '''
