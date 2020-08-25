@@ -245,12 +245,12 @@ class MomentMaps:
 
         v_ref = cube.header['CRPIX3']  # Location of the reference channel
         if cube.header['CTYPE3'] == 'VRAD':
-            v_val = cube.header['CRVAL3'] / 1000.  # Velocity in the reference channel, m/s to km/s
-            v_step = cube.header['CDELT3'] / 1000.  # Velocity step in each channel, m/s to km/s
+            v_val = cube.header['CRVAL3'] / 1000  # Velocity in the reference channel, m/s to km/s
+            v_step = cube.header['CDELT3'] / 1000  # Velocity step in each channel, m/s to km/s
         elif cube.header['CTYPE3'] == 'FREQ':
             v_val = 299792.458 * (230.538000 / (cube.header['CRVAL3'] / 1e9) - 1)
             v_shift = 299792.458 * (230.538000 / ((cube.header['CRVAL3'] + cube.header['CDELT3']) / 1e9) - 1)
-            v_step = v_val - v_shift
+            v_step = - (v_val - v_shift)
         else:
             raise KeyError('Pipeline cannot deal with these units yet.')
 
@@ -308,7 +308,7 @@ class MomentMaps:
         elif cube.header['CTYPE3'] == 'FREQ':
             v_val = 299792.458 * (230.538000 / (cube.header['CRVAL3'] / 1e9) - 1)
             v_shift = 299792.458 * (230.538000 / ((cube.header['CRVAL3'] + cube.header['CDELT3']) / 1e9) - 1)
-            v_step = v_val - v_shift
+            v_step = - (v_val - v_shift)
             mom0 = np.sum(cube.data * abs(v_step), axis=0)
         else:
             raise AttributeError("Can't deal with these units yet.")

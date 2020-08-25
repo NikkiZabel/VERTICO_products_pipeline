@@ -10,7 +10,7 @@ overwrite = True
 sun = True
 tosave = True
 pbcor = True
-resolution = 9
+resolution = 0
 version = '1_0'
 
 galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
@@ -31,7 +31,7 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
 #galaxies = ['NGC4064', 'NGC4222', 'NGC4294', 'NGC4330', 'NGC4388', 'NGC4394', 'NGC4402', 'NGC4405', 'NGC4419',
 #            'NGC4522', 'NGC4533', 'NGC4567', 'NGC4606', 'NGC4607', 'NGC4772']  # These are the 7m only detections
 
-galaxies = ['IC3392']
+galaxies = ['NGC4691']
 
 for i in range(len(galaxies)):
 
@@ -50,7 +50,7 @@ for i in range(len(galaxies)):
 
     if sun:
         if resolution == 15:
-            if not os.path.exists(path + 'products_v' + version + '/15_arcsec/' + galaxy + '/sun18_method/'):
+            if not os.path.exists(path + 'products_v' + version + '/15_arcsec/sun18_method/' + galaxy + '/'):
                 os.mkdir(path + 'products_v' + version + '/15_arcsec/sun18_method/' + galaxy + '/')
             savepath_temp = path + 'products_v' + version + '/15_arcsec/sun18_method/' + galaxy + '/'
         elif resolution == 9:
@@ -181,7 +181,7 @@ for i in range(len(galaxies)):
     #'''
     # Uncertainty maps
 
-    '''
+    #'''
     try:
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                     sun=sun, tosave=tosave).mom0_noise_maps()
@@ -189,31 +189,31 @@ for i in range(len(galaxies)):
                     sun=sun, tosave=tosave).mom1_2_noise_maps()
     except:
         pass
-    '''
+    #'''
     #if galaxy == 'NGC4561': continue
 
     # PVDs
-    '''
+    #'''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).\
        PVD(axis='major', find_angle=False, check_slit=True)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).\
         PVD(axis='minor', check_slit=False)
-    '''
+    #'''
 
     # Spectra
-    '''
+    #'''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).spectrum(x_axis='vel_offset')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).spectrum(x_axis='velocity')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).spectrum(x_axis='frequency')
-    '''
+    #'''
 
     # Radial profiles
-    '''
+    #'''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
                                     alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
@@ -230,4 +230,4 @@ for i in range(len(galaxies)):
                 sun=sun, tosave=tosave).radial_profile(y_units='K km/s', x_units='arcsec',
                                    alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
                                                                             check_aperture=False)
-    '''
+    #'''
