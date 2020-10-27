@@ -1056,6 +1056,29 @@ def parameters(galaxy):
         eccentricity = None
         figsize = (10, 8)
 
+    else:
+        from astroquery.ned import Ned
+        vrange = None
+        vrange_2 = None
+        cliplevel = 1.5
+        stokes = False
+        sysvel_offset = 0
+        angle = 0
+        full_width = False
+        distance = 16.5 #Ned.query_object(galaxy)['RA'][0]
+        nchan_low = 2
+        cliplevel_low = 2
+        nchan_high = 3
+        cliplevel_high = 3.5
+        prune_by_npix = None
+        prune_by_fracbeam = 1
+        expand_by_fracbeam = None
+        expand_by_npix = None
+        expand_by_nchan = 2
+        inclination = None
+        eccentricity = None
+        figsize = (10, 10)
+
     name = galaxy
 
     return name, vrange, vrange_2, cliplevel, stokes, sysvel_offset, angle, \

@@ -103,6 +103,13 @@ class ClipCube:
             cube_pbcorr = self.remove_stokes(cube_pbcorr)
             cube_uncorr = self.remove_stokes(cube_uncorr)
 
+        # If the first and last channels consist of nans only, remove them
+        spectrum_pbcorr = np.nansum(cube_pbcorr.data, axis=(1, 2))
+        cube_pbcorr.data = cube_pbcorr.data[spectrum_pbcorr != 0, :, :]
+
+        spectrum_uncorr = np.nansum(cube_uncorr.data, axis=(1, 2))
+        cube_uncorr.data = cube_uncorr.data[spectrum_uncorr != 0, :, :]
+
         # Get rid of nans
         cube_pbcorr.data[~np.isfinite(cube_pbcorr.data)] = 0
         cube_uncorr.data[~np.isfinite(cube_uncorr.data)] = 0
@@ -112,8 +119,14 @@ class ClipCube:
     def cut_empty_rows(self, cube, noisecube=None):
 
         w = wcs.WCS(cube.header, naxis=2)
-        centre_sky = SkyCoord(cube.header['OBSRA'], cube.header['OBSDEC'], unit=(u.deg, u.deg))
-        centre_pix = wcs.utils.skycoord_to_pixel(centre_sky, w)
+        #try:
+        #    centre_sky = SkyCoord(cube.header['OBSRA'], cube.header['OBSDEC'], unit=(u.deg, u.deg))
+        #except:
+        #    ra = Ned.query_object(self.galaxy.name)['RA'][0]
+        #    dec = Ned.query_object(self.galaxy.name)['DEC'][0]
+        #    centre_sky = SkyCoord(ra, dec, unit=(u.deg, u.deg))
+
+        #centre_pix = wcs.utils.skycoord_to_pixel(centre_sky, w)
 
         beam = cube.header['BMAJ']  # deg
         res = cube.header['CDELT2']  # deg/pixel
@@ -564,10 +577,13 @@ class ClipCube:
                 mask_hdu.header.add_comment('Cube was clipped using the Sun+18 masking method', before='BUNIT')
                 mask_hdu.header.pop('BTYPE')
                 mask_hdu.header.pop('BUNIT')
-                mask_hdu.header.pop('DATAMAX')
-                mask_hdu.header.pop('DATAMIN')
-                mask_hdu.header.pop('JTOK')
-                mask_hdu.header.pop('RESTFRQ')
+                try:
+                    mask_hdu.header.pop('DATAMAX')
+                    mask_hdu.header.pop('DATAMIN')
+                    mask_hdu.header.pop('JTOK')
+                    mask_hdu.header.pop('RESTFRQ')
+                except:
+                    pass
                 mask_hdu.header['CLIP_RMS'] = self.sun_method(emiscube_uncorr_hdu, noisecube_uncorr_hdu, calc_rms=True)
                 mask_hdu.header.comments['CLIP_RMS'] = 'rms value used for clipping in K km/s'
                 mask_hdu.writeto(self.savepath + 'mask_cube.fits', overwrite=True)

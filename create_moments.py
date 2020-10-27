@@ -227,7 +227,10 @@ class MomentMaps:
         header.pop('CRPIX3')
         header.pop('CUNIT3')
         header.pop('NAXIS3')
-        header.pop('OBSGEO-Z')
+        try:
+            header.pop('OBSGEO-Z')
+        except:
+            pass
 
         header['NAXIS'] = 2
 
@@ -244,7 +247,7 @@ class MomentMaps:
         """
 
         v_ref = cube.header['CRPIX3']  # Location of the reference channel
-        if cube.header['CTYPE3'] == 'VRAD':
+        if cube.header['CTYPE3'] == 'VRAD' or cube.header['CTYPE3'] == 'VELOCITY':
             v_val = cube.header['CRVAL3'] / 1000  # Velocity in the reference channel, m/s to km/s
             v_step = cube.header['CDELT3'] / 1000  # Velocity step in each channel, m/s to km/s
         elif cube.header['CTYPE3'] == 'FREQ':
@@ -303,7 +306,7 @@ class MomentMaps:
 
         vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
 
-        if cube.header['CTYPE3'] == 'VRAD':
+        if cube.header['CTYPE3'] == 'VRAD' or cube.header['CTYPE3'] == 'VELOCITY':
             mom0 = np.sum((cube.data * abs(cube.header['CDELT3']) / 1000), axis=0)
         elif cube.header['CTYPE3'] == 'FREQ':
             v_val = 299792.458 * (230.538000 / (cube.header['CRVAL3'] / 1e9) - 1)
@@ -317,6 +320,7 @@ class MomentMaps:
             #mom0 = mom0 / cube.header['JTOK'] * 91.7 * alpha_co * (cube.header['BMAJ'] * 3600 * cube.header[
             #    'BMIN'] * 3600) ** (-1) / 4
             mom0 *= alpha_co
+            print(np.log(np.sum(mom0)))
         elif units == 'K km/s':
             pass
         else:
@@ -538,15 +542,16 @@ class MomentMaps:
         #rms = np.std(np.sum(noise, axis=(1, 2)))
         #np.savetxt(path + 'specnoise.txt', [rms / beamsize])
 
-        psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
-        beamsize = np.sum(psf)
-        spectrum /= beamsize
-
-        #print(np.trapz(np.flip(spectrum), np.flip(spectrum_velocities)) / cube_pbcorr.header['JTOK'])
+        #psf = self.makebeam(cube_pbcorr.shape[1], cube_pbcorr.shape[2], cube_pbcorr.header)
+        #beamsize = np.sum(psf)
+        #spectrum /= beamsize
 
         return spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies # / beamsize
 
     def radial_profile(self, alpha_co=6.25, table_path=None, check_aperture=False, hires=False):
+
+        if hires:
+            print('WARNING: using a resolution of 1 pixel')
 
         _, mom0_hdu_Msun, _, _, _ = self.calc_moms(units='M_Sun/pc^2', alpha_co=alpha_co)
         _, mom0_hdu_K, _, _, _ = self.calc_moms(units='K km/s', alpha_co=alpha_co)
@@ -645,7 +650,7 @@ class MomentMaps:
             radius.append(a_out)
 
         #if ((len(radius) < 5) & (e > 0.7)) or ((len(np.array(rad_prof_K)[np.log10(np.array(rad_prof_K)) < 0]) > 2) & (e > 0.7)):
-        if ((len(radius) < 5) & (e > 0.7)):
+        if ((len(radius) < 15) & (e > 0.7)):
 
             hi_inc = True
 
@@ -664,24 +669,37 @@ class MomentMaps:
             emission_Msun = 2112
 
             while emission_Msun > limit:
-                slice1_K = mom0_K_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
-                slice2_K = mom0_K_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
-                emission_K = np.average(np.average(slice1_K) + np.average(slice2_K))
 
-                slice1_Msun = mom0_Msun_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
-                slice2_Msun = mom0_Msun_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
-                emission_Msun = np.average(np.average(slice1_Msun) + np.average(slice2_Msun))
+                if hires:
+                    slice1_K = mom0_K_rot[:, int(centre + inner):int(centre + inner + 1)]
+                    slice2_K = mom0_K_rot[:, int(centre - inner - 1):int(centre - inner)]
+                    emission_K = np.average(np.average(slice1_K) + np.average(slice2_K))
+
+                    slice1_Msun = mom0_Msun_rot[:, int(centre + inner):int(centre + inner + 1)]
+                    slice2_Msun = mom0_Msun_rot[:, int(centre - inner - 1):int(centre - inner)]
+                    emission_Msun = np.average(np.average(slice1_Msun) + np.average(slice2_Msun))
+                else:
+                    slice1_K = mom0_K_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
+                    slice2_K = mom0_K_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
+                    emission_K = np.average(np.average(slice1_K) + np.average(slice2_K))
+
+                    slice1_Msun = mom0_Msun_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
+                    slice2_Msun = mom0_Msun_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
+                    emission_Msun = np.average(np.average(slice1_Msun) + np.average(slice2_Msun))
 
                 if check_aperture:
-                    mom0_K_rot[:, int(centre + inner):int(centre + inner + beam_pix)] = 10
-                    mom0_K_rot[:, int(centre - inner - beam_pix):int(centre - inner)] = 20
+                    if hires:
+                        mom0_K_rot[:, int(centre + inner):int(centre + inner + 1)] = 10
+                        mom0_K_rot[:, int(centre - inner - 1):int(centre - inner)] = 20
+                    else:
+                        mom0_K_rot[:, int(centre + inner):int(centre + inner + beam_pix)] = 10
+                        mom0_K_rot[:, int(centre - inner - beam_pix):int(centre - inner)] = 20
                     from matplotlib import pyplot as plt
                     plt.imshow(mom0_K_rot)
-                    break
 
                 rad_prof_K.append(emission_K)
                 rad_prof_Msun.append(emission_Msun)
-                radius.append(inner + beam_pix)
+                radius.append(inner + 1)
 
                 area.append(len(slice1_K[slice1_K > 0]) + len(slice2_K[slice2_K > 0]))
 
@@ -740,16 +758,17 @@ class MomentMaps:
                             'Surface density (K km/s), RMS error (K km/s), ' \
                              'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
 
-        if self.tosave:
-            np.savetxt(self.savepath + 'rad_prof.csv',
+        if not hires:
+            if self.tosave:
+                np.savetxt(self.savepath + 'rad_prof.csv',
+                           np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * error_K, rad_prof_Msun,
+                                            np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
+                                            delimiter=',', header=csv_header)
+        else:
+            np.savetxt('/home/nikki/Documents/Data/VERTICO/QuenchMechs/radial_profiles/CO/' + 'radial_profile_' + self.galaxy.name + '.csv',
                        np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * error_K, rad_prof_Msun,
                                         np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
-                                        delimiter=',', header=csv_header)
-
-        #np.savetxt('/home/nikki/Documents/Data/VERTICO/QuenchMechs/radial_profiles/' + 'radial_profile_' + self.galaxy.name + '.csv',
-        #           np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * error_K, rad_prof_Msun,
-        #                            np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
-        #           delimiter=',', header=csv_header)
+                       delimiter=',', header=csv_header)
 
         return rad_prof_K, rms, rad_prof_Msun, rms_Msun, radii_deg * 3600, radii_kpc
 

@@ -212,7 +212,7 @@ class CreateImages:
             if self.galaxy.vrange2:
                 vrange2 = self.galaxy.vrange2
             else:
-                vrange2 = np.nanmax(image.data - sysvel)
+                vrange2 = np.nanmax(image.data) - sysvel
 
             fig.show_contour(image, cmap='sauron', levels=np.linspace(0, vrange2, len(vel_array)), vmin=0,
                              vmax=vrange2, extend='both', filled=True, overlap=True)
@@ -232,7 +232,7 @@ class CreateImages:
             if self.galaxy.vrange:
                 vrange = self.galaxy.vrange
             else:
-                vrange = 1.5 * (np.nanmax(image.data) - sysvel)
+                vrange = 1.2 * (np.nanmax(vel_array) - sysvel)
 
             fig.show_contour(image, cmap='sauron', levels=np.linspace(-vrange, vrange,
                 len(vel_array)), vmin=-vrange, vmax=vrange, extend='both', filled=True,
@@ -471,7 +471,7 @@ class CreateImages:
             else:
                 rad_prof_K, rad_prof_K_err, rad_prof_Msun, rad_prof_Msun_err, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr,
                         self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=False).\
-                    radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture)
+                    radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture, hires=True)
         else:
             temp = np.loadtxt(self.savepath + 'rad_prof.csv', delimiter=',')
             rad_prof_K = temp[:, 0]
