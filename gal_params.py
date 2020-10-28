@@ -1076,7 +1076,7 @@ def parameters(galaxy, sample=None):
         expand_by_nchan = 2
         inclination = None
         eccentricity = None
-        figsize = (10, 10)
+        figsize = (10, 8.5)
 
         if sample == 'heracles':
             import numpy as np

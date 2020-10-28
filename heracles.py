@@ -12,29 +12,44 @@ refresh = True
 overwrite = True
 sun = True
 tosave = True
-resolution = 1200
+resolution = 'nearest_720'
 
 if resolution == 1200:
     data = [f for f in glob(path + '*1200pc.fits')]
 elif resolution == 720:
-    data = [f for f in glob(path + '*1200pc.fits')]
+    data = [f for f in glob(path + '*720pc.fits')]
+elif resolution == 'nearest_720':
+    data = [f for f in glob(path + 'smoothed_cubes_nearest_720pc/' + '*.fits')]
+elif resolution == 'nearest_1200':
+    data = [f for f in glob(path + 'smoothed_cubes_nearest_1200pc/' + '*.fits')]
 
 for file in data:
-    galaxy = file.split('/')[7].split('_')[0]
-    print(galaxy)
 
-    file_pbcorr = file
-    file_uncorr = file
+    if resolution == 1200 or resolution == 720:
 
-    from matplotlib import pyplot as plt
-    #x = fits.open(file_pbcorr)[0]
-    #spectrum = np.nansum(x.data, axis=(1, 2))
-    #print(np.where(spectrum != 0)[0])
-    #break
+        galaxy = file.split('/')[7].split('_')[0]
+        print(galaxy)
 
-    if not os.path.exists(path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/'):
-        os.mkdir(path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/')
-    savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/'
+        file_pbcorr = file
+        file_uncorr = file
+
+        if not os.path.exists(path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/'):
+            os.mkdir(path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/')
+        #else:
+        #    continue
+        savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/'
+
+    elif resolution == 'nearest_720' or resolution == 'nearest_1200':
+
+        galaxy = file.split('/')[8].split('_')[0]
+        print(galaxy)
+
+        file_pbcorr = file
+        file_uncorr = file
+
+        if not os.path.exists(path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy + '/'):
+            os.mkdir(path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy + '/')
+        savepath = path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy + '/'
 
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, sample=sample).moment_zero(units='K km/s')
@@ -47,4 +62,4 @@ for file in data:
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, sample=sample).moment_1_2(moment=2)
 
-    break
+    #break
