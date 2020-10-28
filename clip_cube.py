@@ -19,6 +19,7 @@ class ClipCube:
         self.savepath = savepath or './'
         self.sun = sun
         self.tosave = tosave
+        self.sample = sample
 
     @staticmethod
     def remove_stokes(cube):
@@ -288,12 +289,36 @@ class ClipCube:
 
         return cube_hdu, noisecube_hdu
 
-    def preprocess(self, cube, noisecube=None):
+    def make_square(self, cube, noisecube=None):
 
+        img = np.sum(cube.data, axis=0)
+
+        shape_diff = np.max(img.shape) - np.min(img.shape)
+        square_cube = np.zeros((cube.shape[0], np.max(img.shape), np.max(img.shape)))
+        square_noisecube = np.zeros((noisecube.shape[0], np.max(img.shape), np.max(img.shape)))
+
+        if img.shape[0] > img.shape[1]:
+            first = True
+        else:
+            first = False
+
+        if first:
+            square_cube[:, :, int(shape_diff / 2):int(shape_diff / 2 + img.shape[1])] = cube.data
+            square_noisecube[:, :, int(shape_diff / 2):int(shape_diff / 2 + img.shape[1])] = noisecube.data
+        else:
+            square_cube[:, int(shape_diff / 2):int(shape_diff / 2 + img.shape[0]), :] = cube.data
+            square_noisecube[:, int(shape_diff / 2):int(shape_diff / 2 + img.shape[0]), :] = noisecube.data
+
+        cube.data = square_cube
+        noisecube.data = square_noisecube
+
+        return cube, noisecube
+
+    def preprocess(self, cube, noisecube=None):
         cube, noisecube = self.cut_empty_rows(cube, noisecube)
         cube, noisecube = self.cut_empty_columns(cube, noisecube)
         cube, noisecube = self.centre_data(cube, noisecube)
-
+        cube, noisecube = self.make_square(cube, noisecube)
         return cube, noisecube
 
     def split_cube(self, cube):

@@ -1086,7 +1086,6 @@ def parameters(galaxy, sample=None):
                                       delimiter=',', usecols=[0], dtype='str')
             try:
                 distance = distances[dist_names == galaxy]
-                print(distance)
             except:
                 distance = None
 

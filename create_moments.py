@@ -18,10 +18,11 @@ class MomentMaps:
         self.savepath = savepath or './'
         self.sun = sun
         self.tosave = tosave
+        self.sample = sample
         self.galaxy.start = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave).do_clip(get_chans=True)[0]
+                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(get_chans=True)[0]
         self.galaxy.stop = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave).do_clip(get_chans=True)[1]
+                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(get_chans=True)[1]
 
     def pixel_size_check(self, header, key="CDELT1", expected_pix_size=2, raise_exception=True):
         # check the pixel size is what's expected modulo some floating point error
@@ -81,11 +82,11 @@ class MomentMaps:
 
         # Calculate the noise in the line-free part of the PB UN/CORRECTED cube
         cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave).readfits()
+                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).readfits()
 
         # Centre and clip empty rows and columns to get it in the same shape as the other products
         _, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave).do_clip()
+                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip()
 
         # extract negative values (only needed if masking_scheme='simple')
         if masking_scheme == 'simple':
@@ -302,7 +303,7 @@ class MomentMaps:
         """
 
         cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
-                        tosave=self.tosave).do_clip()
+                        tosave=self.tosave, sample=self.sample).do_clip()
 
         vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
 
@@ -320,7 +321,6 @@ class MomentMaps:
             #mom0 = mom0 / cube.header['JTOK'] * 91.7 * alpha_co * (cube.header['BMAJ'] * 3600 * cube.header[
             #    'BMIN'] * 3600) ** (-1) / 4
             mom0 *= alpha_co
-            print(np.log(np.sum(mom0)))
         elif units == 'K km/s':
             pass
         else:
@@ -331,7 +331,7 @@ class MomentMaps:
 
         # Calculate the systemic velocity from the spatial inner part of the cube (to avoid PB effects)
         inner_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, savepath=self.savepath,
-                              tosave=self.tosave).innersquare(mom1)
+                              tosave=self.tosave, sample=self.sample).innersquare(mom1)
 
         sysvel = np.nanmean(inner_cube)# + self.galaxy.sysvel_offset
         mom1 -= sysvel
@@ -499,7 +499,7 @@ class MomentMaps:
         """
 
         cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
-                        tosave=self.tosave).readfits()
+                        tosave=self.tosave, sample=self.sample).readfits()
 
         clipped_cube, _, _, _, sysvel = self.calc_moms()
 
@@ -561,13 +561,13 @@ class MomentMaps:
         # Estimate the rms from the spatial inner part of the cube
         cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                             savepath=self.savepath,
-                                            tosave=self.tosave).readfits()
+                                            tosave=self.tosave, sample=self.sample).readfits()
         emiscube, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                             savepath=self.savepath,
-                                            tosave=self.tosave).split_cube(cube_pbcorr)
+                                            tosave=self.tosave, sample=self.sample).split_cube(cube_pbcorr)
         inner = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                             savepath=self.savepath,
-                                            tosave=self.tosave).innersquare(noisecube.data)
+                                            tosave=self.tosave, sample=self.sample).innersquare(noisecube.data)
         rms = np.nanstd(inner)
         rms_Msun = rms * alpha_co
         #rms_Msun = rms_Msun * abs(cube_pbcorr.header['CDELT3']) / 1000 * 91.7 * alpha_co * (cube_pbcorr.header['BMAJ'] * 3600 *
@@ -781,20 +781,20 @@ class MomentMaps:
 
         # Map of the number of channels used to calculate the moments
         _, mask_trimmed = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave).do_clip(clip_also=mask)
+                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(clip_also=mask)
         N_map = np.sum(mask_trimmed.data, axis=0)
 
         # Read in the cubes, split into cubes containing line and line-free channels, take the inner cube and calculate
         # the rms from that.
         cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                             savepath=self.savepath,
-                                            tosave=self.tosave).readfits()
+                                            tosave=self.tosave, sample=self.sample).readfits()
         emiscube, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                             savepath=self.savepath,
-                                            tosave=self.tosave).split_cube(cube_uncorr)
+                                            tosave=self.tosave, sample=self.sample).split_cube(cube_uncorr)
         inner = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                             savepath=self.savepath,
-                                            tosave=self.tosave).innersquare(noisecube.data)
+                                            tosave=self.tosave, sample=self.sample).innersquare(noisecube.data)
         rms = np.nanstd(inner)
 
         if calc_rms:
@@ -809,7 +809,7 @@ class MomentMaps:
                            str(self.galaxy.name) + '_7m_co21_pb_rebin.fits')[0]
 
             _, pb_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                        savepath=self.savepath, tosave=self.tosave).do_clip(clip_also=pb_hdu)
+                                        savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(clip_also=pb_hdu)
             pb_map = pb_cube.data[int(pb_cube.shape[0] / 2), :, :]
 
         except:
@@ -850,7 +850,7 @@ class MomentMaps:
 
     def peak_temperature(self):
         cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
-                        tosave=self.tosave).do_clip()
+                        tosave=self.tosave, sample=self.sample).do_clip()
 
         peak_temp = np.amax(cube.data, axis=0)
 

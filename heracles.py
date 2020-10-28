@@ -36,14 +36,14 @@ for file in data:
         os.mkdir(path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/')
     savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/'
 
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #              sun=sun, tosave=tosave).moment_zero(units='K km/s')
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #              sun=sun, tosave=tosave).moment_zero()
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #              sun=sun, tosave=tosave).moment_zero(peak=True)
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #             sun=sun, tosave=tosave).moment_1_2()
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave, sample=sample).moment_zero(units='K km/s')
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave, sample=sample).moment_zero()
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave, sample=sample).moment_zero(peak=True)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                 sun=sun, tosave=tosave, sample=sample).moment_1_2()
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, sample=sample).moment_1_2(moment=2)
 
