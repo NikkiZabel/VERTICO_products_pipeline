@@ -11,8 +11,8 @@ from astropy.stats import mad_std
 
 class MomentMaps:
 
-    def __init__(self, galname, path_pbcorr, path_uncorr, savepath=None, sun=True, tosave=False):
-        self.galaxy = galaxies(galname)
+    def __init__(self, galname, path_pbcorr, path_uncorr, savepath=None, sun=True, tosave=False, sample=None):
+        self.galaxy = galaxies(galname, sample)
         self.path_pbcorr = path_pbcorr
         self.path_uncorr = path_uncorr
         self.savepath = savepath or './'

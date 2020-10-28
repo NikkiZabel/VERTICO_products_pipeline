@@ -1,4 +1,4 @@
-def parameters(galaxy):
+def parameters(galaxy, sample=None):
 
     if galaxy == 'NGC4698':
         vrange = 250
@@ -1057,7 +1057,6 @@ def parameters(galaxy):
         figsize = (10, 8)
 
     else:
-        from astroquery.ned import Ned
         vrange = None
         vrange_2 = None
         cliplevel = 1.5
@@ -1065,7 +1064,7 @@ def parameters(galaxy):
         sysvel_offset = 0
         angle = 0
         full_width = False
-        distance = 16.5 #Ned.query_object(galaxy)['RA'][0]
+        distance = 0
         nchan_low = 2
         cliplevel_low = 2
         nchan_high = 3
@@ -1078,6 +1077,18 @@ def parameters(galaxy):
         inclination = None
         eccentricity = None
         figsize = (10, 10)
+
+        if sample == 'heracles':
+            import numpy as np
+            distances = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/heracles/heracles_distances.csv',
+                                      delimiter=',', usecols=[1])
+            dist_names = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/heracles/heracles_distances.csv',
+                                      delimiter=',', usecols=[0], dtype='str')
+            try:
+                distance = distances[dist_names == galaxy]
+                print(distance)
+            except:
+                distance = None
 
     name = galaxy
 

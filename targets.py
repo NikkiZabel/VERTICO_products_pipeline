@@ -1,12 +1,12 @@
 import gal_params
 
 class galaxies:
-    def __init__(self, galname):
+    def __init__(self, galname, sample=None):
 
         name, vrange, vrange_2, cliplevel, stokes, sysvel_offset, angle, \
         full_width, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \
         prune_by_fracbeam, expand_by_fracbeam, expand_by_npix, expand_by_nchan, inclination, eccentricity, \
-        figsize = gal_params.parameters(galname)
+        figsize = gal_params.parameters(galname, sample)
 
         self.name = name
         self.vrange = vrange

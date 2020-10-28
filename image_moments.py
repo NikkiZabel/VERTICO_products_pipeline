@@ -16,8 +16,8 @@ from matplotlib.colors import ListedColormap
 class CreateImages:
 
     def __init__(self, galname, path_pbcorr, path_uncorr, savepath=None, refresh=False, overwrite=True,
-                 sun=True, tosave=False):
-        self.galaxy = galaxies(galname)
+                 sun=True, tosave=False, sample=None):
+        self.galaxy = galaxies(galname, sample)
         self.path_pbcorr = path_pbcorr
         self.path_uncorr = path_uncorr
         self.refresh = refresh
@@ -142,9 +142,10 @@ class CreateImages:
         fig.beam.set_borderpad(1)
 
         # show a scalebar
-        length = np.degrees(1.e-3 / self.galaxy.distance)  # length of the scalebar in degrees, corresponding to 1 kpc
-        fig.add_scalebar(length=length, label='1 kpc', frame=False)
-        fig.scalebar.set_linewidth(5)
+        if self.galaxy.distance:
+            length = np.degrees(1.e-3 / self.galaxy.distance)  # length of the scalebar in degrees, corresponding to 1 kpc
+            fig.add_scalebar(length=length, label='1 kpc', frame=False)
+            fig.scalebar.set_linewidth(5)
 
         plt.tight_layout()
 
@@ -259,9 +260,10 @@ class CreateImages:
         fig.beam.set_borderpad(1)
 
         # show a scalebar
-        length = np.degrees(1.e-3 / self.galaxy.distance)  # length of the scalebar in degrees, corresponding to 1 kpc
-        fig.add_scalebar(length=length, label='1 kpc', frame=False)
-        fig.scalebar.set_linewidth(5)
+        if self.galaxy.distance:
+            length = np.degrees(1.e-3 / self.galaxy.distance)  # length of the scalebar in degrees, corresponding to 1 kpc
+            fig.add_scalebar(length=length, label='1 kpc', frame=False)
+            fig.scalebar.set_linewidth(5)
 
         #Make sure the axis labels don't fall off the figure
         plt.tight_layout()

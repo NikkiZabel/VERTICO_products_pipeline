@@ -4,6 +4,7 @@ import warnings; warnings.filterwarnings("ignore")
 import os
 from glob import glob
 
+sample = 'heracles'
 version = '1_0'
 path = '/home/nikki/Documents/Data/VERTICO/heracles/'
 
@@ -44,6 +45,6 @@ for file in data:
     #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
     #             sun=sun, tosave=tosave).moment_1_2()
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave).moment_1_2(moment=2)
+                 sun=sun, tosave=tosave, sample=sample).moment_1_2(moment=2)
 
     break
