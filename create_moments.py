@@ -635,7 +635,7 @@ class MomentMaps:
             else:
                 a_out = b_out / np.sqrt(1 - e ** 2)
 
-            aperture = EllipticalAnnulus(centre, a_in, a_out, b_out, theta)
+            aperture = EllipticalAnnulus(positions=centre, a_in=a_in, a_out=a_out, b_out=b_out, theta=theta)
 
             if check_aperture:
                 aperture.plot(color='red')
@@ -661,8 +661,18 @@ class MomentMaps:
 
             angle = self.galaxy.angle + 180 + 90
 
+            # interpolate/rotate moment maps and uncertainty maps
             mom0_K_rot = ndimage.interpolation.rotate(mom0_hdu_K.data, angle, reshape=True)
             mom0_Msun_rot = ndimage.interpolation.rotate(mom0_hdu_Msun.data, angle, reshape=True)
+            
+            mom0_K_uncertainty, SN_hdu, _, _ = self.uncertainty_maps(calc_rms=False)
+            unc_isnan = np.isnan(mom0_K_uncertainty.data)  
+            mom0_K_uncertainty.data[unc_isnan] = 0. # tidy up some nasty nans
+            mom0_K_uncertainty_rot = ndimage.interpolation.rotate(mom0_K_uncertainty.data, angle, reshape=True)
+
+            # print('raw',mom0_K_uncertainty.data)
+            # print('rot',mom0_K_uncertainty_rot)
+            # print(mom0_uncertainty.data)
 
             inner = 0
             centre = (mom0_K_rot.shape[1]) / 2
@@ -679,13 +689,28 @@ class MomentMaps:
                     slice2_Msun = mom0_Msun_rot[:, int(centre - inner - 1):int(centre - inner)]
                     emission_Msun = np.average(np.average(slice1_Msun) + np.average(slice2_Msun))
                 else:
+                    # calculate the radial profile
                     slice1_K = mom0_K_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
                     slice2_K = mom0_K_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
                     emission_K = np.average(np.average(slice1_K) + np.average(slice2_K))
 
                     slice1_Msun = mom0_Msun_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
                     slice2_Msun = mom0_Msun_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
+
+                    # print(slice1_Msun)
                     emission_Msun = np.average(np.average(slice1_Msun) + np.average(slice2_Msun))
+
+                    # now do the same for the uncertainty
+                    slice1_unc = mom0_K_uncertainty_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
+                    slice2_unc = mom0_K_uncertainty_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
+
+                    # uncertainty = sqrt(Sum[(individual uncertainties in beams)**2])/(# of beams)
+                    # or alternatively, uncertainty = sqrt (Sum[(individual uncertainties in pix)**2])/(# of pix)
+                    print(slice1_unc)
+                    emission_unc = np.sqrt((np.sum(slice1_unc) + np.sum(slice2_unc))**2)/(len(slice1_unc)+len(slice2_unc))
+                    
+                    print(emission_unc)
+                    
 
                 if check_aperture:
                     if hires:
@@ -759,13 +784,17 @@ class MomentMaps:
                              'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
 
         if not hires:
+            print(self.tosave)
             if self.tosave:
+                print('writing radial profile to '+ self.savepath + 'rad_prof.csv' )
                 np.savetxt(self.savepath + 'rad_prof.csv',
                            np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * error_K, rad_prof_Msun,
                                             np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
                                             delimiter=',', header=csv_header)
         else:
-            np.savetxt('/home/nikki/Documents/Data/VERTICO/QuenchMechs/radial_profiles/CO/' + 'radial_profile_' + self.galaxy.name + '.csv',
+            if self.tosave:
+                print('writing hi res radial profile to '+ self.savepath + 'rad_prof_hires.csv' )
+                np.savetxt(self.savepath + 'rad_prof_hires.csv',
                        np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * error_K, rad_prof_Msun,
                                         np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
                        delimiter=',', header=csv_header)
