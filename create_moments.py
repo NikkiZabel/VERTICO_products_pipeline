@@ -640,14 +640,31 @@ class MomentMaps:
             if check_aperture:
                 aperture.plot(color='red')
 
-            emission_K = aperture_photometry(mom0_hdu_K.data, aperture)['aperture_sum'][0]
-            emission_Msun = aperture_photometry(mom0_hdu_Msun.data, aperture)['aperture_sum'][0]
+            # pull up the uncertainties
+            mom0_K_uncertainty, SN_hdu, _, _ = self.uncertainty_maps(calc_rms=False)
+            unc_isnan = np.isnan(mom0_K_uncertainty.data)  # mask for nan values
+
+            emission_K = aperture_photometry(mom0_hdu_K.data, aperture, mask=unc_isnan,)['aperture_sum'][0]
+            e_emission_K = aperture_photometry(mom0_hdu_K.data, aperture, mask=unc_isnan, error=mom0_K_uncertainty.data)['aperture_sum_err'][0]
+            emission_Msun = aperture_photometry(mom0_hdu_Msun.data, aperture, error=mom0_K_uncertainty.data)['aperture_sum'][0]
+            e_emission_Msun = e_emission_K * alpha_co
 
             area_temp = aperture.area
             area.append(area_temp)
             rad_prof_K.append(emission_K / area_temp)
             rad_prof_Msun.append(emission_Msun / area_temp)
             radius.append(a_out)
+
+            # K_uncertainty = aperture_photometry(mom0_K_uncertainty.data, aperture)['aperture_sum'][0]
+
+            # uncertainty = sqrt(Sum[(individual uncertainties in beams)**2])/(# of beams)
+            # or alternatively, uncertainty = sqrt (Sum[(individual uncertainties in pix)**2])/(# of pix)
+            # aperture_photometry(.., error=..) returns sqrt(Sum[(individual uncertainties in beams)**2])
+            # thus we just divide by the no pix
+
+            print('k km/s', emission_K / area_temp, e_emission_K/ area_temp
+                    , 'Msun/pc^2', emission_Msun / area_temp, e_emission_Msun/ area_temp
+                    , 'area', area_temp)
 
         #if ((len(radius) < 5) & (e > 0.7)) or ((len(np.array(rad_prof_K)[np.log10(np.array(rad_prof_K)) < 0]) > 2) & (e > 0.7)):
         if ((len(radius) < 15) & (e > 0.7)):
@@ -664,15 +681,6 @@ class MomentMaps:
             # interpolate/rotate moment maps and uncertainty maps
             mom0_K_rot = ndimage.interpolation.rotate(mom0_hdu_K.data, angle, reshape=True)
             mom0_Msun_rot = ndimage.interpolation.rotate(mom0_hdu_Msun.data, angle, reshape=True)
-            
-            mom0_K_uncertainty, SN_hdu, _, _ = self.uncertainty_maps(calc_rms=False)
-            unc_isnan = np.isnan(mom0_K_uncertainty.data)  
-            mom0_K_uncertainty.data[unc_isnan] = 0. # tidy up some nasty nans
-            mom0_K_uncertainty_rot = ndimage.interpolation.rotate(mom0_K_uncertainty.data, angle, reshape=True)
-
-            # print('raw',mom0_K_uncertainty.data)
-            # print('rot',mom0_K_uncertainty_rot)
-            # print(mom0_uncertainty.data)
 
             inner = 0
             centre = (mom0_K_rot.shape[1]) / 2
@@ -697,20 +705,8 @@ class MomentMaps:
                     slice1_Msun = mom0_Msun_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
                     slice2_Msun = mom0_Msun_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
 
-                    # print(slice1_Msun)
+                    
                     emission_Msun = np.average(np.average(slice1_Msun) + np.average(slice2_Msun))
-
-                    # now do the same for the uncertainty
-                    slice1_unc = mom0_K_uncertainty_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
-                    slice2_unc = mom0_K_uncertainty_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
-
-                    # uncertainty = sqrt(Sum[(individual uncertainties in beams)**2])/(# of beams)
-                    # or alternatively, uncertainty = sqrt (Sum[(individual uncertainties in pix)**2])/(# of pix)
-                    print(slice1_unc)
-                    emission_unc = np.sqrt((np.sum(slice1_unc) + np.sum(slice2_unc))**2)/(len(slice1_unc)+len(slice2_unc))
-                    
-                    print(emission_unc)
-                    
 
                 if check_aperture:
                     if hires:
@@ -733,6 +729,7 @@ class MomentMaps:
                 else:
                     inner += beam_pix
 
+        print(rad_prof_K)
         rad_prof_K = rad_prof_K[:-1]
         rad_prof_Msun = rad_prof_Msun[:-1]
         radius = np.array(radius[:-1])
@@ -748,6 +745,8 @@ class MomentMaps:
 
         clip_rms = self.uncertainty_maps(calc_rms=True)
 
+        print(rad_prof_K)
+
         if hi_inc:
             if self.sun:
                 csv_header = 'Slices parallel to the minor axis centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
@@ -755,7 +754,7 @@ class MomentMaps:
                              '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
                             'Radii are equal to one beamsize.  \n ' \
                              'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n' \
-                             'Surface density (K km/s), RMS error (K km/s), ' \
+                             'Surface brightness (K km/s), RMS error (K km/s), ' \
                              'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
             else:
                 csv_header = 'Slices parallel to the minor axis centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
@@ -763,7 +762,7 @@ class MomentMaps:
                              '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
                             'Radii are equal to one beamsize. \n' \
                              'Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n' \
-                             'Surface density (K km/s), RMS error (K km/s), ' \
+                             'Surface brightness (K km/s), RMS error (K km/s), ' \
                              'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
         else:
             if self.sun:
@@ -772,7 +771,7 @@ class MomentMaps:
                              '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
                             'Radii are defined as the semi-major axes of these apertures. \n ' \
                             'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n' \
-                            'Surface density (K km/s), RMS error (K km/s), ' \
+                            'Surface brightness (K km/s), RMS error (K km/s), ' \
                              'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
             else:
                 csv_header = 'Elliptical apertures centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
@@ -780,7 +779,7 @@ class MomentMaps:
                              '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
                             'Radii are defined as the semi-major axes of these apertures. \n' \
                             'Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n' \
-                            'Surface density (K km/s), RMS error (K km/s), ' \
+                            'Surface brightness (K km/s), RMS error (K km/s), ' \
                              'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
 
         if not hires:
