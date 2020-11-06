@@ -619,6 +619,7 @@ class MomentMaps:
         # Create lists to save the results in
         rad_prof_K = []
         rad_prof_Msun = []
+        uncertainty = []
         radius = []
         area = []
 
@@ -669,9 +670,9 @@ class MomentMaps:
 
             # Calculate the emission and corresponding errors in the aperture
             emission_K = aperture_photometry(mom0_hdu_K.data, aperture, mask=unc_isnan,)['aperture_sum'][0]
-            e_emission_K = aperture_photometry(mom0_hdu_K.data, aperture, mask=unc_isnan, error=mom0_K_uncertainty.data)['aperture_sum_err'][0]
-            emission_Msun = aperture_photometry(mom0_hdu_Msun.data, aperture, error=mom0_K_uncertainty.data)['aperture_sum'][0]
-            e_emission_Msun = e_emission_K * alpha_co
+            emission_unc = aperture_photometry(mom0_hdu_K.data, aperture, mask=unc_isnan, error=mom0_K_uncertainty.data)['aperture_sum_err'][0]
+            emission_Msun = aperture_photometry(mom0_hdu_Msun.data, aperture)['aperture_sum'][0]
+            # e_emission_Msun = e_emission_K * alpha_co
 
             # Calculate the area, and get the surface densities by dividing by it
             area_temp = aperture.area
@@ -679,6 +680,7 @@ class MomentMaps:
             rad_prof_K.append(emission_K / area_temp)
             rad_prof_Msun.append(emission_Msun / area_temp)
             radius.append(a_out)
+            uncertainty.append(emission_unc)
 
             ######### SOME TEMPORARY UNCERTAINTY STUFF ##########
             # K_uncertainty = aperture_photometry(mom0_K_uncertainty.data, aperture)['aperture_sum'][0]
