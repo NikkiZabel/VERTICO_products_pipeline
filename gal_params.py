@@ -22,7 +22,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (7, 10)
 
-    if galaxy == 'NGC4694':
+    elif galaxy == 'NGC4694':
         vrange = 50
         vrange_2 = 50
         cliplevel = 1.5
@@ -44,7 +44,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (8.5, 8)
 
-    if galaxy == 'NGC4689':
+    elif galaxy == 'NGC4689':
         vrange = 100
         vrange_2 = 30
         cliplevel = 1.5
@@ -66,7 +66,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 9.5)
 
-    if galaxy == 'NGC4654':
+    elif galaxy == 'NGC4654':
         vrange = 150
         vrange_2 = 30
         cliplevel = 1.5
@@ -88,7 +88,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 6.5)
 
-    if galaxy == 'NGC4579':
+    elif galaxy == 'NGC4579':
         vrange = 200
         vrange_2 = 120
         cliplevel = 1.5
@@ -110,7 +110,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 7)
 
-    if galaxy == 'NGC4569':
+    elif galaxy == 'NGC4569':
         vrange = 200
         vrange_2 = 80
         cliplevel = 1.5
@@ -132,7 +132,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (9.5, 10)
 
-    if galaxy == 'NGC4548':
+    elif galaxy == 'NGC4548':
         vrange = 150
         vrange_2 = 80
         cliplevel = 1.5
@@ -154,7 +154,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 7.5)
 
-    if galaxy == 'NGC4536':
+    elif galaxy == 'NGC4536':
         vrange = 200
         vrange_2 = 100
         cliplevel = 1.5
@@ -176,7 +176,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 7)
 
-    if galaxy == 'NGC4535':
+    elif galaxy == 'NGC4535':
         vrange = 150
         vrange_2 = 50
         cliplevel = 1.5
@@ -198,7 +198,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 10)
 
-    if galaxy == 'NGC4457':
+    elif galaxy == 'NGC4457':
         vrange = 120
         vrange_2 = 60
         cliplevel = 1.5
@@ -220,7 +220,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 7)
 
-    if galaxy == 'NGC4424':
+    elif galaxy == 'NGC4424':
         vrange = 60
         vrange_2 = 35
         cliplevel = 1.5
@@ -242,7 +242,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 7)
 
-    if galaxy == 'NGC4402':
+    elif galaxy == 'NGC4402':
         vrange = 150
         vrange_2 = 35
         cliplevel = 1.5
@@ -264,7 +264,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (15, 5.1)
 
-    if galaxy == 'NGC4321':
+    elif galaxy == 'NGC4321':
         vrange = 150
         vrange_2 = 60
         cliplevel = 1.5
@@ -286,7 +286,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 7)
 
-    if galaxy == 'NGC4298':
+    elif galaxy == 'NGC4298':
         vrange = 150
         vrange_2 = 40
         cliplevel = 1.5
@@ -308,7 +308,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 8.5)
 
-    if galaxy == 'NGC4293':
+    elif galaxy == 'NGC4293':
         vrange = 120
         vrange_2 = 70
         cliplevel = 1.5
@@ -330,7 +330,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 5.5)
 
-    if galaxy == 'NGC4254':
+    elif galaxy == 'NGC4254':
         vrange = 150
         vrange_2 = 40
         cliplevel = 1.5
@@ -352,7 +352,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (9, 7.5)
 
-    if galaxy == 'NGC4561':
+    elif galaxy == 'NGC4561':
         vrange = 30
         vrange_2 = 20
         cliplevel = 1.5
@@ -374,7 +374,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (7.5, 9)
 
-    if galaxy == 'NGC4450':
+    elif galaxy == 'NGC4450':
         vrange = 150
         vrange_2 = 75
         cliplevel = 3
@@ -396,7 +396,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (9, 10)
 
-    if galaxy == 'NGC4580':
+    elif galaxy == 'NGC4580':
         vrange = 100
         vrange_2 = 35
         cliplevel = 3
@@ -418,7 +418,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 10)
 
-    if galaxy == 'NGC4772':
+    elif galaxy == 'NGC4772':
         vrange = 400
         vrange_2 = 30
         cliplevel = 3
@@ -440,7 +440,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 9.5)
 
-    if galaxy == 'NGC4567':
+    elif galaxy == 'NGC4567':
         vrange = 120
         vrange_2 = 50
         cliplevel = 3
@@ -462,7 +462,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 6)
 
-    if galaxy == 'NGC4396':
+    elif galaxy == 'NGC4396':
         vrange = 100
         vrange_2 = 30
         cliplevel = 3
@@ -484,7 +484,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 7.5)
 
-    if galaxy == 'NGC4808':
+    elif galaxy == 'NGC4808':
         vrange = 150
         vrange_2 = 40
         cliplevel = 3
@@ -506,7 +506,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 7.5)
 
-    if galaxy == 'NGC4651':
+    elif galaxy == 'NGC4651':
         vrange = 200
         vrange_2 = 75
         cliplevel = 3
@@ -528,7 +528,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 6.5)
 
-    if galaxy == 'NGC4607':
+    elif galaxy == 'NGC4607':
         vrange = 120
         vrange_2 = 30
         cliplevel = 3
@@ -550,7 +550,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (8, 10)
 
-    if galaxy == 'NGC4606':
+    elif galaxy == 'NGC4606':
         vrange = 100
         vrange_2 = 50
         cliplevel = 3
@@ -572,7 +572,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 7.5)
 
-    if galaxy == 'NGC4533':
+    elif galaxy == 'NGC4533':
         vrange = 100
         vrange_2 = 75
         cliplevel = 3
@@ -594,7 +594,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 10)
 
-    if galaxy == 'NGC4532':
+    elif galaxy == 'NGC4532':
         vrange = 100
         vrange_2 = 30
         cliplevel = 3
@@ -616,7 +616,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (9, 10)
 
-    if galaxy == 'NGC4522':
+    elif galaxy == 'NGC4522':
         vrange = 100
         vrange_2 = 30
         cliplevel = 3
@@ -638,7 +638,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (9.5, 10)
 
-    if galaxy == 'NGC4419':
+    elif galaxy == 'NGC4419':
         vrange = 200
         vrange_2 = 75
         cliplevel = 3
@@ -660,7 +660,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 7)
 
-    if galaxy == 'NGC4405':
+    elif galaxy == 'NGC4405':
         vrange = 100
         vrange_2 = 30
         cliplevel = 3
@@ -682,7 +682,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 9)
 
-    if galaxy == 'NGC4394':
+    elif galaxy == 'NGC4394':
         vrange = 100
         vrange_2 = 50
         cliplevel = 3
@@ -704,7 +704,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 10)
 
-    if galaxy == 'NGC4388':
+    elif galaxy == 'NGC4388':
         vrange = 200
         vrange_2 = 100
         cliplevel = 3
@@ -726,7 +726,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (14.5, 6)
 
-    if galaxy == 'NGC4383':
+    elif galaxy == 'NGC4383':
         vrange = 100
         vrange_2 = 50
         cliplevel = 3
@@ -748,7 +748,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (9, 10)
 
-    if galaxy == 'NGC4380':
+    elif galaxy == 'NGC4380':
         vrange = 200
         vrange_2 = 50
         cliplevel = 3
@@ -770,7 +770,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (9, 10)
 
-    if galaxy == 'NGC4351':
+    elif galaxy == 'NGC4351':
         vrange = 50
         vrange_2 = 30
         cliplevel = 3
@@ -792,7 +792,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 6.5)
 
-    if galaxy == 'NGC4330':
+    elif galaxy == 'NGC4330':
         vrange = 150
         vrange_2 = 30
         cliplevel = 3
@@ -814,7 +814,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 6.5)
 
-    if galaxy == 'NGC4302':
+    elif galaxy == 'NGC4302':
         vrange = 200
         vrange_2 = 75
         cliplevel = 3
@@ -836,7 +836,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (6, 20)
 
-    if galaxy == 'NGC4294':
+    elif galaxy == 'NGC4294':
         vrange = 100
         vrange_2 = 40
         cliplevel = 3
@@ -858,7 +858,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (9, 10)
 
-    if galaxy == 'NGC4222':
+    elif galaxy == 'NGC4222':
         vrange = 100
         vrange_2 = 25
         cliplevel = 3
@@ -880,7 +880,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 6.5)
 
-    if galaxy == 'NGC4216':
+    elif galaxy == 'NGC4216':
         vrange = 300
         vrange_2 = 75
         cliplevel = 3
@@ -902,7 +902,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (6.5, 10)
 
-    if galaxy == 'NGC4192':
+    elif galaxy == 'NGC4192':
         vrange = 250
         vrange_2 = 100
         cliplevel = 3
@@ -924,7 +924,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (8.5, 10)
 
-    if galaxy == 'NGC4064':
+    elif galaxy == 'NGC4064':
         vrange = 120
         vrange_2 = 60
         cliplevel = 3
@@ -946,7 +946,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 10)
 
-    if galaxy == 'IC3392':
+    elif galaxy == 'IC3392':
         vrange = 120
         vrange_2 = 40
         cliplevel = 3
@@ -968,7 +968,7 @@ def parameters(galaxy, sample=None):
         eccentricity = None
         figsize = (10, 8.5)
 
-    if galaxy == 'NGC4713':
+    elif galaxy == 'NGC4713':
         vrange = 110
         vrange_2 = 40
         cliplevel = 4

@@ -756,6 +756,7 @@ class MomentMaps:
                 # Option to check the aperture. It is done a little ugly by setting the values inside to 10 and 20 to
                 # make them show up on top of the moment map.
                 if check_aperture:
+                    plt.figure()
                     if hires:
                         mom0_K_rot[:, int(centre + inner):int(centre + inner + 1)] = 10
                         mom0_K_rot[:, int(centre - inner - 1):int(centre - inner)] = 20
@@ -764,6 +765,7 @@ class MomentMaps:
                         mom0_K_rot[:, int(centre - inner - beam_pix):int(centre - inner)] = 20
                     from matplotlib import pyplot as plt
                     plt.imshow(mom0_K_rot)
+                    break
 
                 # Save the emission and area covered
                 rad_prof_K.append(emission_K)
@@ -798,9 +800,16 @@ class MomentMaps:
         error_K = uncertainty * np.sqrt(N_beams)
         error_Msun = error_K * alpha_co
 
+        print('Old error: ')
         print(error_K_old)
-        print('*****')
+        print('New error:')
         print(error_K)
+        print('New error / old error:')
+        print(error_K / error_K_old)
+        print('RMS:')
+        print(rms)
+        print('Average value in uncertainty map:')
+        print(np.nanmedian(uncertainty))
 
         # Define some parameters that need to go in the csv header
         w = wcs.WCS(mom0_hdu_K.header, naxis=2)

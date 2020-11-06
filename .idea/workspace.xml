@@ -19,12 +19,11 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Added a function to make all moment maps come out square">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Implemented errors in radial profiles for highly inclined galaxies, added comments to the function.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clip_cube.py" beforeDir="false" afterPath="$PROJECT_DIR$/clip_cube.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/image_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_moments.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,13 +64,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00036" summary="Added 2 galaxies, fixed a bug in the centring of the image.">
-      <created>1585909846799</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1585909846799</updated>
     </task>
     <task id="LOCAL-00037" summary="Tried to image NGC4561">
       <created>1586170440276</created>
@@ -409,7 +401,14 @@
       <option name="project" value="LOCAL" />
       <updated>1603897348502</updated>
     </task>
-    <option name="localTasksCounter" value="85" />
+    <task id="LOCAL-00085" summary="Implemented errors in radial profiles for highly inclined galaxies, added comments to the function.">
+      <created>1604665404225</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1604665404226</updated>
+    </task>
+    <option name="localTasksCounter" value="86" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -425,7 +424,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Some tweaks to the plots" />
     <MESSAGE value="Some more tweaks to the plots" />
     <MESSAGE value="Some small tweaks" />
     <MESSAGE value="Plots in offset, manually add in beam information" />
@@ -450,7 +448,8 @@
     <MESSAGE value="Made some changes to make it work with the HERACLES data products, and made a script to import those data and put them through the pipeline. Distances still need to be implemented." />
     <MESSAGE value="Implement code to read heracles distances from csv file" />
     <MESSAGE value="Added a function to make all moment maps come out square" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added a function to make all moment maps come out square" />
+    <MESSAGE value="Implemented errors in radial profiles for highly inclined galaxies, added comments to the function." />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented errors in radial profiles for highly inclined galaxies, added comments to the function." />
   </component>
   <component name="WindowStateProjectService">
     <state x="458" y="62" width="1040" height="882" key="FileChooserDialogImpl" timestamp="1600767261922">
@@ -466,11 +465,11 @@
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1603877550336" />
-    <state x="588" y="289" width="829" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1604660552973">
+    <state x="588" y="289" width="829" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1604665406986">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="540" y="1080" width="829" height="1080" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1597159309723" />
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1604660552973" />
+    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1604665406986" />
     <state x="719" y="247" width="539" height="619" key="git4idea.branch.GitSmartOperationDialog" timestamp="1604662937877">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
