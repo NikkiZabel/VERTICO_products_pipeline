@@ -12,7 +12,7 @@ refresh = True
 overwrite = True
 sun = True
 tosave = True
-resolution = 'nearest_720'
+resolution = 'nearest_1200'
 
 if resolution == 1200:
     data = [f for f in glob(path + '*1200pc.fits')]
@@ -49,6 +49,8 @@ for file in data:
 
         if not os.path.exists(path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy + '/'):
             os.mkdir(path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy + '/')
+        else:
+            continue
         savepath = path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy + '/'
 
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
