@@ -550,14 +550,24 @@ class MomentMaps:
 
     def radial_profile(self, alpha_co=6.25, table_path=None, check_aperture=False, hires=False):
 
+        # Option to use "high resolution", which means calculating the surface density at each pixel rather than
+        # each beam along the galaxy major axis.
         if hires:
             print('WARNING: using a resolution of 1 pixel')
 
+        # Read in moment maps and corresponding uncertainties
         _, mom0_hdu_Msun, _, _, _ = self.calc_moms(units='M_Sun/pc^2', alpha_co=alpha_co)
         _, mom0_hdu_K, _, _, _ = self.calc_moms(units='K km/s', alpha_co=alpha_co)
+        mom0_K_uncertainty, SN_hdu, _, _ = self.uncertainty_maps(calc_rms=False)
 
+        # Deal with nans in uncertainty map
+        unc_isnan = np.isnan(mom0_K_uncertainty.data)  # mask for nan values
+        mom0_K_uncertainty.data[unc_isnan] = 0
+
+        # Calculate the number of pixels in one beam (along the major axis)
         beam_pix = mom0_hdu_K.header['BMAJ'] / mom0_hdu_K.header['CDELT2']
 
+        ##### THIS PART CAN GO AFTER WE FIX THIS #####
         # Estimate the rms from the spatial inner part of the cube
         cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                             savepath=self.savepath,
@@ -570,14 +580,16 @@ class MomentMaps:
                                             tosave=self.tosave, sample=self.sample).innersquare(noisecube.data)
         rms = np.nanstd(inner)
         rms_Msun = rms * alpha_co
-        #rms_Msun = rms_Msun * abs(cube_pbcorr.header['CDELT3']) / 1000 * 91.7 * alpha_co * (cube_pbcorr.header['BMAJ'] * 3600 *
-        #        cube_pbcorr.header['BMIN'] * 3600) ** (-1) / 4
+        ###################################################
 
+        # Set the surface density limit to which we want to calculate radial profiles
         if hires:
             limit = 0
         else:
             limit = 2 * rms_Msun
 
+        # Calculate the shape of the elliptical annuli, of no eccentricity or inclination is defined, it will be
+        # read from the master table.
         if self.galaxy.eccentricity:
             e = self.galaxy.eccentricity
         elif self.galaxy.inclination:
@@ -589,35 +601,48 @@ class MomentMaps:
             print('Reading the inclination from the master table.')
             table = fits.open(table_path)
             inc = table[1].data['inclination'][table[1].data['Galaxy'] == self.galaxy.name]
+
+            # Inclinations of exactly 0 or 90 degrees give problems, so shift them slightly
             if inc == [90]:
                 inc = [89]
             if inc == [0]:
                 inc = [1]
             e = np.sin(np.deg2rad(inc))[0]
 
+        # Calculate the centre of the image. The moment maps are centred, so this is just the centre of the image
         centre = (int(mom0_hdu_K.shape[1] / 2), int(mom0_hdu_K.shape[0] / 2))
+
+        # Set hi_inc to False to begin with, it will be set to True automatically if the galaxy is found to have too
+        # high inclination to use elliptical annuli
         hi_inc = False
+
+        # Create lists to save the results in
         rad_prof_K = []
         rad_prof_Msun = []
         radius = []
         area = []
 
-        b_in = -beam_pix + 0.000000000001
-        if hires:
-            b_in = -1 + 0.0000000001
+        # Set the starting values for the elliptical annuli
         b_out = 0
         theta = np.deg2rad(self.galaxy.angle + 90)
-
         emission_Msun = 2112
         area_temp = 1
+        if hires:
+            b_in = -1 + 0.0000000001
+        else:
+            b_in = -beam_pix + 0.000000000001
 
+        # If we want to check if the aperture is correct, plot the moment map first.
         if check_aperture:
             from matplotlib import pyplot as plt
             plt.figure()
             plt.imshow(mom0_hdu_K.data)
 
+        # As long as the lower surface density limit is not reached, create a new aperture and calculate the surface
+        # density inside.
         while emission_Msun / area_temp > limit:
 
+            # Set the correct parameters to create the new aperture
             if hires:
                 b_in += 1
                 b_out += 1
@@ -635,26 +660,27 @@ class MomentMaps:
             else:
                 a_out = b_out / np.sqrt(1 - e ** 2)
 
+            # Create the aperture
             aperture = EllipticalAnnulus(positions=centre, a_in=a_in, a_out=a_out, b_out=b_out, theta=theta)
 
+            # Option to check if it ends up in the right place
             if check_aperture:
                 aperture.plot(color='red')
 
-            # pull up the uncertainties
-            mom0_K_uncertainty, SN_hdu, _, _ = self.uncertainty_maps(calc_rms=False)
-            unc_isnan = np.isnan(mom0_K_uncertainty.data)  # mask for nan values
-
+            # Calculate the emission and corresponding errors in the aperture
             emission_K = aperture_photometry(mom0_hdu_K.data, aperture, mask=unc_isnan,)['aperture_sum'][0]
             e_emission_K = aperture_photometry(mom0_hdu_K.data, aperture, mask=unc_isnan, error=mom0_K_uncertainty.data)['aperture_sum_err'][0]
             emission_Msun = aperture_photometry(mom0_hdu_Msun.data, aperture, error=mom0_K_uncertainty.data)['aperture_sum'][0]
             e_emission_Msun = e_emission_K * alpha_co
 
+            # Calculate the area, and get the surface densities by dividing by it
             area_temp = aperture.area
             area.append(area_temp)
             rad_prof_K.append(emission_K / area_temp)
             rad_prof_Msun.append(emission_Msun / area_temp)
             radius.append(a_out)
 
+            ######### SOME TEMPORARY UNCERTAINTY STUFF ##########
             # K_uncertainty = aperture_photometry(mom0_K_uncertainty.data, aperture)['aperture_sum'][0]
 
             # uncertainty = sqrt(Sum[(individual uncertainties in beams)**2])/(# of beams)
@@ -662,32 +688,49 @@ class MomentMaps:
             # aperture_photometry(.., error=..) returns sqrt(Sum[(individual uncertainties in beams)**2])
             # thus we just divide by the no pix
 
-            print('k km/s', emission_K / area_temp, e_emission_K/ area_temp
-                    , 'Msun/pc^2', emission_Msun / area_temp, e_emission_Msun/ area_temp
-                    , 'area', area_temp)
+            #print('k km/s', emission_K / area_temp, e_emission_K/ area_temp
+            #        , 'Msun/pc^2', emission_Msun / area_temp, e_emission_Msun/ area_temp
+            #        , 'area', area_temp)
+            ###########################################################
 
+        # If we find that the inclination is too high to get sufficient data points - this is completely arbitrary and
+        # the conditions are kind of fluid. Now, it is a combination of the number of data points and eccentricity.
+        # (it can't be based on number of data points only as that would give problems with small galaxies, but we could
+        # choose a certain eccentricity/inclination limit instead. This way, we wouldn't have to do the calculation
+        # twice.
         #if ((len(radius) < 5) & (e > 0.7)) or ((len(np.array(rad_prof_K)[np.log10(np.array(rad_prof_K)) < 0]) > 2) & (e > 0.7)):
         if ((len(radius) < 15) & (e > 0.7)):
 
+            # Set the hi_inc parameter to True so we know what is happening
             hi_inc = True
 
+            # Create new lists to overwrite the current ones that do not contain enough information.
             rad_prof_K = []
             rad_prof_Msun = []
             radius = []
             area = []
+            uncertainty = []
 
+            # Calculate the angle with which we have to rotate the galaxy to align the major axis with the horizontal.
             angle = self.galaxy.angle + 180 + 90
 
             # interpolate/rotate moment maps and uncertainty maps
             mom0_K_rot = ndimage.interpolation.rotate(mom0_hdu_K.data, angle, reshape=True)
             mom0_Msun_rot = ndimage.interpolation.rotate(mom0_hdu_Msun.data, angle, reshape=True)
+            mom0_K_uncertainty_rot = ndimage.interpolation.rotate(mom0_K_uncertainty.data, angle, reshape=True)
 
+            # Set initial parameters for the slices and make sure the condition for the loop is not yet met.
             inner = 0
             centre = (mom0_K_rot.shape[1]) / 2
             emission_Msun = 2112
 
+            # As long as we don't reach the border of the galaxy (as per the surface density limit defined above),
+            # define a vertical slice and calculate the emission inside.
             while emission_Msun > limit:
 
+                # Calculate a vertical slice left and right of the centre, then combine the two to obtain the total
+                # emission at a certain radius. Each time the loop is called, the slice is placed further out to match
+                # the outside of the previous slice.
                 if hires:
                     slice1_K = mom0_K_rot[:, int(centre + inner):int(centre + inner + 1)]
                     slice2_K = mom0_K_rot[:, int(centre - inner - 1):int(centre - inner)]
@@ -696,18 +739,22 @@ class MomentMaps:
                     slice1_Msun = mom0_Msun_rot[:, int(centre + inner):int(centre + inner + 1)]
                     slice2_Msun = mom0_Msun_rot[:, int(centre - inner - 1):int(centre - inner)]
                     emission_Msun = np.average(np.average(slice1_Msun) + np.average(slice2_Msun))
+
                 else:
-                    # calculate the radial profile
                     slice1_K = mom0_K_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
                     slice2_K = mom0_K_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
                     emission_K = np.average(np.average(slice1_K) + np.average(slice2_K))
 
                     slice1_Msun = mom0_Msun_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
                     slice2_Msun = mom0_Msun_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
-
-                    
                     emission_Msun = np.average(np.average(slice1_Msun) + np.average(slice2_Msun))
 
+                    slice1_unc = mom0_K_uncertainty_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
+                    slice2_unc = mom0_K_uncertainty_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
+                    emission_unc = np.average(np.average(slice1_unc) + np.average(slice2_unc))
+
+                # Option to check the aperture. It is done a little ugly by setting the values inside to 10 and 20 to
+                # make them show up on top of the moment map.
                 if check_aperture:
                     if hires:
                         mom0_K_rot[:, int(centre + inner):int(centre + inner + 1)] = 10
@@ -718,35 +765,49 @@ class MomentMaps:
                     from matplotlib import pyplot as plt
                     plt.imshow(mom0_K_rot)
 
+                # Save the emission and area covered
                 rad_prof_K.append(emission_K)
                 rad_prof_Msun.append(emission_Msun)
-                radius.append(inner + 1)
-
+                uncertainty.append(emission_unc)
                 area.append(len(slice1_K[slice1_K > 0]) + len(slice2_K[slice2_K > 0]))
 
+                # Shift the slice by the appropriate amount
                 if hires:
+                    radius.append(inner + 1)
                     inner += 1
                 else:
+                    radius.append(inner + beam_pix)
                     inner += beam_pix
 
-        print(rad_prof_K)
+        # Throw away the last element as the condition was no longer met
         rad_prof_K = rad_prof_K[:-1]
         rad_prof_Msun = rad_prof_Msun[:-1]
         radius = np.array(radius[:-1])
         area = area[:-1]
+        uncertainty = uncertainty[:-1]
+
+        # Calculate radii corresponding to the elements in the arrays above
         radii_deg = radius * mom0_hdu_K.header['CDELT2']
         radii_kpc = np.deg2rad(radii_deg) * self.galaxy.distance * 1000
-        N_beams = np.array(area) / (beam_pix ** 2 * np.pi)
-        error_K = np.sqrt(N_beams) * rms
-        error_Msun = np.sqrt(N_beams) * rms_Msun
 
+        # Calculate uncertainties
+        # sqrt(Sum[(individual uncertainties in beams)**2])/(# of beams)
+        N_beams = np.array(area) / (beam_pix ** 2 * np.pi)
+        error_K_old = np.sqrt(N_beams) * rms
+        error_Msun_old = np.sqrt(N_beams) * rms_Msun
+        error_K = uncertainty * np.sqrt(N_beams)
+        error_Msun = error_K * alpha_co
+
+        print(error_K_old)
+        print('*****')
+        print(error_K)
+
+        # Define some parameters that need to go in the csv header
         w = wcs.WCS(mom0_hdu_K.header, naxis=2)
         centre_sky = wcs.utils.pixel_to_skycoord(mom0_hdu_K.shape[0] / 2, mom0_hdu_K.shape[1] / 2, wcs=w)
-
         clip_rms = self.uncertainty_maps(calc_rms=True)
 
-        print(rad_prof_K)
-
+        # Save radial profiles as csv
         if hi_inc:
             if self.sun:
                 csv_header = 'Slices parallel to the minor axis centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \

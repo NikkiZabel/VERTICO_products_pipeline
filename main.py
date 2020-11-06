@@ -2,26 +2,22 @@ from image_moments import CreateImages
 from create_moments import *
 import warnings; warnings.filterwarnings("ignore")
 import os
-from matplotlib import pyplot as plt
-import pathlib
-
 
 # Set some parameters to apply to all images below
 refresh = True
-overwrite = True
+overwrite = False
 sun = True
-clip = False
-tosave = False
+tosave = True
 pbcor = True
 resolution = 0
-version = '1.0'
+version = '1_0'
 
-# galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
-#             'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
-#             'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808', 'NGC4396',
-#             'NGC4567', 'NGC4772', 'NGC4580', 'NGC4450', 'NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
-#             'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689',
-#             'NGC4691', 'NGC4698', 'NGC4694']
+galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
+            'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
+            'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808', 'NGC4396',
+            'NGC4567', 'NGC4772', 'NGC4580', 'NGC4450', 'NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
+            'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689',
+            'NGC4691', 'NGC4698', 'NGC4694']
 
 #galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
 #            'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
@@ -34,81 +30,49 @@ version = '1.0'
 #galaxies = ['NGC4064', 'NGC4222', 'NGC4294', 'NGC4330', 'NGC4388', 'NGC4394', 'NGC4402', 'NGC4405', 'NGC4419',
 #            'NGC4522', 'NGC4533', 'NGC4567', 'NGC4606', 'NGC4607', 'NGC4772']  # These are the 7m only detections
 
-galaxies = ['IC3392']
+galaxies = ['NGC4222']
 
 for i in range(len(galaxies)):
 
     galaxy = galaxies[i]
 
-    print("")
-    print("Beginning "+galaxy+":")
+    print(galaxy)
 
-    path = '/Users/thbrown/VERTICO/'
+    path = '/home/nikki/Documents/Data/VERTICO/'
 
     if resolution == 15:
-        readpath = path + 'share/cubes/v1/15arcsec/' + galaxy + '/'
+        readpath = path + 'ReducedData/v1/15arcsec/' + galaxy + '/'
     elif resolution == 9:
-        readpath = path + 'share/cubes/v1/9arcsec/' + galaxy + '/'
+        readpath = path + 'ReducedData/v1/9arcsec/' + galaxy + '/'
     else:
-        readpath = path + 'share/cubes/v1/native/' + galaxy + '/'
+        readpath = path + 'ReducedData/v1/native/' + galaxy + '/'
 
     if sun:
         if resolution == 15:
-
-            # check if the dir exists, if not make it
-            if not os.path.exists(path + 'products/v' + version + '/15_arcsec/' + galaxy + '/'):
-                print("making product directory: "+path + 'products/v' + version + '/15_arcsec/' + galaxy + '/')
-                pathlib.Path(path + 'products/v' + version + '/15_arcsec/' + galaxy + '/').mkdir(parents=True, exist_ok=True)
-            else:
-                print("Product directory exists: "+path + 'products/v' + version + '/15_arcsec/' + galaxy + '/')
-
-            savepath_temp = path + 'products/v' + version + '/15_arcsec/' + galaxy + '/'
+            if not os.path.exists(path + 'products_v' + version + '/15_arcsec/sun18_method/' + galaxy + '/'):
+                os.mkdir(path + 'products_v' + version + '/15_arcsec/sun18_method/' + galaxy + '/')
+            savepath_temp = path + 'products_v' + version + '/15_arcsec/sun18_method/' + galaxy + '/'
         elif resolution == 9:
-            
-            if not os.path.exists(path + 'products/v' + version + '/9_arcsec/' + galaxy + '/'):
-                print("making product directory: "+path + 'products/v' + version + '/9_arcsec/' + galaxy + '/')
-                pathlib.Path(path + 'products/v' + version + '/9_arcsec/' + galaxy + '/').mkdir(parents=True, exist_ok=True)
-            else:
-                print("Product directory exists: "+path + 'products/v' + version + '/9_arcsec/' + galaxy + '/')
-
-            savepath_temp = path + 'products/v' + version + '/9_arcsec/' + galaxy + '/'
+            if not os.path.exists(path + 'products_v' + version + '/9_arcsec/sun18_method/' + galaxy + '/'):
+                os.mkdir(path + 'products_v' + version + '/9_arcsec/sun18_method/' + galaxy + '/')
+            savepath_temp = path + 'products_v' + version + '/9_arcsec/sun18_method/' + galaxy + '/'
         else:
-            
-            if not os.path.exists(path + 'products/v' + version + '/native/' + galaxy + '/'):
-                print("making product directory: "+path + 'products/v' + version + '/native/' + galaxy + '/')
-                pathlib.Path(path + 'products/v' + version + '/native/' + galaxy + '/').mkdir(parents=True, exist_ok=True)
-            else:
-                print("Product directory exists: "+path + 'products/v' + version + '/native/' + galaxy + '/')
-
-            savepath_temp = path + 'products/v' + version + '/native/' + galaxy + '/'
+            if not os.path.exists(path + 'products_v' + version + '/native/sun18_method/' + galaxy + '/'):
+                os.mkdir(path + 'products_v' + version + '/native/sun18_method/' + galaxy + '/')
+            savepath_temp = path + 'products_v' + version + '/native/sun18_method/' + galaxy + '/'
     else:
         if resolution == 15:
-            
-            if not os.path.exists(path + 'products/v' + version + '/15_arcsec/dame11_method/' + galaxy + '/'):
-                print("making product directory: "+path + 'products/v' + version + '/15_arcsec/dame11_method/' + galaxy + '/')
-                pathlib.Path(path + 'products/v' + version + '/15_arcsec/dame11_method/' + galaxy + '/').mkdir(parents=True, exist_ok=True)
-            else:
-                print("Product directory exists: "+path + 'products/v' + version + '/15_arcsec/dame11_method/' + galaxy + '/')
-
-            savepath_temp = path + 'products/v' + version + '/15_arcsec/dame11_method/' + galaxy + '/'
+            if not os.path.exists(path + 'products_v' + version + '/15_arcsec/dame11_method/' + galaxy + '/'):
+                os.mkdir(path + 'products_v' + version + '/15_arcsec/dame11_method/' + galaxy + '/')
+            savepath_temp = path + 'products_v' + version + '/15_arcsec/dame11_method/' + galaxy + '/'
         elif resolution == 9:
-            
-            if not os.path.exists(path + 'products/v' + version + '/9_arcsec/dame11_method/' + galaxy + '/'):
-                print("making product directory: "+path + 'products/v' + version + '/9_arcsec/dame11_method/' + galaxy + '/')
-                pathlib.Path(path + 'products/v' + version + '/9_arcsec/dame11_method/' + galaxy + '/').mkdir(parents=True, exist_ok=True)
-            else:
-                print("Product directory exists: "+path + 'products/v' + version + '/9_arcsec/dame11_method/' + galaxy + '/')
-
-            savepath_temp = path + 'products/v' + version + '/9_arcsec/dame11_method/' + galaxy + '/'
+            if not os.path.exists(path + 'products_v' + version + '/9_arcsec/dame11_method/' + galaxy + '/'):
+                os.mkdir(path + 'products_v' + version + '/9_arcsec/dame11_method/' + galaxy + '/')
+            savepath_temp = path + 'products_v' + version + '/9_arcsec/dame11_method/' + galaxy + '/'
         else:
-            
-            if not os.path.exists(path + 'products/v' + version + '/native/dame11_method/' + galaxy + '/'):
-                print("making product directory: "+path + 'products/v' + version + '/native/dame11_method/' + galaxy + '/')
-                pathlib.Path(path + 'products/v' + version + '/native/dame11_method/' + galaxy + '/').mkdir(parents=True, exist_ok=True)
-            else:
-                print("Product directory exists: "+path + 'products/v' + version + '/native/dame11_method/' + galaxy + '/')
-
-            savepath_temp = path + 'products/v' + version + '/native/dame11_method/' + galaxy + '/'
+            if not os.path.exists(path + 'products_v' + version + '/native/dame11_method/' + galaxy + '/'):
+                os.mkdir(path + 'products_v' + version + '/native/dame11_method/' + galaxy + '/')
+            savepath_temp = path + 'products_v' + version + '/native/dame11_method/' + galaxy + '/'
 
     if galaxy == 'NGC4606' or galaxy == 'NGC4351':
         import matplotlib
@@ -118,71 +82,43 @@ for i in range(len(galaxies)):
 
     if resolution == 15:
         if sun:
-            savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_15_arcsec_'
+            savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_15_arcsec_sun18_'
         else:
             savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_15_arcsec_dame11_'
-    
     elif resolution == 9:
         if sun:
-            savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_9_arcsec_'
+            savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_9_arcsec_sun18_'
         else:
             savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_9_arcsec_dame11_'
-    
     else:
         if sun:
-            savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_'
+            savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_sun18_'
         else:
             savepath = savepath_temp + galaxy + '_7m+tp_co21_pbcorr_round_k_dame11_'
     try:
         file_pbcorr = readpath + galaxy + '_7m+tp_co21_pbcorr_round_k.fits'
         file_uncorr = readpath + galaxy + '_7m+tp_co21_flat_round_k.fits'
-    
-        assert os.path.exists(file_pbcorr) & os.path.exists(file_uncorr) 
-
-        if clip:
-            print('clipping data cube...')
-            cube_corr, cube_uncorr = ClipCube(galaxy
-                                                , file_pbcorr
-                                                , file_uncorr).readfits()
-
-            clipped_hdu, noisecube_hdu = ClipCube(galaxy
-                                                , file_pbcorr
-                                                , file_uncorr
-                                                , sun=sun
-                                                , savepath=savepath
-                                                , tosave=tosave).do_clip()
+        cube_corr, cube_uncorr = ClipCube(galaxy, file_pbcorr, file_uncorr).readfits()
     except:
         if resolution == 15:
             if sun:
-                savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_15_arcsec_'
+                savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_15_arcsec_sun18_'
             else:
                 savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_15_arcsec_dame11_'
         elif resolution == 9:
             if sun:
-                savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_9_arcsec_'
+                savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_9_arcsec_sun18_'
             else:
                 savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_9_arcsec_dame11_'
         else:
             if sun:
-                savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_'
+                savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_sun18_'
             else:
                 savepath = savepath_temp + galaxy + '_7m_co21_pbcorr_round_k_dame11_'
         try:
             file_pbcorr = readpath + galaxy + '_7m_co21_pbcorr_round_k.fits'
             file_uncorr = readpath + galaxy + '_7m_co21_flat_round_k.fits'
-            
-            assert os.path.exists(file_pbcorr) & os.path.exists(file_uncorr) 
-
-            if clip:
-                cube_corr, cube_uncorr = ClipCube(galaxy
-                                                    , file_pbcorr
-                                                    , file_uncorr).readfits()
-                clipped_hdu, noisecube_hdu = ClipCube(galaxy
-                                                , file_pbcorr
-                                                , file_uncorr
-                                                , sun=sun
-                                                , savepath=savepath
-                                                , tosave=tosave).do_clip()
+            cube_corr, cube_uncorr = ClipCube(galaxy, file_pbcorr, file_uncorr).readfits()
         except:
             continue
         TP = False
@@ -197,7 +133,6 @@ for i in range(len(galaxies)):
         data = fits.open(file_pbcorr)[0]
         pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/' + galaxy + '/' +
                            galaxy + '_7m_co21_pb_rebin.fits')[0]
-
         if not pb.shape[1:3] == data.shape[1:3]:
             print('Wrong PB shape:')
             print(galaxy)
@@ -212,8 +147,7 @@ for i in range(len(galaxies)):
         file_pbcorr = file_uncorr
         cube_corr = cube_uncorr.copy()
         if not os.path.exists(savepath_temp + 'PB_uncorrected/'):
-            print("making product directory "+(savepath_temp + 'PB_uncorrected/')
-            pathlib.Path(savepath_temp + 'PB_uncorrected/').mkdir(parents=True, exist_ok=True)
+            os.mkdir(savepath_temp + 'PB_uncorrected/')
         if TP:
             savepath = savepath_temp + 'PB_uncorrected/' + galaxy + '_7m+tp_co21_flat_round_k.fits'
         else:
@@ -221,6 +155,7 @@ for i in range(len(galaxies)):
     '''
 
     # Have a first look at the cube to figure out some parameters
+    #from matplotlib import pyplot as plt
     #plt.figure()
     #plt.imshow(np.sum(cube_corr.data, axis=0), origin='lower')
     #plt.figure()
@@ -232,10 +167,9 @@ for i in range(len(galaxies)):
 
 
     # Moment maps
-    
-    # CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #               sun=sun, tosave=tosave).moment_zero(units='K km/s')
     '''
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave).moment_zero(units='K km/s')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).moment_zero()
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -291,10 +225,13 @@ for i in range(len(galaxies)):
                 sun=sun, tosave=tosave).radial_profile(y_units='K km/s', x_units='kpc',
                                    alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
                                                                             check_aperture=False)
-    '''
-    print(tosave)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave).radial_profile(y_units='K km/s', x_units='arcsec',
-                                   alpha_co=6.25, table_path='/Users/thbrown/VERTICO/share/catalogues/VERTICO_basic.fits',
+                                   alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
                                                                             check_aperture=False)
-    
+    '''
+
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                sun=sun, tosave=tosave).radial_profile(y_units='K km/s', x_units='arcsec',
+                                   alpha_co=6.25, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
+                                                                            check_aperture=False)

@@ -474,7 +474,7 @@ class CreateImages:
             else:
                 rad_prof_K, rad_prof_K_err, rad_prof_Msun, rad_prof_Msun_err, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr,
                         self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=False, sample=self.sample).\
-                    radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture, hires=True)
+                    radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture, hires=False)
         else:
             temp = np.loadtxt(self.savepath + 'rad_prof.csv', delimiter=',')
             rad_prof_K = temp[:, 0]

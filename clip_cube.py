@@ -318,7 +318,7 @@ class ClipCube:
         cube, noisecube = self.cut_empty_rows(cube, noisecube)
         cube, noisecube = self.cut_empty_columns(cube, noisecube)
         cube, noisecube = self.centre_data(cube, noisecube)
-        cube, noisecube = self.make_square(cube, noisecube)
+        #cube, noisecube = self.make_square(cube, noisecube)
         return cube, noisecube
 
     def split_cube(self, cube):
