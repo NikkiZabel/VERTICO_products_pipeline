@@ -678,7 +678,7 @@ class MomentMaps:
             area.append(area_temp)
             rad_prof_K.append(emission_K / area_temp)
             rad_prof_Msun.append(emission_Msun / area_temp)
-            radius.append(a_out)
+            radius.append(b_out)  # OR A_OUT? OR AN AVERAGE?
 
             ######### SOME TEMPORARY UNCERTAINTY STUFF ##########
             # K_uncertainty = aperture_photometry(mom0_K_uncertainty.data, aperture)['aperture_sum'][0]
