@@ -27,13 +27,13 @@ class MomentMaps:
     def pixel_size_check(self, header, key="CDELT1", expected_pix_size=2, raise_exception=True):
         # check the pixel size is what's expected modulo some floating point error
         pixel_size_arcsec = abs(header[key] * 3600)
-        pixel_size_error_message = self.galaxy.name + ": " + key + " = " + str(pixel_size_arcsec) + "arcsec" + \
+        pixel_size_e_message = self.galaxy.name + ": " + key + " = " + str(pixel_size_arcsec) + "arcsec" + \
                                    " not " + str(expected_pix_size) + "arcsec"
         if not np.max(np.abs(pixel_size_arcsec - expected_pix_size)) < 1e-6:
             if raise_exception == True:
-                raise Exception(pixel_size_error_message)
+                raise Exception(pixel_size_e_message)
             else:
-                print(pixel_size_error_message)
+                print(pixel_size_e_message)
                 pass
 
     def calc_noise_in_cube(self,
@@ -619,7 +619,7 @@ class MomentMaps:
         # Create lists to save the results in
         rad_prof_K = []
         rad_prof_Msun = []
-        uncertainty = []
+        e_rad_prof_K = []
         radius = []
         area = []
 
@@ -670,9 +670,8 @@ class MomentMaps:
 
             # Calculate the emission and corresponding errors in the aperture
             emission_K = aperture_photometry(mom0_hdu_K.data, aperture, mask=unc_isnan,)['aperture_sum'][0]
-            emission_unc = aperture_photometry(mom0_hdu_K.data, aperture, mask=unc_isnan, error=mom0_K_uncertainty.data)['aperture_sum_err'][0]
+            e_emission_K = aperture_photometry(mom0_hdu_K.data, aperture, mask=unc_isnan, error=mom0_K_uncertainty.data)['aperture_sum_err'][0]
             emission_Msun = aperture_photometry(mom0_hdu_Msun.data, aperture)['aperture_sum'][0]
-            # e_emission_Msun = e_emission_K * alpha_co
 
             # Calculate the area, and get the surface densities by dividing by it
             area_temp = aperture.area
@@ -680,7 +679,7 @@ class MomentMaps:
             rad_prof_K.append(emission_K / area_temp)
             rad_prof_Msun.append(emission_Msun / area_temp)
             radius.append(a_out)
-            uncertainty.append(emission_unc)
+            e_rad_prof_K.append(e_emission_K)
 
             ######### SOME TEMPORARY UNCERTAINTY STUFF ##########
             # K_uncertainty = aperture_photometry(mom0_K_uncertainty.data, aperture)['aperture_sum'][0]
@@ -711,7 +710,7 @@ class MomentMaps:
             rad_prof_Msun = []
             radius = []
             area = []
-            uncertainty = []
+            e_rad_prof_K= []
 
             # Calculate the angle with which we have to rotate the galaxy to align the major axis with the horizontal.
             angle = self.galaxy.angle + 180 + 90
@@ -753,7 +752,7 @@ class MomentMaps:
 
                     slice1_unc = mom0_K_uncertainty_rot[:, int(centre + inner):int(centre + inner + beam_pix)]
                     slice2_unc = mom0_K_uncertainty_rot[:, int(centre - inner - beam_pix):int(centre - inner)]
-                    emission_unc = np.average(np.average(slice1_unc) + np.average(slice2_unc))
+                    e_emission_K = np.average(np.average(slice1_unc) + np.average(slice2_unc))
 
                 # Option to check the aperture. It is done a little ugly by setting the values inside to 10 and 20 to
                 # make them show up on top of the moment map.
@@ -772,7 +771,7 @@ class MomentMaps:
                 # Save the emission and area covered
                 rad_prof_K.append(emission_K)
                 rad_prof_Msun.append(emission_Msun)
-                uncertainty.append(emission_unc)
+                e_rad_prof_K.append(e_emission_K)
                 area.append(len(slice1_K[slice1_K > 0]) + len(slice2_K[slice2_K > 0]))
 
                 # Shift the slice by the appropriate amount
@@ -788,7 +787,7 @@ class MomentMaps:
         rad_prof_Msun = rad_prof_Msun[:-1]
         radius = np.array(radius[:-1])
         area = area[:-1]
-        uncertainty = uncertainty[:-1]
+        e_rad_prof_K = e_rad_prof_K[:-1]
 
         # Calculate radii corresponding to the elements in the arrays above
         radii_deg = radius * mom0_hdu_K.header['CDELT2']
@@ -797,21 +796,30 @@ class MomentMaps:
         # Calculate uncertainties
         # sqrt(Sum[(individual uncertainties in beams)**2])/(# of beams)
         N_beams = np.array(area) / (beam_pix ** 2 * np.pi)
-        error_K_old = np.sqrt(N_beams) * rms
-        error_Msun_old = np.sqrt(N_beams) * rms_Msun
-        error_K = uncertainty * np.sqrt(N_beams)
-        error_Msun = error_K * alpha_co
+        e_rad_prof_K_old = np.sqrt(N_beams) * rms
+        e_rad_prof_Msun_old = np.sqrt(N_beams) * rms_Msun
+        
+        ###
+        # TB - I'm not sure about this, the numbers look more reasonable when we do it this way but
+        # if I understand the error given in e_emission_K, I think we may divide by Npix (=area_temp?) rather than Nbeams
+        e_rad_prof_K = e_rad_prof_K / N_beams
+        ####
 
-        print('Old error: ')
-        print(error_K_old)
-        print('New error:')
-        print(error_K)
-        print('New error / old error:')
-        print(error_K / error_K_old)
-        print('RMS:')
+        e_rad_prof_Msun = np.array(e_rad_prof_K) * alpha_co
+
+        print('Old radial profile error: ')
+        [print('{} +/ {:}'.format(e,s)) for e, s in zip(rad_prof_K,e_rad_prof_K_old)]
+        print('\nNew radial profile error: ')
+        [print('{} +/ {:}'.format(e,s)) for e, s in zip(rad_prof_K,e_rad_prof_K)]
+        print('\nNew radial profile  error:')
+        print(e_rad_prof_K)
+        print('\nNew error / old error:')
+        print(e_rad_prof_K/ e_rad_prof_K_old)
+        print('\nRMS:')
         print(rms)
-        print('Average value in uncertainty map:')
-        print(np.nanmedian(uncertainty))
+        print('\nAverage value in uncertainty map:')
+        print(np.nanmedian(e_rad_prof_K))
+        print('')
 
         # Define some parameters that need to go in the csv header
         w = wcs.WCS(mom0_hdu_K.header, naxis=2)
@@ -855,19 +863,18 @@ class MomentMaps:
                              'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
 
         if not hires:
-            print(self.tosave)
             if self.tosave:
                 print('writing radial profile to '+ self.savepath + 'rad_prof.csv' )
                 np.savetxt(self.savepath + 'rad_prof.csv',
-                           np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * error_K, rad_prof_Msun,
-                                            np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
+                           np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * e_rad_prof_K, rad_prof_Msun,
+                                            np.ones(len(rad_prof_Msun)) * e_rad_prof_Msun, radii_deg * 3600, radii_kpc)),
                                             delimiter=',', header=csv_header)
         else:
             if self.tosave:
                 print('writing hi res radial profile to '+ self.savepath + 'rad_prof_hires.csv' )
                 np.savetxt(self.savepath + 'rad_prof_hires.csv',
-                       np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * error_K, rad_prof_Msun,
-                                        np.ones(len(rad_prof_Msun)) * error_Msun, radii_deg * 3600, radii_kpc)),
+                       np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * e_rad_prof_K, rad_prof_Msun,
+                                        np.ones(len(rad_prof_Msun)) * e_rad_prof_Msun, radii_deg * 3600, radii_kpc)),
                        delimiter=',', header=csv_header)
 
         return rad_prof_K, rms, rad_prof_Msun, rms_Msun, radii_deg * 3600, radii_kpc
