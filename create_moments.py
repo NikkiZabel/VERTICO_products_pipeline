@@ -6,12 +6,13 @@ from clip_cube import ClipCube
 from photutils import EllipticalAnnulus
 from photutils import aperture_photometry
 from astropy import wcs
+from pathlib import Path
 from astropy.stats import mad_std
 
 
 class MomentMaps:
 
-    def __init__(self, galname, path_pbcorr, path_uncorr, savepath=None, sun=True, tosave=False, sample=None):
+    def __init__(self, galname, path_pbcorr, path_uncorr, alpha_co=None, savepath=None, sun=True, tosave=False, sample=None):
         self.galaxy = galaxies(galname, sample)
         self.path_pbcorr = path_pbcorr
         self.path_uncorr = path_uncorr
@@ -19,10 +20,13 @@ class MomentMaps:
         self.sun = sun
         self.tosave = tosave
         self.sample = sample
+
+        # I'm temporarily setting tosave=False to avoid tons of print outs
         self.galaxy.start = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(get_chans=True)[0]
+                                    savepath=self.savepath, tosave=False, sample=self.sample).do_clip(silent=True, get_chans=True)[0]
         self.galaxy.stop = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(get_chans=True)[1]
+                                    savepath=self.savepath, tosave=False, sample=self.sample).do_clip(silent=True, get_chans=True)[1]
+        self.alpha_co = alpha_co
 
     def pixel_size_check(self, header, key="CDELT1", expected_pix_size=2, raise_exception=True):
         # check the pixel size is what's expected modulo some floating point error
@@ -86,7 +90,7 @@ class MomentMaps:
 
         # Centre and clip empty rows and columns to get it in the same shape as the other products
         _, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip()
+                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(silent=True)
 
         # extract negative values (only needed if masking_scheme='simple')
         if masking_scheme == 'simple':
@@ -152,6 +156,7 @@ class MomentMaps:
         # Write as FITS file
         rmscube_hdu = fits.PrimaryHDU(rmscube, noisecube.header)
         rmscube_hdu.writeto(self.savepath + 'rms_cube.fits', overwrite=True)
+        print("\n{} written to file.".format(Path(self.savepath + 'rms_cube.fits').name))
 
         return rmscube_hdu
 
@@ -292,7 +297,7 @@ class MomentMaps:
 
         return header
 
-    def calc_moms(self, units='M_Sun/pc^2', alpha_co=6.25):
+    def calc_moms(self, units='K km/s'):
         """
         Clip the spectral cube according to the desired method, and create moment 0, 1, and 2 maps. Save them as fits
         files if so desired. Also calculate the systemic velocity from the moment 1 map.
@@ -301,9 +306,15 @@ class MomentMaps:
         value for CO(2-1) from https://arxiv.org/pdf/1805.00937.pdf.
         :return: clipped spectral cube, HDUs of the moment 0, 1, and 2 maps, and the systemic velocity in km/s
         """
+        C = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
+                        tosave=self.tosave, sample=self.sample)
 
-        cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
-                        tosave=self.tosave, sample=self.sample).do_clip()
+        # try to read the cube, if it doesn't exist clip it
+        cube = C.read_clipped_cube()
+        
+        if cube == None:
+            print("Clipping and trimming cube...")
+            cube, _ = C.do_clip(silent=True)
 
         vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
 
@@ -320,7 +331,7 @@ class MomentMaps:
         if units == 'M_Sun/pc^2':
             #mom0 = mom0 / cube.header['JTOK'] * 91.7 * alpha_co * (cube.header['BMAJ'] * 3600 * cube.header[
             #    'BMIN'] * 3600) ** (-1) / 4
-            mom0 *= alpha_co
+            mom0 *= self.alpha_co
         elif units == 'K km/s':
             pass
         else:
@@ -354,7 +365,7 @@ class MomentMaps:
         mom0_hdu.header['BUNIT'] = units; mom0_hdu.header.comments['BUNIT'] = ''
         mom1_hdu.header['BUNIT'] = 'km/s'; mom1_hdu.header.comments['BUNIT'] = ''
         mom2_hdu.header['BUNIT'] = 'km/s'; mom2_hdu.header.comments['BUNIT'] = ''
-        mom0_hdu.header['ALPHA_CO'] = alpha_co; #mom0_hdu.header.comments['ALPHA_CO'] = 'Assuming a line ratio of 0.7'
+        mom0_hdu.header['ALPHA_CO'] = self.alpha_co; #mom0_hdu.header.comments['ALPHA_CO'] = 'Assuming a line ratio of 0.7'
         mom1_hdu.header['SYSVEL'] = sysvel; mom1_hdu.header.comments['SYSVEL'] = 'km/s'
 
         self.add_clipping_keywords(mom0_hdu.header)
@@ -364,10 +375,14 @@ class MomentMaps:
         if self.tosave:
             if units == 'M_Sun/pc^2':
                 mom0_hdu.writeto(self.savepath + 'mom0_Msun.fits', overwrite=True)
+                print("\n{} written to file.".format(Path(self.savepath + 'mom0_Msun.fits').name))
             if units == 'K km/s':
                 mom0_hdu.writeto(self.savepath + 'mom0_Kkms-1.fits', overwrite=True)
+                print("\n{} written to file.".format(Path(self.savepath + 'mom0_Kkms-1.fits').name))
             mom1_hdu.writeto(self.savepath + 'mom1.fits', overwrite=True)
+            print("\n{} written to file.".format(Path(self.savepath + 'mom1.fits').name))
             mom2_hdu.writeto(self.savepath + 'mom2.fits', overwrite=True)
+            print("\n{} written to file.".format(Path(self.savepath + 'mom2.fits').name))
 
         return cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel
 
@@ -486,8 +501,10 @@ class MomentMaps:
         if self.tosave:
             if axis == 'major':
                 pvd_hdu.writeto(self.savepath + 'PVD_major.fits', overwrite=True)
+                print("\n{} written to file.".format(Path(self.savepath + 'PVD_major.fits').name))
             if axis == 'minor':
                 pvd_hdu.writeto(self.savepath + 'PVD_minor.fits', overwrite=True)
+                print("\n{} written to file.".format(Path(self.savepath + 'PVD_minor.fits').name))
 
         return pvd_hdu
 
@@ -548,7 +565,7 @@ class MomentMaps:
 
         return spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies # / beamsize
 
-    def radial_profile(self, alpha_co=6.25, table_path=None, check_aperture=False, hires=False):
+    def radial_profile(self, alpha_co, table_path=None, check_aperture=False, hires=False):
 
         # Option to use "high resolution", which means calculating the surface density at each pixel rather than
         # each beam along the galaxy major axis.
@@ -800,8 +817,10 @@ class MomentMaps:
         e_rad_prof_Msun_old = np.sqrt(N_beams) * rms_Msun
         
         ###
-        # TB - I'm not sure about this, the numbers look more reasonable when we do it this way but
-        # if I understand the error given in e_emission_K, I think we may divide by Npix (=area_temp?) rather than Nbeams
+        # I'm not sure about this, although the numbers look reasonable so have left as is
+        # It depends on the error returned by aperture_photometry(*, error=...). I think
+        # a) the error is the average uncertainty per pix then it must be divided by Npix (=area_temp?).
+        # b) Otherwise, if the the error is avg uncertainty per beam then I think we are correct in dividing by Nbeams
         e_rad_prof_K = e_rad_prof_K / N_beams
         ####
 
@@ -888,7 +907,7 @@ class MomentMaps:
 
         # Map of the number of channels used to calculate the moments
         _, mask_trimmed = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(clip_also=mask)
+                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(silent=True, clip_also=mask)
         N_map = np.sum(mask_trimmed.data, axis=0)
 
         # Read in the cubes, split into cubes containing line and line-free channels, take the inner cube and calculate
@@ -916,7 +935,7 @@ class MomentMaps:
                            str(self.galaxy.name) + '_7m_co21_pb_rebin.fits')[0]
 
             _, pb_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                        savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(clip_also=pb_hdu)
+                                        savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(silent=True, clip_also=pb_hdu)
             pb_map = pb_cube.data[int(pb_cube.shape[0] / 2), :, :]
 
         except:
@@ -949,15 +968,28 @@ class MomentMaps:
 
         if self.tosave:
             mom0_uncertainty.writeto(self.savepath + 'mom0_unc.fits', overwrite=True)
+            print("\n{} written to file.".format(Path(self.savepath + 'mom0_unc.fits').name))
             SN_hdu.writeto(self.savepath + 'mom0_SN.fits', overwrite=True)
+            print("\n{} written to file.".format(Path(self.savepath + 'mom0_SN.fits').name))
             mom1_uncertainty.writeto(self.savepath + 'mom1_unc.fits', overwrite=True)
+            print("\n{} written to file.".format(Path(self.savepath + 'mom1_unc.fits').name))
             mom2_uncertainty.writeto(self.savepath + 'mom2_unc.fits', overwrite=True)
+            print("\n{} written to file.".format(Path(self.savepath + 'mom2_unc.fits').name))
 
         return mom0_uncertainty, SN_hdu, mom1_uncertainty, mom2_uncertainty
 
     def peak_temperature(self):
-        cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
-                        tosave=self.tosave, sample=self.sample).do_clip()
+
+        C = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
+                        tosave=self.tosave, sample=self.sample)
+
+        try: # try to read the cube, if it doesn't exist clip it
+            cube = C.read_clipped_cube()
+        except:
+            cube, _ = C.do_clip(silent=True)
+
+        # cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
+        #                 tosave=self.tosave, sample=self.sample).do_clip(silent=True)
 
         peak_temp = np.amax(cube.data, axis=0)
 
@@ -968,5 +1000,6 @@ class MomentMaps:
 
         if self.tosave:
             peak_temp_hdu.writeto(self.savepath + 'peak_temp.fits', overwrite=True)
+            print("\n{} written to file.".format(Path(self.savepath + 'peak_temp.fits').name))
 
         return peak_temp_hdu
