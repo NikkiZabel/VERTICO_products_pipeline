@@ -76,13 +76,13 @@ def main(logOutput=False):
         # Applied to all routines, otherwise use defaults
         
         # data release version to be used (and included file name, header information)
-        version = '1.0'
+        version = '1.1'
 
         # VERTICO datacubes are produced with different round beam sizes:
         # 'native' = native cube resolution_str (typically 7" - 9")
         # '9arcsec' = 9" beam cubes
         # '15arcsec' = 15" beam cubes
-        resolution_str = 'native'
+        resolution_str = '9arcsec'
 
         # Select the products you want the pipeline to produce
         # [ADD DESC HERE]
@@ -120,7 +120,7 @@ def main(logOutput=False):
         clip = True # Clip the input data cubes in velocity space
         tosave = True # Save products and figures to file
         pbcor = True # Use primary beam corrected cube
-        TP = True # If True, products will use 7m+TP datacube where available. If False, 7m only cubes will be used
+        TP = False # If True, products will use 7m+TP datacube where available. If False, 7m only cubes will be used
         alpha_co = 6.25
 
         # Summary
@@ -133,6 +133,7 @@ def main(logOutput=False):
         print("clip = ", clip)
         print("tosave = ", tosave)
         print("pbcor = ", pbcor)
+        print("TP = ", TP)
         print("resolution_str", resolution_str)
         print("alpha_co = {} Msol/pc^2 K km/s".format(alpha_co))
         print("")
@@ -147,18 +148,25 @@ def main(logOutput=False):
 
         inputDataPath = '/Users/thbrown/VERTICO/share/cubes/'
 
-        outputProductPath = '/Users/thbrown/VERTICO/pipelineTesting/'
+        outputProductPath = '/Users/thbrown/VERTICO/share/products/7m_only/'
 
         # in/output path objects
         readpath = Path(inputDataPath + 'v'+version + '/' + resolution_str + '/')
 
-        writepath = Path(outputProductPath + '/' + 'products.' + 'v'+version + '/' + resolution_str + '/')
+        writepath = Path(outputProductPath + '/' + 'release.' + 'v'+version + '/' + resolution_str + '/')
 
         ######################################################################################
         # Input galaxy ID(s) #################################################################
 
-        # all galaxies for which processed data exist
+        # all galaxies for which processed data exist (ignore partial mosaics)
         galaxies = [dI for dI in os.listdir(readpath) if os.path.isdir(os.path.join(readpath,dI)) and ('_' not in dI)]  
+
+        non_detections = ["VCC1581", "IC3418"]
+
+        for ndet in non_detections:
+            galaxies.remove(ndet)
+
+        galaxies.sort()
 
         # galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
         #             'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
@@ -167,24 +175,24 @@ def main(logOutput=False):
         #             'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689',
         #             'NGC4698', 'NGC4694']
 
-        #galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
+        # galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
         #            'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
         #            'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808', 'NGC4396',
         #            'NGC4567', 'NGC4772', 'NGC4580', 'NGC4450', 'NGC4694', 'NGC4561']
 
-        #galaxies = ['NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
+        # galaxies = ['NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
         #            'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689']
 
-        #galaxies = ['NGC4064', 'NGC4222', 'NGC4294', 'NGC4330', 'NGC4388', 'NGC4394', 'NGC4402', 'NGC4405', 'NGC4419',
+        # galaxies = ['NGC4064', 'NGC4222', 'NGC4294', 'NGC4330', 'NGC4388', 'NGC4394', 'NGC4402', 'NGC4405', 'NGC4419',
         #           ', 'NGC4533', 'NGC4567', 'NGC4606', 'NGC4607', 'NGC4772']  # These are the 7m only detections
 
         # galaxies = ['NGC4254']
 
         # galaxies = ['NGC4064']
 
+        print('{} Galaxies'.format(len(galaxies)))
         print('Input Galaxy ID(s): ' + ','.join(galaxies))
         print('')
-
 
         # if the Sun+18 masking method not used, ask user to input identifier to be used in filenames and headers
         if not sunflag:
@@ -216,26 +224,11 @@ def main(logOutput=False):
             print("Beginning "+galaxy+"...")
 
             
-            # create galaxy specific write path
-            galaxywritepath = writepath / galaxy
-            galaxywritepath.mkdir(parents=False, exist_ok=True)
-
-            # galaxy file prefix for each product file
-            galaxyfileprefix =  galaxy + '_7m+tp_co21_pbcorr_round_k_' + resolution_str + '_'
-
-            # string save path + prefix
-            savepath = str(galaxywritepath / galaxyfileprefix)
-
-            if tosave:
-                print("")
-                print("Galaxy products will be saved in {}".format(galaxywritepath))
-                print("with the file prefix: {}*".format(galaxyfileprefix))
-                print("")
 
             # not sure why this is here?
-            if galaxy == 'NGC4606' or galaxy == 'NGC4351':
-                import matplotlib
-                matplotlib.rcParams['text.usetex'] = False
+            """if galaxy == 'NGC4606' or galaxy == 'NGC4351':
+                                                    import matplotlib
+                                                    matplotlib.rcParams['text.usetex'] = False"""
 
             # assign the flat and pb corrected cube files and check they exist
             # Search for cube in data directory
@@ -263,6 +256,22 @@ def main(logOutput=False):
             print("Flat cube: {}".format(file_uncorr))
             print("")
             
+            # create galaxy specific write path
+            galaxywritepath = writepath / galaxy
+            galaxywritepath.mkdir(parents=False, exist_ok=True)
+
+            # galaxy file prefix for each product file
+            galaxyfileprefix =  Path(file_pbcorr).stem + '_' + resolution_str + '_'
+
+            # string save path + prefix
+            savepath = str(galaxywritepath / galaxyfileprefix)
+
+            if tosave:
+                print("")
+                print("Galaxy products will be saved in {}".format(galaxywritepath))
+                print("with the file prefix: {}*".format(galaxyfileprefix))
+                print("")
+
             # clip cubes if True:
             if clip:
 
@@ -351,8 +360,6 @@ def main(logOutput=False):
                          sun=sunflag, tosave=tosave).moment_1_2(moment=2)
 
             if any(c in productList for c in ('mom8', 'peakT')):
-
-                print(productList)
                 
                 print("")
                 print("MOMENT 8 (PEAK TEMPERATURE):")
@@ -419,6 +426,7 @@ def main(logOutput=False):
     print("ELAPSED: ", str(elapsedTime))
     
     if logOutput == True:
+        # move the log file to the product directory
         print("moved log file to ", writepath/logfile)
         os.rename("./"+logfile, writepath/logfile)
 
