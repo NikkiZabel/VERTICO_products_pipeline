@@ -15,7 +15,7 @@ from matplotlib.colors import ListedColormap
 
 class CreateImages:
 
-    def __init__(self, galname, path_pbcorr, path_uncorr, savepath=None, refresh=False, overwrite=True,
+    def __init__(self, galname, path_pbcorr, path_uncorr, alpha_co=None, savepath=None, refresh=False, overwrite=True,
                  sun=True, tosave=False, sample=None):
         self.galaxy = galaxies(galname, sample)
         self.path_pbcorr = path_pbcorr
@@ -26,6 +26,7 @@ class CreateImages:
         self.sun = sun
         self.tosave = tosave
         self.sample = sample
+        self.alpha_co = alpha_co
 
     @staticmethod
     def custom_cmap(cmap=plt.cm.afmhot_r):
@@ -59,10 +60,10 @@ class CreateImages:
         elif self.refresh:
             if units == 'M_Sun/pc^2':
                 if self.overwrite:
-                    _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                    _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, alpha_co=self.alpha_co, sun=self.sun,
                                                     savepath=self.savepath, tosave=True, sample=self.sample).calc_moms(units='M_Sun/pc^2')
                 else:
-                    _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                    _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr,  self.path_uncorr, alpha_co=self.alpha_co, sun=self.sun,
                                                     tosave=False, sample=self.sample).calc_moms(units='M_Sun/pc^2')
             elif units == 'K km/s':
                 if self.overwrite:

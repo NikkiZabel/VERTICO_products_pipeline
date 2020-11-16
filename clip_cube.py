@@ -534,7 +534,18 @@ class ClipCube:
 
         return mask
 
-    def do_clip(self, clip_also=None, get_chans=False):
+    def read_clipped_cube(self):
+        """
+        Look for the clipped_hdu, noisecube_hdu returned in do_clip()
+        return null if not found
+        """
+        try:
+            return fits.open(self.savepath + 'cube_clipped_trimmed.fits')[0]
+        except:
+            return None
+
+
+    def do_clip(self, silent=False, clip_also=None, get_chans=False):
         """
         Clip the array, either according to the Sun method (if self.sun == True, which is default) or the smooth
         clipping method from Dame.
@@ -612,6 +623,9 @@ class ClipCube:
                 mask_hdu.header['CLIP_RMS'] = self.sun_method(emiscube_uncorr_hdu, noisecube_uncorr_hdu, calc_rms=True)
                 mask_hdu.header.comments['CLIP_RMS'] = 'rms value used for clipping in K km/s'
                 mask_hdu.writeto(self.savepath + 'mask_cube.fits', overwrite=True)
+                if not silent:
+                    print('mask written to ', self.savepath + 'mask_cube.fits')
+                    print("")
 
         else:
             mask = self.smooth_mask(cube_uncorr_copy)
@@ -632,17 +646,27 @@ class ClipCube:
                 mask_hdu.header['CLIP_RMS'] = self.sun_method(emiscube_uncorr, noisecube_uncorr, calc_rms=True)
                 mask_hdu.header.comments['CLIP_RMS'] = 'rms value used for clipping in K km/s'
                 mask_hdu.writeto(self.savepath + 'mask_cube.fits', overwrite=True)
+                if not silent:
+                    print('mask written to ', self.savepath + 'mask_cube.fits')
+                    print("")
 
         emiscube_pbcorr[mask == 0] = 0
         clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr, cube_pbcorr.header)
 
-        #if self.tosave:
-        #    clipped_hdu.writeto(self.savepath + 'cube_clipped.fits', overwrite=True)
+        if self.tosave:
+           clipped_hdu.writeto(self.savepath + 'cube_clipped.fits', overwrite=True)
+           if not silent:
+               print('clipped cube written to ', self.savepath + 'cube_clipped.fits')
+               print("")
 
         # Do some pre-processing to make the creation of the moments easier
         clipped_hdu, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=clip_also)
 
-        #if self.tosave:
-        #    clipped_hdu.writeto(self.savepath + 'cube_clipped_trimmed.fits', overwrite=True)
+        if self.tosave:
+           clipped_hdu.writeto(self.savepath + 'cube_clipped_trimmed.fits', overwrite=True)
+           if not silent:
+               print('trimmed cube written to ', self.savepath + 'cube_clipped_trimmed.fits')
+               print("")
+
 
         return clipped_hdu, noisecube_hdu
