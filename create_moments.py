@@ -20,13 +20,13 @@ class MomentMaps:
         self.sun = sun
         self.tosave = tosave
         self.sample = sample
+        self.alpha_co = alpha_co
 
         # I'm temporarily setting tosave=False to avoid tons of print outs
         self.galaxy.start = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                     savepath=self.savepath, tosave=False, sample=self.sample).do_clip(silent=True, get_chans=True)[0]
         self.galaxy.stop = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                     savepath=self.savepath, tosave=False, sample=self.sample).do_clip(silent=True, get_chans=True)[1]
-        self.alpha_co = alpha_co
 
     def pixel_size_check(self, header, key="CDELT1", expected_pix_size=2, raise_exception=True):
         # check the pixel size is what's expected modulo some floating point error
@@ -565,7 +565,7 @@ class MomentMaps:
 
         return spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies # / beamsize
 
-    def radial_profile(self, alpha_co, table_path=None, check_aperture=False, hires=False):
+    def radial_profile(self, table_path=None, check_aperture=False, hires=False):
 
         # Option to use "high resolution", which means calculating the surface density at each pixel rather than
         # each beam along the galaxy major axis.
@@ -573,8 +573,8 @@ class MomentMaps:
             print('WARNING: using a resolution of 1 pixel')
 
         # Read in moment maps and corresponding uncertainties
-        _, mom0_hdu_Msun, _, _, _ = self.calc_moms(units='M_Sun/pc^2', alpha_co=alpha_co)
-        _, mom0_hdu_K, _, _, _ = self.calc_moms(units='K km/s', alpha_co=alpha_co)
+        _, mom0_hdu_Msun, _, _, _ = self.calc_moms(units='M_Sun/pc^2')
+        _, mom0_hdu_K, _, _, _ = self.calc_moms(units='K km/s')
         mom0_K_uncertainty, SN_hdu, _, _ = self.uncertainty_maps(calc_rms=False)
 
         # Deal with nans in uncertainty map
@@ -596,7 +596,7 @@ class MomentMaps:
                                             savepath=self.savepath,
                                             tosave=self.tosave, sample=self.sample).innersquare(noisecube.data)
         rms = np.nanstd(inner)
-        rms_Msun = rms * alpha_co
+        rms_Msun = rms * self.alpha_co
         ###################################################
 
         # Set the surface density limit to which we want to calculate radial profiles
@@ -826,7 +826,7 @@ class MomentMaps:
         e_rad_prof_K = e_rad_prof_K / N_beams
         ####
 
-        e_rad_prof_Msun = np.array(e_rad_prof_K) * alpha_co
+        e_rad_prof_Msun = np.array(e_rad_prof_K) * self.alpha_co
 
         print('Old radial profile error: ')
         [print('{} +/ {:}'.format(e,s)) for e, s in zip(rad_prof_K,e_rad_prof_K_old)]
@@ -892,7 +892,7 @@ class MomentMaps:
                                             delimiter=',', header=csv_header)
         else:
             if self.tosave:
-                print('writing hi res radial profile to '+ self.savepath + 'rad_prof_hires.csv' )
+                print('writing hi res radial profile to ' + self.savepath + 'rad_prof_hires.csv' )
                 np.savetxt(self.savepath + 'rad_prof_hires.csv',
                        np.column_stack((rad_prof_K, np.ones(len(rad_prof_K)) * e_rad_prof_K, rad_prof_Msun,
                                         np.ones(len(rad_prof_Msun)) * e_rad_prof_Msun, radii_deg * 3600, radii_kpc)),

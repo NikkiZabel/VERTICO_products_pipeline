@@ -1,4 +1,4 @@
-#import matplotlib; matplotlib.use('Agg')
+import matplotlib; matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import aplpy as apl
 from astropy import wcs
@@ -460,7 +460,7 @@ class CreateImages:
             if x_axis == 'vel_offset':
                 plt.savefig(self.savepath + 'spectrum_vel_offset.pdf', bbox_inches='tight')
 
-    def radial_profile(self, y_units='K kms', x_units='kpc', alpha_co=6.25, table_path=None, check_aperture=False):
+    def radial_profile(self, y_units='K kms', x_units='kpc', table_path=None, check_aperture=False):
 
         if not ((y_units == 'K km/s') or (y_units == 'M_Sun pc^-2')):
             raise AttributeError('Please choose between "K kms" and "M_Sun pc^-2" for the keyword "y_units".')
@@ -470,12 +470,12 @@ class CreateImages:
         if self.refresh:
             if self.overwrite:
                 rad_prof_K, rad_prof_K_err, rad_prof_Msun, rad_prof_Msun_err, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr,
-                        self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=True, sample=self.sample).\
-                    radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture)
+                        self.path_uncorr, alpha_co=self.alpha_co, sun=self.sun, savepath=self.savepath, tosave=True, sample=self.sample).\
+                    radial_profile(table_path=table_path, check_aperture=check_aperture)
             else:
                 rad_prof_K, rad_prof_K_err, rad_prof_Msun, rad_prof_Msun_err, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr,
-                        self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=False, sample=self.sample).\
-                    radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture, hires=False)
+                        self.path_uncorr, alpha_co=self.alpha_co, sun=self.sun, savepath=self.savepath, tosave=False, sample=self.sample).\
+                    radial_profile(table_path=table_path, check_aperture=check_aperture, hires=False)
         else:
             temp = np.loadtxt(self.savepath + 'rad_prof.csv', delimiter=',')
             rad_prof_K = temp[:, 0]

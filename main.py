@@ -104,23 +104,24 @@ def main(logOutput=False):
         #     radial_profile_density_arcsec - 
         #     radial_profile_density_kpc - 
 
-        productList = ['mom0', 
-                        'mom1', 
-                        'mom2', 
-                        'peakT', 
-                        'mom0_noise', 
-                        'mom1_noise', 
-                        'pvd', 
-                        'spectrum'
+        productList = [#'mom0',
+                       # 'mom1',
+                       # 'mom2',
+                       # 'peakT',
+                       # 'mom0_noise',
+                       # 'mom1_noise',
+                       # 'pvd',
+                       # 'spectrum',
                         'radial_profile']
 
-        refresh = True # TB - I don't know what this does?
-        overwrite = True # Overwrite when writing products and figures to file
+        refresh = True  # If True, the data product in question is created from the data cubes before it is imaged.
+                        # If False, the image is created from the existing product (i.e. a FITS file).
+        overwrite = True  # Overwrite existing data products with new ones if "refresh" is set to True.
         sunflag = True  # Compute the cube masks using method outlined in Sun+2018 (PHANGS)
-        clip = True # Clip the input data cubes in velocity space
-        tosave = True # Save products and figures to file
-        pbcor = True # Use primary beam corrected cube
-        TP = False # If True, products will use 7m+TP datacube where available. If False, 7m only cubes will be used
+        clip = True  # Clip the input data cubes in velocity space
+        tosave = True  # Save products and figures to file
+        pbcor = True  # Use primary beam corrected cube
+        TP = False  # If True, products will use 7m+TP datacube where available. If False, 7m only cubes will be used
         alpha_co = 6.25
 
         # Summary
@@ -147,19 +148,19 @@ def main(logOutput=False):
         # 2. outputProductPath, output directory where products will be stored (if specified)
 
         inputDataPath = '/Users/thbrown/VERTICO/share/cubes/'
-
         outputProductPath = '/Users/thbrown/VERTICO/share/products/7m_only/'
+        #inputDataPath = '/home/nikki/Documents/Data/VERTICO/ReducedData/'  # Nikki's path, please do not remove
 
         # in/output path objects
         readpath = Path(inputDataPath + 'v'+version + '/' + resolution_str + '/')
-
         writepath = Path(outputProductPath + '/' + 'release.' + 'v'+version + '/' + resolution_str + '/')
+        #writepath = Path('/home/nikki/Documents/Data/VERTICO/products_v1_0/' + resolution_str + '/sun18_method/')  # Nikki's path, please do not remove
 
         ######################################################################################
         # Input galaxy ID(s) #################################################################
 
         # all galaxies for which processed data exist (ignore partial mosaics)
-        galaxies = [dI for dI in os.listdir(readpath) if os.path.isdir(os.path.join(readpath,dI)) and ('_' not in dI)]  
+        galaxies = [dI for dI in os.listdir(readpath) if os.path.isdir(os.path.join(readpath, dI)) and ('_' not in dI)]
 
         non_detections = ["VCC1581", "IC3418"]
 
@@ -186,9 +187,7 @@ def main(logOutput=False):
         # galaxies = ['NGC4064', 'NGC4222', 'NGC4294', 'NGC4330', 'NGC4388', 'NGC4394', 'NGC4402', 'NGC4405', 'NGC4419',
         #           ', 'NGC4533', 'NGC4567', 'NGC4606', 'NGC4607', 'NGC4772']  # These are the 7m only detections
 
-        # galaxies = ['NGC4254']
-
-        # galaxies = ['NGC4064']
+        galaxies = ['IC3392']
 
         print('{} Galaxies'.format(len(galaxies)))
         print('Input Galaxy ID(s): ' + ','.join(galaxies))
@@ -225,16 +224,16 @@ def main(logOutput=False):
 
             
 
-            # not sure why this is here?
+            # not sure why this is here? Because it bugs out for this one galaxy for some reason. Go figure.
             """if galaxy == 'NGC4606' or galaxy == 'NGC4351':
                                                     import matplotlib
                                                     matplotlib.rcParams['text.usetex'] = False"""
 
             # assign the flat and pb corrected cube files and check they exist
             # Search for cube in data directory
-            cubedir = readpath / str(galaxy +'/')
+            cubedir = readpath / str(galaxy + '/')
             if os.path.exists(cubedir):
-                cubesearch = str(cubedir) + '/' + galaxy + '*_co21_*_round_k.fits' # use wildcard & glob to find cubes
+                cubesearch = str(cubedir) + '/' + galaxy + '*_co21_*_round_k.fits'  # use wildcard & glob to find cubes
                 cubefiles = glob.glob(cubesearch)
             
             # select the 7m+TP cube if it's there AND the TP = True, else use the 7m data
@@ -415,9 +414,9 @@ def main(logOutput=False):
 
                 for xunits in ['kpc', 'arcsec']:
                     for yunits in ['K km/s', 'M_Sun pc^-2']:
-                        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                        CreateImages(galaxy, file_pbcorr, file_uncorr, alpha_co=alpha_co, savepath=savepath, refresh=refresh, overwrite=overwrite,
                                 sun=sunflag, tosave=tosave).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
-                                                    alpha_co=alpha_co, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
+                                table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
                                                                                     check_aperture=False)
          
     print("")
