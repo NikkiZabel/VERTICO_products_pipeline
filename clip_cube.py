@@ -297,22 +297,34 @@ class ClipCube:
         square_cube = np.zeros((cube.shape[0], np.max(img.shape), np.max(img.shape)))
         square_noisecube = np.zeros((noisecube.shape[0], np.max(img.shape), np.max(img.shape)))
 
-        if img.shape[0] > img.shape[1]:
-            first = True
-        else:
-            first = False
+        new_header = cube.header.copy()
 
-        if first:
+        if img.shape[0] > img.shape[1]:
             square_cube[:, :, int(shape_diff / 2):int(shape_diff / 2 + img.shape[1])] = cube.data
             square_noisecube[:, :, int(shape_diff / 2):int(shape_diff / 2 + img.shape[1])] = noisecube.data
+            new_header['CRPIX1'] = cube.header['CRPIX1'] + shape_diff / 2
         else:
             square_cube[:, int(shape_diff / 2):int(shape_diff / 2 + img.shape[0]), :] = cube.data
             square_noisecube[:, int(shape_diff / 2):int(shape_diff / 2 + img.shape[0]), :] = noisecube.data
+            new_header['CRPIX2'] = cube.header['CRPIX2'] + shape_diff / 2
 
-        cube.data = square_cube
-        noisecube.data = square_noisecube
+        new_header['NAXIS1'] = cube.shape[2]
+        new_header['NAXIS2'] = cube.shape[1]
 
-        return cube, noisecube
+        square_cube_hdu = fits.PrimaryHDU(square_cube, new_header)
+
+        if not noisecube:
+            square_noisecube = np.array([0])
+
+        noisecube_hdu = fits.PrimaryHDU(square_noisecube, new_header)
+
+        if noisecube:
+            try:
+                noisecube_hdu.header['NAXIS3'] = noisecube.header['NAXIS3']
+            except:
+                pass
+
+        return square_cube_hdu, noisecube_hdu
 
     def preprocess(self, cube, noisecube=None):
         cube, noisecube = self.cut_empty_rows(cube, noisecube)
