@@ -1088,7 +1088,7 @@ def parameters(galaxy, sample=None):
                 distance = distances[dist_names == galaxy]
             except:
                 distance = None
-        elif sample == 'VIVA':
+        elif sample == 'viva':
             distance = 16.5
             if galaxy == 'ngc4580':
                 nchan_low = 1

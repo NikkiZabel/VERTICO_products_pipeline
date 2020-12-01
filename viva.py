@@ -31,9 +31,6 @@ for file in data:
 
         print(galaxy)
 
-        if galaxy == 'ngc4192':
-            continue
-
         # There is only one cube, so pb un/corrected files are the same
         file_pbcorr = file
         file_uncorr = file
@@ -45,24 +42,27 @@ for file in data:
         savepath = path + 'products_v' + version + '/sun18_method/' + galaxy + '/'
 
         # Moment maps
-        #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-        #              sun=sun, tosave=tosave, sample=sample).moment_zero(units='K km/s')
-        #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-        #              sun=sun, tosave=tosave, sample=sample).moment_zero()
-        #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-        #              sun=sun, tosave=tosave, sample=sample).moment_zero(peak=True)
-        #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-        #             sun=sun, tosave=tosave, sample=sample).moment_1_2()
-        #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-        #             sun=sun, tosave=tosave, sample=sample).moment_1_2(moment=2)
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                      sun=sun, tosave=tosave, sample=sample).moment_zero(units='K km/s')
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                      sun=sun, tosave=tosave, sample=sample).moment_zero()
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                      sun=sun, tosave=tosave, sample=sample).moment_zero(peak=True)
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, sample=sample).moment_1_2()
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, sample=sample).moment_1_2(moment=2)
 
         # Spectra
-        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                     sun=sun, tosave=tosave).spectrum(x_axis='vel_offset')
-        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                     sun=sun, tosave=tosave).spectrum(x_axis='velocity')
-        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                     sun=sun, tosave=tosave).spectrum(x_axis='frequency')
+        try:
+            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                         sun=sun, tosave=tosave).spectrum(x_axis='vel_offset')
+            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                         sun=sun, tosave=tosave).spectrum(x_axis='velocity')
+            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                         sun=sun, tosave=tosave).spectrum(x_axis='frequency')
+        except:
+            pass
 
         #break
 
