@@ -76,6 +76,8 @@ class CreateImages:
         else:
             image = fits.open(path + 'mom0.fits')[0]
 
+        #print(image.header)
+
         f = plt.figure(figsize=self.galaxy.figsize)
 
         # show the image in colour

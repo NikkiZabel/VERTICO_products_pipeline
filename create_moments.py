@@ -216,11 +216,14 @@ class MomentMaps:
             header.pop('PC2_3')
             header.pop('PC3_3')
         except:
-            header.pop('PC03_01')
-            header.pop('PC03_03')
-            header.pop('PC03_02')
-            header.pop('PC01_03')
-            header.pop('PC02_03')
+            try:
+                header.pop('PC03_01')
+                header.pop('PC03_03')
+                header.pop('PC03_02')
+                header.pop('PC01_03')
+                header.pop('PC02_03')
+            except:
+                pass
 
         header.pop('CTYPE3')
         header.pop('CRVAL3')
@@ -234,6 +237,8 @@ class MomentMaps:
             pass
 
         header['NAXIS'] = 2
+        if header['WCSAXES'] == 3:
+            header['WCSAXES'] = 2
 
         return header
 
