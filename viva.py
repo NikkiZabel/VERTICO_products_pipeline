@@ -29,6 +29,9 @@ for file in data:
         else:
             galaxy = galnames[i]
 
+        if not galaxy == 'ngc4293':
+            continue
+
         print(galaxy)
 
         # There is only one cube, so pb un/corrected files are the same

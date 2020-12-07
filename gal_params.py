@@ -1090,7 +1090,7 @@ def parameters(galaxy, sample=None):
                 distance = None
         elif sample == 'viva':
             distance = 16.5
-            if galaxy == 'ngc4580':
+            if galaxy == 'ngc4580' or galaxy == 'ngc4654':
                 nchan_low = 1
                 nchan_high = 2
 

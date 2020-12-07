@@ -615,13 +615,17 @@ class MomentMaps:
 
         emission_Msun = 2112
         area_temp = 1
+        count = 0
 
         if check_aperture:
             from matplotlib import pyplot as plt
             plt.figure()
             plt.imshow(mom0_hdu_K.data)
 
-        while emission_Msun / area_temp > limit:
+        while (emission_Msun / area_temp > limit) | (count < 4):
+
+            # The second condition was added to deal better with galaxies that have a "hole" in the centre.
+            count += 1
 
             if hires:
                 b_in += 1
