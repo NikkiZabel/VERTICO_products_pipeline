@@ -676,8 +676,11 @@ class MomentMaps:
             inner = 0
             centre = (mom0_K_rot.shape[1]) / 2
             emission_Msun = 2112
+            count = 0
 
-            while emission_Msun > limit:
+            while (emission_Msun > limit) | (count < 4):
+
+                count += 1
 
                 if hires:
                     slice1_K = mom0_K_rot[:, int(centre + inner):int(centre + inner + 1)]

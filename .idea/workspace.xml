@@ -19,10 +19,8 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Slightly cleaned up the viva script.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/viva.py" beforeDir="false" afterPath="$PROJECT_DIR$/viva.py" afterDir="false" />
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Added a small improvement to the radial profiles">
+      <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,13 +66,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00040" summary="Finished and imaged moment 0 uncertainties.">
-      <created>1587811004728</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1587811004728</updated>
     </task>
     <task id="LOCAL-00041" summary="Stab at moment 1 uncertainties">
       <created>1587827489020</created>
@@ -412,7 +403,14 @@
       <option name="project" value="LOCAL" />
       <updated>1606835740305</updated>
     </task>
-    <option name="localTasksCounter" value="89" />
+    <task id="LOCAL-00089" summary="Added a small improvement to the radial profiles">
+      <created>1607343081430</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1607343081431</updated>
+    </task>
+    <option name="localTasksCounter" value="90" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -428,7 +426,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Small tweaks to the figures" />
     <MESSAGE value="Correction bug in mom0 when 3rd axis is given in frequency." />
     <MESSAGE value="Some tweaks to SDSS overplot" />
     <MESSAGE value="Loop over overview_plots to create them for all galaxies." />
@@ -453,29 +450,7 @@
     <MESSAGE value="Fixed bug in &quot;make_square&quot; function" />
     <MESSAGE value="Added a script to push VIVA data through" />
     <MESSAGE value="Slightly cleaned up the viva script." />
-    <option name="LAST_COMMIT_MESSAGE" value="Slightly cleaned up the viva script." />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="458" y="62" width="1040" height="882" key="FileChooserDialogImpl" timestamp="1600767261922">
-      <screen x="67" y="27" width="1853" height="1053" />
-    </state>
-    <state x="458" y="62" width="1102" height="751" key="FileChooserDialogImpl/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1600767261922" />
-    <state x="624" y="316" width="728" height="482" key="MultipleFileMergeDialog" timestamp="1600163261895">
-      <screen x="67" y="27" width="1853" height="1053" />
-    </state>
-    <state x="624" y="316" width="728" height="482" key="MultipleFileMergeDialog/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1600163261895" />
-    <state x="482" y="188" width="1022" height="737" key="SettingsEditor" timestamp="1603877550336">
-      <screen x="67" y="27" width="1853" height="1053" />
-    </state>
-    <state x="482" y="188" width="1022" height="737" key="SettingsEditor/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1603877550336" />
-    <state x="540" y="1080" width="859" height="1080" key="Vcs.Push.Dialog.v2" timestamp="1606835742391">
-      <screen x="0" y="1080" width="1920" height="1080" />
-    </state>
-    <state x="540" y="1080" width="859" height="1080" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@0.1080.1920.1080" timestamp="1606835742391" />
-    <state x="588" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1603905874893" />
-    <state x="656" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1598261749214">
-      <screen x="67" y="27" width="1853" height="1053" />
-    </state>
-    <state x="656" y="259" width="672" height="678" key="search.everywhere.popup/67.27.1853.1053/0.1080.1920.1080@67.27.1853.1053" timestamp="1598261749214" />
+    <MESSAGE value="Added a small improvement to the radial profiles" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added a small improvement to the radial profiles" />
   </component>
 </project>
