@@ -1080,6 +1080,21 @@ def parameters(galaxy, sample=None):
 
         if sample == 'heracles':
             import numpy as np
+
+            def get_inc_pa(galaxy, ):
+                from astropy.io import fits
+                table = fits.open('/home/nikki/Documents/Data/VERTICO/heracles/heracles_sdss_r_properties.fits')[1]
+                gal_name_table = table.data['Galaxy']
+                gal_num_table = np.array([n.split('C')[1] for n in gal_name_table])
+
+                galaxy_num = galaxy.split('c')[1]
+                incl = table.data['inclination'][gal_num_table == galaxy_num]
+                pa = table.data['pa'][gal_num_table == galaxy_num]
+
+                return incl[0], pa[0]
+
+            inclination, angle = get_inc_pa(galaxy)
+
             distances = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/heracles/heracles_distances.csv',
                                       delimiter=',', usecols=[1])
             dist_names = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/heracles/heracles_distances.csv',
@@ -1088,6 +1103,7 @@ def parameters(galaxy, sample=None):
                 distance = distances[dist_names == galaxy]
             except:
                 distance = None
+
         elif sample == 'viva':
             distance = 16.5
             if galaxy == 'ngc4580' or galaxy == 'ngc4654':

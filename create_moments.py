@@ -237,8 +237,11 @@ class MomentMaps:
             pass
 
         header['NAXIS'] = 2
-        if header['WCSAXES'] == 3:
-            header['WCSAXES'] = 2
+        try:
+            if header['WCSAXES'] == 3:
+                header['WCSAXES'] = 2
+        except:
+            pass
 
         return header
 
@@ -466,20 +469,44 @@ class MomentMaps:
         pvd_header['CENTR_PIX_SKY'] = '(' + str(np.round(centre_sky.ra.deg, 2)) + ', ' + str(np.round(centre_sky.dec.deg, 2)) + ')'
         pvd_header.comments['CENTR_PIX_SKY'] = 'Central pix in sky coords (deg)'
         pvd_header['SYSVEL'] = sysvel + self.galaxy.sysvel_offset
-        pvd_header['RESTFRQ'] = clipped_cube.header['RESTFRQ']
-        pvd_header.comments['RESTFRQ'] = clipped_cube.header.comments['RESTFRQ']
-        pvd_header['SPECSYS'] = clipped_cube.header['SPECSYS']
-        pvd_header.comments['SPECSYS'] = clipped_cube.header.comments['SPECSYS']
-        pvd_header['ALTRVAL'] = clipped_cube.header['ALTRVAL']
-        pvd_header['ALTRPIX'] = clipped_cube.header['ALTRPIX']
-        pvd_header['VELREF'] = clipped_cube.header['VELREF']
-        pvd_header['USEWEIGH'] = clipped_cube.header['USEWEIGH']
-        pvd_header['JTOK'] = clipped_cube.header['JTOK']
-        pvd_header['OBSRA'] = clipped_cube.header['OBSRA']
-        pvd_header['OBSDEC'] = clipped_cube.header['OBSDEC']
-        pvd_header['OBSGEO-X'] = clipped_cube.header['OBSGEO-X']
-        pvd_header['OBSGEO-Y'] = clipped_cube.header['OBSGEO-Y']
-        pvd_header['OBSGEO-Z'] = clipped_cube.header['OBSGEO-Z']
+        try:
+            pvd_header['RESTFRQ'] = clipped_cube.header['RESTFRQ']
+            pvd_header.comments['RESTFRQ'] = clipped_cube.header.comments['RESTFRQ']
+        except:
+            pass
+        try:
+            pvd_header['SPECSYS'] = clipped_cube.header['SPECSYS']
+            pvd_header.comments['SPECSYS'] = clipped_cube.header.comments['SPECSYS']
+        except:
+            pass
+        try:
+            pvd_header['ALTRVAL'] = clipped_cube.header['ALTRVAL']
+            pvd_header['ALTRPIX'] = clipped_cube.header['ALTRPIX']
+        except:
+            pass
+        try:
+            pvd_header['VELREF'] = clipped_cube.header['VELREF']
+        except:
+            pass
+        try:
+            pvd_header['USEWEIGH'] = clipped_cube.header['USEWEIGH']
+        except:
+            pass
+        try:
+            pvd_header['JTOK'] = clipped_cube.header['JTOK']
+        except:
+            pass
+        try:
+            pvd_header['OBSRA'] = clipped_cube.header['OBSRA']
+            pvd_header['OBSDEC'] = clipped_cube.header['OBSDEC']
+        except:
+            pass
+        try:
+            pvd_header['OBSGEO-X'] = clipped_cube.header['OBSGEO-X']
+            pvd_header['OBSGEO-Y'] = clipped_cube.header['OBSGEO-Y']
+            pvd_header['OBSGEO-Z'] = clipped_cube.header['OBSGEO-Z']
+        except:
+            pass
         pvd_header['DISTANCE'] = self.galaxy.distance
         pvd_header.comments['DISTANCE'] = 'Mpc'
         pvd_header['ORIGIN'] = clipped_cube.header['ORIGIN']
@@ -527,7 +554,12 @@ class MomentMaps:
         spectrum_velocities = vel_array_full[self.galaxy.start - 5:self.galaxy.stop + 5]
         spectrum = spectrum[self.galaxy.start - 5:self.galaxy.stop + 5]
         spectrum_vel_offset = spectrum_velocities - sysvel + self.galaxy.sysvel_offset
-        spectrum_frequencies = cube_pbcorr.header['RESTFRQ'] * (1 - spectrum_velocities / 299792.458) / 1e9
+        try:
+            rest_frequency = cube_pbcorr.header['RESTFRQ']
+        except:
+            print('Warning: assuming the CO(2-1) line was observed and setting rest frequency to 230.53800000 GHz.')
+            rest_frequency = 230538000000
+        spectrum_frequencies = rest_frequency * (1 - spectrum_velocities / 299792.458) / 1e9
 
         if self.tosave:
             clip_rms = self.uncertainty_maps(calc_rms=True)
