@@ -21,10 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Added a small improvement to the radial profiles">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/heracles.py" beforeDir="false" afterPath="$PROJECT_DIR$/heracles.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/image_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_moments.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,13 +67,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00042" summary="Made uncertainty maps for all moments">
-      <created>1587896092987</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1587896092987</updated>
     </task>
     <task id="LOCAL-00043" summary="Added peak temperature maps">
       <created>1587900823327</created>
@@ -414,7 +404,14 @@
       <option name="project" value="LOCAL" />
       <updated>1607343551451</updated>
     </task>
-    <option name="localTasksCounter" value="91" />
+    <task id="LOCAL-00091" summary="Finished adding code to create all products for HERACLES.">
+      <created>1609162785687</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1609162785688</updated>
+    </task>
+    <option name="localTasksCounter" value="92" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -430,7 +427,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Correction bug in mom0 when 3rd axis is given in frequency." />
     <MESSAGE value="Some tweaks to SDSS overplot" />
     <MESSAGE value="Loop over overview_plots to create them for all galaxies." />
     <MESSAGE value="Updated mass estimation, saving out masks for the entire cube for the Sun method." />
@@ -455,6 +451,7 @@
     <MESSAGE value="Added a script to push VIVA data through" />
     <MESSAGE value="Slightly cleaned up the viva script." />
     <MESSAGE value="Added a small improvement to the radial profiles" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added a small improvement to the radial profiles" />
+    <MESSAGE value="Finished adding code to create all products for HERACLES." />
+    <option name="LAST_COMMIT_MESSAGE" value="Finished adding code to create all products for HERACLES." />
   </component>
 </project>
