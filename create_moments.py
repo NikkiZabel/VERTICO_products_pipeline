@@ -550,9 +550,15 @@ class MomentMaps:
         spectrum = np.nansum(cube_pbcorr.data, axis=(1, 2))
         _, _, vel_array_full = self.create_vel_array(cube_pbcorr)
 
-        spectrum_velocities = vel_array_full[self.galaxy.start - 5:self.galaxy.stop + 5]
-        spectrum = spectrum[self.galaxy.start - 5:self.galaxy.stop + 5]
-        spectrum_vel_offset = spectrum_velocities - sysvel + self.galaxy.sysvel_offset
+        if self.galaxy.start - 5 < 0:
+            spectrum_velocities = vel_array_full[0:self.galaxy.stop + 5]
+            spectrum = spectrum[0:self.galaxy.stop + 5]
+            spectrum_vel_offset = spectrum_velocities - sysvel + self.galaxy.sysvel_offset
+        else:
+            spectrum_velocities = vel_array_full[self.galaxy.start - 5:self.galaxy.stop + 5]
+            spectrum = spectrum[self.galaxy.start - 5:self.galaxy.stop + 5]
+            spectrum_vel_offset = spectrum_velocities - sysvel + self.galaxy.sysvel_offset
+
         try:
             rest_frequency = cube_pbcorr.header['RESTFRQ']
         except:
