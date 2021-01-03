@@ -193,7 +193,7 @@ class CreateImages:
         vel_array, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                       tosave=False, sample=self.sample).create_vel_array(emiscube)
 
-        sysvel = (sysvel + 5) // 10 * 10
+        #sysvel = (sysvel + 5) // 10 * 10
 
         f = plt.figure(figsize=self.galaxy.figsize)
 
@@ -236,7 +236,7 @@ class CreateImages:
             if self.galaxy.vrange:
                 vrange = self.galaxy.vrange
             else:
-                vrange = 1.2 * np.nanmax(image.data)
+                vrange = int(vel_array[0] - sysvel)
 
             fig.show_contour(image, cmap='sauron', levels=np.linspace(-vrange, vrange,
                 len(vel_array)), vmin=-vrange, vmax=vrange, extend='both', filled=True,

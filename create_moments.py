@@ -314,7 +314,6 @@ class MomentMaps:
                         tosave=self.tosave, sample=self.sample).do_clip()
 
         vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
-
         if cube.header['CTYPE3'] == 'VRAD' or cube.header['CTYPE3'] == 'VELOCITY':
             mom0 = np.sum((cube.data * abs(cube.header['CDELT3']) / 1000), axis=0)
         elif cube.header['CTYPE3'] == 'FREQ':
@@ -328,12 +327,12 @@ class MomentMaps:
         if units == 'M_Sun/pc^2':
             #mom0 = mom0 / cube.header['JTOK'] * 91.7 * alpha_co * (cube.header['BMAJ'] * 3600 * cube.header[
             #    'BMIN'] * 3600) ** (-1) / 4
+
             mom0 *= alpha_co
         elif units == 'K km/s':
             pass
         else:
             raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
-
         mom1 = np.sum(cube.data * vel_narray, axis=0) / np.sum(cube.data, axis=0)
         mom2 = np.sqrt(np.sum(abs(cube.data) * (vel_narray - mom1) ** 2, axis=0) / np.sum(abs(cube.data), axis=0))
 

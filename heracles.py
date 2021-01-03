@@ -38,13 +38,24 @@ for file in data:
         #else:
         #    continue
         if resolution == 1200:
-            savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/' + galaxy + 'exact_1200pc'
+            savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/' + galaxy + 'exact_1200pc_'
         else:
-            savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/' + galaxy + 'exact_720pc'
+            savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/' + galaxy + 'exact_720pc_'
+
     elif resolution == 'nearest_720' or resolution == 'nearest_1200':
 
         galaxy = file.split('/')[8].split('_')[0]
         print(galaxy)
+
+        #if os.path.exists(path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy
+        #                  + '/' + galaxy + '_nearest_aniano_30arcsec_1119.92pc_mom0_Kkms-1.pdf'):
+        #    continue
+
+        if galaxy == 'ngc4536':
+            continue
+
+        if galaxy == 'ngc2903':
+            continue
 
         file_pbcorr = file
         file_uncorr = file
@@ -54,22 +65,22 @@ for file in data:
         #else:
         #    continue
         if resolution == 'nearest_1200':
-            savepath = path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy + '/' + galaxy + '_nearest_aniano_30arcsec_1119.92pc'
+            savepath = path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy + '/' + galaxy + '_nearest_aniano_30arcsec_1119.92pc_'
         else:
-            savepath = path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy + '/' + galaxy + '_nearest_aniano_20arcsec_746.61pc'
+            savepath = path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy + '/' + galaxy + '_nearest_aniano_20arcsec_746.61pc_'
 
     # Moment maps
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave, sample=sample).moment_zero(units='K km/s')
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave, sample=sample).moment_zero()
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave, sample=sample).moment_zero(peak=True)
+    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #              sun=sun, tosave=tosave, sample=sample).moment_zero(units='K km/s')
+    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #              sun=sun, tosave=tosave, sample=sample).moment_zero()
+    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #              sun=sun, tosave=tosave, sample=sample).moment_zero(peak=True)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, sample=sample).moment_1_2()
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave, sample=sample).moment_1_2(moment=2)
-
+    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #             sun=sun, tosave=tosave, sample=sample).moment_1_2(moment=2)
+    '''
     # Uncertainty maps
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).mom0_noise_maps()
@@ -79,8 +90,9 @@ for file in data:
     # PVDs
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).PVD(axis='major', find_angle=False, check_slit=False)
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave).PVD(axis='minor', check_slit=False)
+    if not galaxy == 'ngc2841':
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                      sun=sun, tosave=tosave).PVD(axis='minor', check_slit=False)
 
     # Spectra
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -103,5 +115,5 @@ for file in data:
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='arcsec',
                                    alpha_co=6.25, table_path=None, check_aperture=False)
-
-    break
+    '''
+    #break
