@@ -21,9 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Small bug in spectrum">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/heracles.py" beforeDir="false" afterPath="$PROJECT_DIR$/heracles.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/image_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_moments.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,13 +67,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00046" summary="Fixed some bugs">
-      <created>1588155638092</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1588155638092</updated>
     </task>
     <task id="LOCAL-00047" summary="Fixed centring">
       <created>1588167773197</created>
@@ -413,7 +404,14 @@
       <option name="project" value="LOCAL" />
       <updated>1609696695356</updated>
     </task>
-    <option name="localTasksCounter" value="95" />
+    <task id="LOCAL-00095" summary="Change in heracles filenames">
+      <created>1610014501999</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1610014501999</updated>
+    </task>
+    <option name="localTasksCounter" value="96" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -429,7 +427,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Temporary change in radial profiles" />
     <MESSAGE value="Added mosaic for moment 1 and 2" />
     <MESSAGE value="Peak temperature mosaic" />
     <MESSAGE value="Changed directory structure, headers, filenames, etc." />
@@ -454,6 +451,7 @@
     <MESSAGE value="Changed filenames Heracles resolutions" />
     <MESSAGE value="Slight change in calculation moment 1 velocity range" />
     <MESSAGE value="Small bug in spectrum" />
-    <option name="LAST_COMMIT_MESSAGE" value="Small bug in spectrum" />
+    <MESSAGE value="Change in heracles filenames" />
+    <option name="LAST_COMMIT_MESSAGE" value="Change in heracles filenames" />
   </component>
 </project>
