@@ -229,7 +229,10 @@ class MomentMaps:
         header.pop('CRVAL3')
         header.pop('CDELT3')
         header.pop('CRPIX3')
-        header.pop('CUNIT3')
+        try:
+            header.pop('CUNIT3')
+        except:
+         pass
         header.pop('NAXIS3')
         try:
             header.pop('OBSGEO-Z')

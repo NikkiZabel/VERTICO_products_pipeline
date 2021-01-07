@@ -12,9 +12,11 @@ refresh = True
 overwrite = True
 sun = True
 tosave = True
-resolution = 'nearest_1200'
+resolution = 'native'
 
-if resolution == 1200:
+if resolution == 'native':
+    data = [f for f in glob(path + 'native/' + '*hans.fits.gz')]
+elif resolution == 1200:
     data = [f for f in glob(path + '*1200pc.fits')]
 elif resolution == 720:
     data = [f for f in glob(path + '*720pc.fits')]
@@ -25,7 +27,20 @@ elif resolution == 'nearest_1200':
 
 for file in data:
 
-    if resolution == 1200 or resolution == 720:
+    if resolution == 'native':
+
+        long_str = file.split('/')[-1].split('hans.fits.gz')[0]
+        galaxy = long_str.split('_')[0]
+        print(galaxy)
+
+        file_pbcorr = file
+        file_uncorr = file
+
+        if not os.path.exists(path + 'products_v' + version + '/native/sun18_method/' + galaxy + '/'):
+            os.mkdir(path + 'products_v' + version + '/native/sun18_method/' + galaxy + '/')
+        savepath = path + 'products_v' + version + '/native/sun18_method/' + galaxy + '/' + long_str + '_'
+
+    elif resolution == 1200 or resolution == 720:
 
         long_str = file.split('/')[-1].split('.fits')[0]
         galaxy = long_str.split('_')[0]
@@ -42,8 +57,6 @@ for file in data:
 
         if not os.path.exists(path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/'):
             os.mkdir(path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/')
-        else:
-            continue
 
         if resolution == 1200:
             savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/' + galaxy + '_exact_1200pc_'
@@ -74,6 +87,9 @@ for file in data:
                 os.mkdir(path + 'products_v' + version + '/nearest_aniano_720pc/sun18_method/' + galaxy + '/')
             savepath = path + 'products_v' + version + '/nearest_aniano_720pc/sun18_method/' + galaxy + \
                        '/' + long_str + '_'
+
+        if os.path.exists(savepath + 'mom0_Kkms-1.fits'):
+            continue
 
     # Moment maps
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,

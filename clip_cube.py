@@ -612,8 +612,11 @@ class ClipCube:
 
             if self.tosave:
                 mask_hdu.header.add_comment('Cube was clipped using the Sun+18 masking method', before='BUNIT')
-                mask_hdu.header.pop('BTYPE')
-                mask_hdu.header.pop('BUNIT')
+                try:
+                    mask_hdu.header.pop('BTYPE')
+                    mask_hdu.header.pop('BUNIT')
+                except:
+                    pass
                 try:
                     mask_hdu.header.pop('DATAMAX')
                     mask_hdu.header.pop('DATAMIN')
