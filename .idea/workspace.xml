@@ -19,10 +19,11 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Slight change in calculation moment 1 velocity range">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Small bug in spectrum">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/heracles.py" beforeDir="false" afterPath="$PROJECT_DIR$/heracles.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_moments.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,13 +69,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00045" summary="Fixed bug in recentering function?">
-      <created>1588009217590</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1588009217590</updated>
     </task>
     <task id="LOCAL-00046" summary="Fixed some bugs">
       <created>1588155638092</created>
@@ -412,7 +406,14 @@
       <option name="project" value="LOCAL" />
       <updated>1609681957098</updated>
     </task>
-    <option name="localTasksCounter" value="94" />
+    <task id="LOCAL-00094" summary="Small bug in spectrum">
+      <created>1609696695356</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1609696695356</updated>
+    </task>
+    <option name="localTasksCounter" value="95" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -428,7 +429,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updated mass estimation, saving out masks for the entire cube for the Sun method." />
     <MESSAGE value="Temporary change in radial profiles" />
     <MESSAGE value="Added mosaic for moment 1 and 2" />
     <MESSAGE value="Peak temperature mosaic" />
@@ -453,6 +453,7 @@
     <MESSAGE value="Finished adding code to create all products for HERACLES." />
     <MESSAGE value="Changed filenames Heracles resolutions" />
     <MESSAGE value="Slight change in calculation moment 1 velocity range" />
-    <option name="LAST_COMMIT_MESSAGE" value="Slight change in calculation moment 1 velocity range" />
+    <MESSAGE value="Small bug in spectrum" />
+    <option name="LAST_COMMIT_MESSAGE" value="Small bug in spectrum" />
   </component>
 </project>

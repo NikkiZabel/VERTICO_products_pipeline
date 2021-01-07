@@ -73,10 +73,10 @@ class CreateImages:
                                                     tosave=False, sample=self.sample).calc_moms(units='K km/s')
             else:
                 raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
+        elif units == 'M_Sun/pc^2':
+            image = fits.open(self.savepath + '_mom0_Msun.fits')[0]
         else:
-            image = fits.open(path + 'mom0.fits')[0]
-
-        #print(image.header)
+            image = fits.open(self.savepath + '_mom0_Kkms-1.fits')[0]
 
         f = plt.figure(figsize=self.galaxy.figsize)
 

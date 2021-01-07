@@ -12,7 +12,7 @@ refresh = True
 overwrite = True
 sun = True
 tosave = True
-resolution = 'nearest_720'
+resolution = 'nearest_1200'
 
 if resolution == 1200:
     data = [f for f in glob(path + '*1200pc.fits')]
@@ -27,32 +27,9 @@ for file in data:
 
     if resolution == 1200 or resolution == 720:
 
-        galaxy = file.split('/')[7].split('_')[0]
+        long_str = file.split('/')[-1].split('.fits')[0]
+        galaxy = long_str.split('_')[0]
         print(galaxy)
-
-        file_pbcorr = file
-        file_uncorr = file
-
-        if not os.path.exists(path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/'):
-            os.mkdir(path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/')
-        #else:
-        #    continue
-        if resolution == 1200:
-            savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/' + galaxy + 'exact_1200pc_'
-        else:
-            savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/' + galaxy + 'exact_720pc_'
-
-    elif resolution == 'nearest_720' or resolution == 'nearest_1200':
-
-        galaxy = file.split('/')[8].split('_')[0]
-        print(galaxy)
-
-        #if os.path.exists(path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy
-        #                  + '/' + galaxy + '_nearest_aniano_20arcsec_746.61pc_mom0_Kkms-1.pdf'):
-        #    continue
-
-        if not galaxy == 'ngc4736':
-            continue
 
         if galaxy == 'ngc4536':
             continue
@@ -63,17 +40,42 @@ for file in data:
         file_pbcorr = file
         file_uncorr = file
 
-        if not os.path.exists(path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy + '/'):
-            os.mkdir(path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy + '/')
-        #else:
-        #    continue
-        if resolution == 'nearest_1200':
-            savepath = path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy + '/' + galaxy + '_nearest_aniano_30arcsec_1119.92pc_'
+        if not os.path.exists(path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/'):
+            os.mkdir(path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/')
         else:
-            savepath = path + 'products_v' + version + '/smoothed_cubes_' + resolution + 'pc/sun18_method/' + galaxy + '/' + galaxy + '_nearest_aniano_20arcsec_746.61pc_'
+            continue
+
+        if resolution == 1200:
+            savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/' + galaxy + '_exact_1200pc_'
+        else:
+            savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/' + galaxy + '_exact_720pc_'
+
+    elif resolution == 'nearest_720' or resolution == 'nearest_1200':
+
+        long_str = file.split('/')[-1].split('.fits')[0]
+        galaxy = long_str.split('_')[0]
+        print(galaxy)
+
+        if galaxy == 'ngc4536':
+            continue
+
+        if galaxy == 'ngc2903':
+            continue
+
+        file_pbcorr = file
+        file_uncorr = file
+
+        if resolution == 'nearest_1200':
+            if not os.path.exists(path + 'products_v' + version + '/nearest_aniano_1200pc/sun18_method/' + galaxy + '/'):
+                os.mkdir(path + 'products_v' + version + '/nearest_aniano_1200pc/sun18_method/' + galaxy + '/')
+            savepath = path + 'products_v' + version + '/nearest_aniano_1200pc/sun18_method/' + galaxy + '/' + long_str + '_'
+        elif resolution == 'nearest_720':
+            if not os.path.exists(path + 'products_v' + version + '/nearest_aniano_720pc/sun18_method/' + galaxy + '/'):
+                os.mkdir(path + 'products_v' + version + '/nearest_aniano_720pc/sun18_method/' + galaxy + '/')
+            savepath = path + 'products_v' + version + '/nearest_aniano_720pc/sun18_method/' + galaxy + \
+                       '/' + long_str + '_'
 
     # Moment maps
-    '''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, sample=sample).moment_zero(units='K km/s')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -82,9 +84,9 @@ for file in data:
                   sun=sun, tosave=tosave, sample=sample).moment_zero(peak=True)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, sample=sample).moment_1_2()
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #             sun=sun, tosave=tosave, sample=sample).moment_1_2(moment=2)
-    
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                 sun=sun, tosave=tosave, sample=sample).moment_1_2(moment=2)
+
     # Uncertainty maps
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).mom0_noise_maps()
@@ -97,7 +99,7 @@ for file in data:
     if not galaxy == 'ngc2841':
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave).PVD(axis='minor', check_slit=False)
-    '''
+
     # Spectra
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).spectrum(x_axis='vel_offset')
@@ -119,5 +121,5 @@ for file in data:
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='arcsec',
                                    alpha_co=6.25, table_path=None, check_aperture=False)
-    #'''
+
     #break

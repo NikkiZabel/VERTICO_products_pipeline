@@ -1093,7 +1093,9 @@ def parameters(galaxy, sample=None):
 
                 return incl[0], pa[0]
 
-            inclination, angle = get_inc_pa(galaxy)
+            inclination, pa = get_inc_pa(galaxy)
+
+            angle = pa + 90
 
             distances = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/heracles/heracles_distances.csv',
                                       delimiter=',', usecols=[1])
