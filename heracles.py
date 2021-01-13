@@ -33,6 +33,9 @@ for file in data:
         galaxy = long_str.split('_')[0]
         print(galaxy)
 
+        if not galaxy == 'NGC5457':
+            continue
+
         file_pbcorr = file
         file_uncorr = file
 
@@ -40,16 +43,19 @@ for file in data:
             os.mkdir(path + 'products_v' + version + '/native/sun18_method/' + galaxy + '/')
         savepath = path + 'products_v' + version + '/native/sun18_method/' + galaxy + '/' + long_str + '_'
 
+        #if os.path.exists(savepath + 'mom0_Kkms-1.pdf'):
+        #    continue
+
     elif resolution == 1200 or resolution == 720:
 
         long_str = file.split('/')[-1].split('.fits')[0]
         galaxy = long_str.split('_')[0]
         print(galaxy)
 
-        if galaxy == 'ngc4536':
+        if (galaxy == 'ngc4536') | (galaxy == 'NGC4536'):
             continue
 
-        if galaxy == 'ngc2903':
+        if (galaxy == 'ngc2903') | (galaxy == 'NGC2903'):
             continue
 
         file_pbcorr = file
@@ -62,6 +68,9 @@ for file in data:
             savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/' + galaxy + '_exact_1200pc_'
         else:
             savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/' + galaxy + '_exact_720pc_'
+
+        if os.path.exists(path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/' + galaxy + '_exact_720pc_mom0_Kkms-1.pdf'):
+            continue
 
     elif resolution == 'nearest_720' or resolution == 'nearest_1200':
 
@@ -90,7 +99,7 @@ for file in data:
 
         if os.path.exists(savepath + 'mom0_Kkms-1.fits'):
             continue
-
+    '''
     # Moment maps
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, sample=sample).moment_zero(units='K km/s')
@@ -102,7 +111,7 @@ for file in data:
                  sun=sun, tosave=tosave, sample=sample).moment_1_2()
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, sample=sample).moment_1_2(moment=2)
-
+    
     # Uncertainty maps
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).mom0_noise_maps()
@@ -115,7 +124,8 @@ for file in data:
     if not galaxy == 'ngc2841':
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave).PVD(axis='minor', check_slit=False)
-
+    #'''
+    '''
     # Spectra
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave).spectrum(x_axis='vel_offset')
@@ -123,19 +133,18 @@ for file in data:
                  sun=sun, tosave=tosave).spectrum(x_axis='velocity')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave).spectrum(x_axis='frequency')
-
+    '''
     # Radial profiles
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
-                                    alpha_co=6.25, table_path=None, check_aperture=False)
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
-                                   alpha_co=6.25, table_path=None, check_aperture=False)
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='kpc',
-                                   alpha_co=6.25, table_path=None, check_aperture=False)
+    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #            sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
+    #                                alpha_co=6.25, table_path=None, check_aperture=False)
+    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #            sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
+    #                               alpha_co=6.25, table_path=None, check_aperture=False)
+    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+    #            sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='kpc',
+    #                               alpha_co=6.25, table_path=None, check_aperture=False)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='arcsec',
                                    alpha_co=6.25, table_path=None, check_aperture=False)
-
     #break

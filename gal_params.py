@@ -1081,17 +1081,31 @@ def parameters(galaxy, sample=None):
         if sample == 'heracles':
             import numpy as np
 
-            def get_inc_pa(galaxy, ):
+            def get_inc_pa(galaxy):
                 from astropy.io import fits
                 table = fits.open('/home/nikki/Documents/Data/VERTICO/heracles/heracles_sdss_r_properties.fits')[1]
                 gal_name_table = table.data['Galaxy']
                 gal_num_table = np.array([n.split('C')[1] for n in gal_name_table])
 
-                galaxy_num = galaxy.split('c')[1]
-                incl = table.data['inclination'][gal_num_table == galaxy_num]
-                pa = table.data['pa'][gal_num_table == galaxy_num]
-
-                return incl[0], pa[0]
+                try:
+                    incl = table.data['inclination'][gal_name_table == galaxy]
+                    pa = table.data['pa'][gal_name_table == galaxy]
+                    return incl[0], pa[0]
+                except:
+                    try:
+                        galaxy_num = galaxy.split('c')[1]
+                        incl = table.data['inclination'][gal_num_table == galaxy_num]
+                        pa = table.data['pa'][gal_num_table == galaxy_num]
+                        return incl[0], pa[0]
+                    except:
+                        # These galaxies do not have incl/PA calculated by VERTICO, so these have been taken from HyperLEDA.
+                        if galaxy == 'NGC2903':
+                            inclination = 67
+                            pa = 22
+                        elif galaxy == 'NGC4536':
+                            inclination = 73
+                            pa = 121
+                        return inclination, pa
 
             inclination, pa = get_inc_pa(galaxy)
 
@@ -1101,10 +1115,8 @@ def parameters(galaxy, sample=None):
                                       delimiter=',', usecols=[1])
             dist_names = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/heracles/heracles_distances.csv',
                                       delimiter=',', usecols=[0], dtype='str')
-            try:
-                distance = distances[dist_names == galaxy]
-            except:
-                distance = None
+
+            distance = distances[dist_names == galaxy]
 
         elif sample == 'viva':
             distance = 16.5

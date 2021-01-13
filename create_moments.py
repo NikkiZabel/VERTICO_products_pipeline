@@ -447,24 +447,39 @@ class MomentMaps:
         pvd_header['BPA'] = clipped_cube.header['BPA']
         pvd_header['FULL_WIDTH'] = self.galaxy.full_width
         pvd_header.comments['FULL_WIDTH'] = 'True if all emission used.'
-        pvd_header['OBJECT'] = clipped_cube.header['OBJECT']
+        try:
+            pvd_header['OBJECT'] = clipped_cube.header['OBJECT']
+        except:
+            pass
         pvd_header['EQUINOX'] = 2000
         pvd_header['RADESYS'] = 'FK5'
-        pvd_header['LONPOLE'] = clipped_cube.header['LONPOLE']
-        pvd_header['LATPOLE'] = clipped_cube.header['LATPOLE']
+        try:
+            pvd_header['LONPOLE'] = clipped_cube.header['LONPOLE']
+            pvd_header['LATPOLE'] = clipped_cube.header['LATPOLE']
+        except:
+            pass
         pvd_header['CTYPE1'] = 'OFFSET'
         pvd_header['CRVAL1'] = 0
         pvd_header['CDELT1'] = clipped_cube.header['CDELT1'] / (cube_rot.shape[2] / cube_rot.shape[2])
         pvd_header['CRPIX1'] = np.ceil(PV.shape[1] / 2)
-        pvd_header['CUNIT1'] = clipped_cube.header['CUNIT1']
+        try:
+            pvd_header['CUNIT1'] = clipped_cube.header['CUNIT1']
+        except:
+            pass
         pvd_header['CTYPE2'] = 'VRAD'
         pvd_header['CRVAL2'] = clipped_cube.header['CRVAL3']
         pvd_header['CDELT2'] = clipped_cube.header['CDELT3']
         pvd_header['CRPIX2'] = clipped_cube.header['CRPIX3']
-        pvd_header['CUNIT2'] = 'km/s'
+        try:
+            pvd_header['CUNIT2'] = 'km/s'
+        except:
+            pass
         pvd_header['PC1_1'] = pvd_header['CDELT1']
-        pvd_header['PC2_1'] = clipped_cube.header['PC2_1']
-        pvd_header['PC1_2'] = clipped_cube.header['PC1_2']
+        try:
+            pvd_header['PC2_1'] = clipped_cube.header['PC2_1']
+            pvd_header['PC1_2'] = clipped_cube.header['PC1_2']
+        except:
+            pass
         pvd_header['PC2_2'] = pvd_header['CDELT2']
         pvd_header['CENTR_PIX'] = '(' + str(clipped_cube.shape[0] / 2) + ', ' + str(clipped_cube.shape[1] / 2) + ')'
         pvd_header.comments['CENTR_PIX'] = 'Central pix used for rot. + loc. slit'
@@ -511,7 +526,10 @@ class MomentMaps:
             pass
         pvd_header['DISTANCE'] = self.galaxy.distance
         pvd_header.comments['DISTANCE'] = 'Mpc'
-        pvd_header['ORIGIN'] = clipped_cube.header['ORIGIN']
+        try:
+            pvd_header['ORIGIN'] = clipped_cube.header['ORIGIN']
+        except:
+            pass
         pvd_header['BUNIT'] = 'K km/s'
         self.add_clipping_keywords(pvd_header)
 
@@ -765,7 +783,10 @@ class MomentMaps:
         radius = np.array(radius[:-1])
         area = area[:-1]
         radii_deg = radius * mom0_hdu_K.header['CDELT2']
-        radii_kpc = np.deg2rad(radii_deg) * self.galaxy.distance * 1000
+        try:
+            radii_kpc = np.deg2rad(radii_deg) * self.galaxy.distance * 1000
+        except:
+            radii_kpc = np.zeros(len(radii_deg))
         N_beams = np.array(area) / (beam_pix ** 2 * np.pi)
         error_K = np.sqrt(N_beams) * rms
         error_Msun = np.sqrt(N_beams) * rms_Msun
