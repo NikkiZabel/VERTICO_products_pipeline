@@ -7,11 +7,12 @@ from photutils import EllipticalAnnulus
 from photutils import aperture_photometry
 from astropy import wcs
 from astropy.stats import mad_std
+import os
 
 
 class MomentMaps:
 
-    def __init__(self, galname, path_pbcorr, path_uncorr, savepath=None, sun=True, tosave=False, sample=None):
+    def __init__(self, galname, path_pbcorr, path_uncorr, savepath=None, sun=True, tosave=False, sample=None, redo_clip=False):
         self.galaxy = galaxies(galname, sample)
         self.path_pbcorr = path_pbcorr
         self.path_uncorr = path_uncorr
@@ -19,10 +20,9 @@ class MomentMaps:
         self.sun = sun
         self.tosave = tosave
         self.sample = sample
-        self.galaxy.start = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(get_chans=True)[0]
-        self.galaxy.stop = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(get_chans=True)[1]
+        self.redo_clip = redo_clip
+        self.galaxy.start, self.galaxy.stop = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(get_chans=True)
 
     def pixel_size_check(self, header, key="CDELT1", expected_pix_size=2, raise_exception=True):
         # check the pixel size is what's expected modulo some floating point error
@@ -85,7 +85,14 @@ class MomentMaps:
                                     savepath=self.savepath, tosave=self.tosave, sample=self.sample).readfits()
 
         # Centre and clip empty rows and columns to get it in the same shape as the other products
-        _, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+        if not self.redo_clip:
+            if os.path.exists(self.savepath + 'noisecube_clipped_trimmed.fits'):
+                noisecube = fits.read(self.savepath + 'noisecube_clipped_trimmed.fits')[0]
+            else:
+                _, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                        savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip()
+        else:
+            _, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                     savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip()
 
         # extract negative values (only needed if masking_scheme='simple')
@@ -313,10 +320,17 @@ class MomentMaps:
         :return: clipped spectral cube, HDUs of the moment 0, 1, and 2 maps, and the systemic velocity in km/s
         """
 
-        cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
-                        tosave=self.tosave, sample=self.sample).do_clip()
+        if self.redo_clip:
+            cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
+                            tosave=self.tosave, sample=self.sample).do_clip()
+        elif os.path.exists(self.savepath + 'cube_clipped_trimmed.fits'):
+            cube = fits.open(self.savepath + 'cube_clipped_trimmed.fits')[0]
+        else:
+            cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                               savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip()
 
         vel_array, vel_narray, vel_fullarray = self.create_vel_array(cube)
+
         if cube.header['CTYPE3'] == 'VRAD' or cube.header['CTYPE3'] == 'VELOCITY':
             mom0 = np.sum((cube.data * abs(cube.header['CDELT3']) / 1000), axis=0)
         elif cube.header['CTYPE3'] == 'FREQ':
@@ -853,8 +867,17 @@ class MomentMaps:
         mask = fits.open(self.savepath + 'mask_cube.fits')[0]
 
         # Map of the number of channels used to calculate the moments
-        _, mask_trimmed = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(clip_also=mask)
+        if self.redo_clip:
+            _, mask_trimmed = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                        savepath=self.savepath, tosave=self.tosave, sample=self.sample).\
+                do_clip(clip_also=mask, clip_also_nat='mask')
+        elif os.path.exists(self.savepath + 'mask_clipped_trimmed.fits'):
+            mask_trimmed = fits.open(self.savepath + 'mask_clipped_trimmed.fits')[0]
+        else:
+            _, mask_trimmed = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                       savepath=self.savepath, tosave=self.tosave, sample=self.sample). \
+                do_clip(clip_also=mask, clip_also_nat='mask')
+
         N_map = np.sum(mask_trimmed.data, axis=0)
 
         # Read in the cubes, split into cubes containing line and line-free channels, take the inner cube and calculate
@@ -880,9 +903,17 @@ class MomentMaps:
         try:
             pb_hdu = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/' + str(self.galaxy.name) + '/' +
                            str(self.galaxy.name) + '_7m_co21_pb_rebin.fits')[0]
+            if self.redo_clip:
+                _, pb_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                                            savepath=self.savepath, tosave=self.tosave, sample=self.sample).\
+                    do_clip(clip_also=pb_hdu, clip_also_nat='pb')
+            elif os.path.exists(self.savepath + 'pb_clipped_trimmed.fits'):
+                pb_cube = fits.open(self.savepath + 'pb_clipped_trimmed.fits')[0]
+            else:
+                _, pb_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+                        savepath=self.savepath, tosave=self.tosave, sample=self.sample).\
+                    do_clip(clip_also=pb_hdu, clip_also_nat='pb')
 
-            _, pb_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                        savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(clip_also=pb_hdu)
             pb_map = pb_cube.data[int(pb_cube.shape[0] / 2), :, :]
 
         except:
@@ -922,8 +953,14 @@ class MomentMaps:
         return mom0_uncertainty, SN_hdu, mom1_uncertainty, mom2_uncertainty
 
     def peak_temperature(self):
-        cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
-                        tosave=self.tosave, sample=self.sample).do_clip()
+        if self.redo_clip:
+            cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
+                            tosave=self.tosave, sample=self.sample).do_clip()
+        elif os.path.exists(self.savepath + 'cube_clipped_trimmed.fits'):
+            cube = fits.open(self.savepath + 'cube_clipped_trimmed.fits')[0]
+        else:
+            cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
+                            tosave=self.tosave, sample=self.sample).do_clip()
 
         peak_temp = np.amax(cube.data, axis=0)
 

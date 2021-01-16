@@ -546,7 +546,7 @@ class ClipCube:
 
         return mask
 
-    def do_clip(self, clip_also=None, get_chans=False):
+    def do_clip(self, clip_also=None, clip_also_nat='noise', get_chans=False):
         """
         Clip the array, either according to the Sun method (if self.sun == True, which is default) or the smooth
         clipping method from Dame.
@@ -657,7 +657,13 @@ class ClipCube:
         # Do some pre-processing to make the creation of the moments easier
         clipped_hdu, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=clip_also)
 
-        #if self.tosave:
-        #    clipped_hdu.writeto(self.savepath + 'cube_clipped_trimmed.fits', overwrite=True)
+        if self.tosave:
+            clipped_hdu.writeto(self.savepath + 'cube_clipped_trimmed.fits', overwrite=True)
+            if clip_also_nat == 'noise':
+                noisecube_hdu.writeto(self.savepath + 'noisecube_clipped_trimmed.fits', overwrite=True)
+            elif clip_also_nat == 'mask':
+                noisecube_hdu.writeto(self.savepath + 'mask_clipped_trimmed.fits', overwrite=True)
+            elif clip_also_nat == 'pb':
+                noisecube_hdu.writeto(self.savepath + 'pb_clipped_trimmed.fits', overwrite=True)
 
         return clipped_hdu, noisecube_hdu

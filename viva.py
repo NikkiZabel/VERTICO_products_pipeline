@@ -6,19 +6,20 @@ from glob import glob
 
 sample = 'viva'
 version = '1_0'
-path = '/home/nikki/Documents/Data/VERTICO/VIVA/Reprojected_15_arcsec/'
+path = '/home/nikki/Documents/Data/VERTICO/VIVA/Reprojected_15_arcsec_new/'
 
 refresh = True
 overwrite = True
 sun = True
 tosave = True
+redo_clip = False
 
-data = [f for f in glob(path + 'cubes/' + '*.fits')]
+data = [f for f in glob(path + '*.fits')]
 
 for file in data:
 
     # Split off the galaxy's name
-    galnames = file.split('/')[9].split('_cube')[0].split('_')
+    galnames = file.split('/')[8].split('_cube')[0].split('_')
 
     # Sometimes a cube contains two galaxies, loop over both to create individual products
     for i in range(len(galnames)):
@@ -29,10 +30,9 @@ for file in data:
         else:
             galaxy = galnames[i]
 
-        if not galaxy == 'ngc4293':
-            continue
-
         print(galaxy)
+        if galaxy == 'ngc4293':
+            continue
 
         # There is only one cube, so pb un/corrected files are the same
         file_pbcorr = file
@@ -46,29 +46,51 @@ for file in data:
 
         # Moment maps
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                      sun=sun, tosave=tosave, sample=sample).moment_zero(units='K km/s')
+                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                      sun=sun, tosave=tosave, sample=sample).moment_zero()
+                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                      sun=sun, tosave=tosave, sample=sample).moment_zero(peak=True)
+                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(peak=True)
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                     sun=sun, tosave=tosave, sample=sample).moment_1_2()
+                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_1_2()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                     sun=sun, tosave=tosave, sample=sample).moment_1_2(moment=2)
+                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_1_2(moment=2)
+
+        # Uncertainty maps
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, redo_clip=redo_clip).mom0_noise_maps()
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, redo_clip=redo_clip).mom1_2_noise_maps()
+
+        # PVDs
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave).PVD(axis='major', find_angle=False, check_slit=False)
+        if not galaxy == 'ngc2841':
+            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                         sun=sun, tosave=tosave).PVD(axis='minor', check_slit=False)
 
         # Spectra
-        try:
-            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                         sun=sun, tosave=tosave).spectrum(x_axis='vel_offset')
-            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                         sun=sun, tosave=tosave).spectrum(x_axis='velocity')
-            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                         sun=sun, tosave=tosave).spectrum(x_axis='frequency')
-        except:
-            pass
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='vel_offset')
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='velocity')
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='frequency')
 
-        #break
-
+        # Radial profiles
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                    sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
+                                        alpha_co=6.25, table_path=None, check_aperture=False)
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                    sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
+                                       alpha_co=6.25, table_path=None, check_aperture=False)
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                    sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='kpc',
+                                       alpha_co=6.25, table_path=None, check_aperture=False)
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
+                                                                           alpha_co=6.25, table_path=None,
+                                                                           check_aperture=False)
 
 
 

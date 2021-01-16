@@ -16,7 +16,7 @@ from matplotlib.colors import ListedColormap
 class CreateImages:
 
     def __init__(self, galname, path_pbcorr, path_uncorr, savepath=None, refresh=False, overwrite=True,
-                 sun=True, tosave=False, sample=None):
+                 sun=True, tosave=False, sample=None, redo_clip=False):
         self.galaxy = galaxies(galname, sample)
         self.path_pbcorr = path_pbcorr
         self.path_uncorr = path_uncorr
@@ -26,6 +26,7 @@ class CreateImages:
         self.sun = sun
         self.tosave = tosave
         self.sample = sample
+        self.redo_clip = redo_clip
 
     @staticmethod
     def custom_cmap(cmap=plt.cm.afmhot_r):
@@ -49,10 +50,12 @@ class CreateImages:
             if self.refresh:
                 if self.overwrite:
                     image = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                                    savepath=self.savepath, tosave=True, sample=self.sample).peak_temperature()
+                                                    savepath=self.savepath, tosave=True, sample=self.sample,
+                                       redo_clip=self.redo_clip).peak_temperature()
                 else:
                     image = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                                    tosave=False, sample=self.sample).peak_temperature()
+                                                    tosave=False, sample=self.sample, redo_clip=self.redo_clip).\
+                        peak_temperature()
             else:
                 image = fits.open(path + 'peak_temp.fits')[0]
 
@@ -60,17 +63,21 @@ class CreateImages:
             if units == 'M_Sun/pc^2':
                 if self.overwrite:
                     _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                                    savepath=self.savepath, tosave=True, sample=self.sample).calc_moms(units='M_Sun/pc^2')
+                                                    savepath=self.savepath, tosave=True, sample=self.sample,
+                                                   redo_clip=self.redo_clip).calc_moms(units='M_Sun/pc^2')
                 else:
                     _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                                    tosave=False, sample=self.sample).calc_moms(units='M_Sun/pc^2')
+                                                    tosave=False, sample=self.sample, redo_clip=self.redo_clip).\
+                        calc_moms(units='M_Sun/pc^2')
             elif units == 'K km/s':
                 if self.overwrite:
                     _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                                    savepath=self.savepath, tosave=True, sample=self.sample).calc_moms(units='K km/s')
+                                                    savepath=self.savepath, tosave=True, sample=self.sample,
+                                                   redo_clip=self.redo_clip).calc_moms(units='K km/s')
                 else:
                     _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                                    tosave=False, sample=self.sample).calc_moms(units='K km/s')
+                                                    tosave=False, sample=self.sample, redo_clip=self.redo_clip).\
+                        calc_moms(units='K km/s')
             else:
                 raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
         elif units == 'M_Sun/pc^2':
@@ -167,10 +174,12 @@ class CreateImages:
             if self.refresh:
                 if self.overwrite:
                     _, _, image, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                                         savepath=self.savepath, sun=self.sun, tosave=True, sample=self.sample).calc_moms()
+                                                         savepath=self.savepath, sun=self.sun, tosave=True,
+                                                        sample=self.sample, redo_clip=self.redo_clip).calc_moms()
                 else:
                     _, _, image, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                                         sun=self.sun, tosave=False, sample=self.sample).calc_moms()
+                                                         sun=self.sun, tosave=False, sample=self.sample,
+                                                        redo_clip=self.redo_clip).calc_moms()
             else:
                 image = fits.open(self.path + 'mom1.fits')[0]
 
@@ -178,10 +187,12 @@ class CreateImages:
             if self.refresh:
                 if self.overwrite:
                     _, _, _, image, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                                         savepath=self.savepath, sun=self.sun, tosave=True, sample=self.sample).calc_moms()
+                                                         savepath=self.savepath, sun=self.sun, tosave=True,
+                                                        sample=self.sample, redo_clip=self.redo_clip).calc_moms()
                 else:
                     _, _, _, image, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                                         sun=self.sun, tosave=False, sample=self.sample).calc_moms()
+                                                         sun=self.sun, tosave=False, sample=self.sample,
+                                                        redo_clip=self.redo_clip).calc_moms()
             else:
                 image = fits.open(self.path + 'mom2.fits')[0]
 
@@ -191,7 +202,8 @@ class CreateImages:
                                             savepath=self.savepath,
                                             tosave=self.tosave, sample=self.sample).split_cube(cube_uncorr)
         vel_array, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                      tosave=False, sample=self.sample).create_vel_array(emiscube)
+                                      tosave=False, sample=self.sample, redo_clip=self.redo_clip).\
+            create_vel_array(emiscube)
 
         #sysvel = (sysvel + 5) // 10 * 10
 
@@ -293,16 +305,18 @@ class CreateImages:
         if self.refresh:
             if self.overwrite:
                 PV = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                 savepath=self.savepath, tosave=True, sample=self.sample).\
+                                 savepath=self.savepath, tosave=True, sample=self.sample, redo_clip=self.redo_clip).\
                     PVD(axis=axis, find_angle=find_angle, check_slit=check_slit)
             else:
-                PV = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False, sample=self.sample).\
+                PV = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, tosave=False,
+                                sample=self.sample, redo_clip=self.redo_clip).\
                     PVD(axis=axis, find_angle=find_angle, check_slit=check_slit)
         else:
             PV = fits.open(self.path + 'PVD.fits')[0]
 
         clipped_cube, _, _, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                               sun=self.sun, tosave=False, savepath=self.savepath, sample=self.sample).calc_moms()
+                                               sun=self.sun, tosave=False, savepath=self.savepath, sample=self.sample,
+                                                   redo_clip=self.redo_clip).calc_moms()
 
 
         # Create a physical position axis using the middle found and the spatial resolution, in arc seconds
@@ -358,7 +372,8 @@ class CreateImages:
         ax.callbacks.connect("xlim_changed", x_kpc)
 
         velocity, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                    sun=self.sun, savepath=self.savepath, tosave=False, sample=self.sample).create_vel_array(clipped_cube)
+                                    sun=self.sun, savepath=self.savepath, tosave=False, sample=self.sample,
+                                    redo_clip=self.redo_clip).create_vel_array(clipped_cube)
 
         velocity = np.flip(velocity) - sysvel
 
@@ -407,11 +422,13 @@ class CreateImages:
         if self.refresh:
             if self.overwrite:
                 spectrum, velocity, v_off, frequency = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                                    sun=self.sun, savepath=self.savepath, tosave=True, sample=self.sample).spectrum()
+                                                    sun=self.sun, savepath=self.savepath, tosave=True,
+                                                                  sample=self.sample, redo_clip=self.redo_clip).spectrum()
 
             else:
                 spectrum, velocity, v_off, frequency = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                                    sun=self.sun, savepath=self.savepath, tosave=False, sample=self.sample).spectrum()
+                                                    sun=self.sun, savepath=self.savepath, tosave=False,
+                                                                  sample=self.sample, redo_clip=self.redo_clip).spectrum()
 
         else:
             temp = np.loadtxt(self.savepath + 'spectrum.csv', delimiter=',')
@@ -421,7 +438,8 @@ class CreateImages:
             frequency = temp[:, 3]
 
         clipped_cube, _, _, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
-                                               sun=self.sun, tosave=False, savepath=self.savepath, sample=self.sample).calc_moms()
+                                               sun=self.sun, tosave=False, savepath=self.savepath, sample=self.sample,
+                                                   redo_clip=self.redo_clip).calc_moms()
 
         fig, ax = plt.subplots(figsize=(7, 7))
 
@@ -471,11 +489,11 @@ class CreateImages:
         if self.refresh:
             if self.overwrite:
                 rad_prof_K, rad_prof_K_err, rad_prof_Msun, rad_prof_Msun_err, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr,
-                        self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=True, sample=self.sample).\
+                        self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=True, sample=self.sample, redo_clip=self.redo_clip).\
                     radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture)
             else:
                 rad_prof_K, rad_prof_K_err, rad_prof_Msun, rad_prof_Msun_err, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr,
-                        self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=False, sample=self.sample).\
+                        self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=False, sample=self.sample, redo_clip=self.redo_clip).\
                     radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture, hires=True)
         else:
             temp = np.loadtxt(self.savepath + 'rad_prof.csv', delimiter=',')
@@ -534,10 +552,10 @@ class CreateImages:
         if self.refresh:
             if self.overwrite:
                 mom0_unc, mom0_SN, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                       tosave=True, savepath=self.savepath, sample=self.sample).uncertainty_maps()
+                                       tosave=True, savepath=self.savepath, sample=self.sample, redo_clip=self.redo_clip).uncertainty_maps()
             else:
                 mom0_unc, mom0_SN, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                       tosave=False, sample=self.sample).uncertainty_maps()
+                                       tosave=False, sample=self.sample, redo_clip=self.redo_clip).uncertainty_maps()
         else:
             mom0_unc = fits.open(path + 'mom0_unc.fits')[0]
             mom0_SN = fits.open(path + 'mom0_SN.fits')[0]
@@ -601,10 +619,10 @@ class CreateImages:
         if self.refresh:
             if self.overwrite:
                 mom0_unc, SN_hdu, mom1_unc, mom2_unc = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                               tosave=True, savepath=self.savepath, sample=self.sample).uncertainty_maps()
+                                               tosave=True, savepath=self.savepath, sample=self.sample, redo_clip=self.redo_clip).uncertainty_maps()
             else:
                 mom0_unc, SN_hdu, mom1_unc, mom2_unc = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                               tosave=False, sample=self.sample).uncertainty_maps()
+                                               tosave=False, sample=self.sample, redo_clip=self.redo_clip).uncertainty_maps()
         else:
             mom1_unc = fits.open(path + 'mom1_unc.fits')[0]
             mom2_unc = fits.open(path + 'mom2_unc.fits')[0]
