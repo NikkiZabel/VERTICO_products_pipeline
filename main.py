@@ -5,6 +5,7 @@ import os
 from matplotlib import pyplot as plt
 
 # Set some parameters to apply to all images below
+redo_clip = False
 refresh = True
 overwrite = False
 sun = True

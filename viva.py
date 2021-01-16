@@ -7,6 +7,7 @@ from glob import glob
 sample = 'viva'
 version = '1_0'
 path = '/home/nikki/Documents/Data/VERTICO/VIVA/Reprojected_15_arcsec_new/'
+table_path = '/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits'
 
 refresh = True
 overwrite = True
@@ -80,16 +81,16 @@ for file in data:
         # Radial profiles
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
-                                        alpha_co=6.25, table_path=None, check_aperture=False)
+                                        alpha_co=6.25, table_path=table_path, check_aperture=False)
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
-                                       alpha_co=6.25, table_path=None, check_aperture=False)
+                                       alpha_co=6.25, table_path=table_path, check_aperture=False)
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='kpc',
-                                       alpha_co=6.25, table_path=None, check_aperture=False)
+                                       alpha_co=6.25, table_path=table_path, check_aperture=False)
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
-                                                                           alpha_co=6.25, table_path=None,
+                                                                           alpha_co=6.25, table_path=table_path,
                                                                            check_aperture=False)
 
 
