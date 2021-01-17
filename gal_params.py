@@ -1129,11 +1129,12 @@ def parameters(galaxy, sample=None):
             distance = distances[dist_names == galaxy]
 
     if sample == 'viva':
-        if galaxy == 'ngc4580' or galaxy == 'ngc4654':
+        if galaxy == 'NGC4580' or galaxy == 'NGC4654':
             nchan_low = 1
             nchan_high = 2
 
     name = galaxy
+    figsize = (10, 8.5)
 
     return name, vrange, vrange_2, cliplevel, stokes, sysvel_offset, angle, \
            full_width, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \

@@ -345,7 +345,14 @@ class MomentMaps:
             #mom0 = mom0 / cube.header['JTOK'] * 91.7 * alpha_co * (cube.header['BMAJ'] * 3600 * cube.header[
             #    'BMIN'] * 3600) ** (-1) / 4
 
-            mom0 *= alpha_co
+            if self.sample == 'viva':
+                coldens_atom_cm = mom0 * 1.10e24 / (cube.header['BMAJ'] * 3600 * cube.header['BMIN'] * 3600)
+                Msol_to_matom = 1.187883838e57
+                pc_to_cm = 9.521e36
+                coldens_Msol_pc = coldens_atom_cm / Msol_to_matom * pc_to_cm
+                mom0 = coldens_Msol_pc
+            else:
+                mom0 *= alpha_co
         elif units == 'K km/s':
             pass
         else:
@@ -646,9 +653,14 @@ class MomentMaps:
                                             savepath=self.savepath,
                                             tosave=self.tosave, sample=self.sample).innersquare(noisecube.data)
         rms = np.nanstd(inner)
-        rms_Msun = rms * alpha_co
-        #rms_Msun = rms_Msun * abs(cube_pbcorr.header['CDELT3']) / 1000 * 91.7 * alpha_co * (cube_pbcorr.header['BMAJ'] * 3600 *
-        #        cube_pbcorr.header['BMIN'] * 3600) ** (-1) / 4
+
+        if self.sample == 'viva':
+            coldens_atom_cm = rms * 1.10e24 / (cube_pbcorr.header['BMAJ'] * 3600 * cube_pbcorr.header['BMIN'] * 3600)
+            Msol_to_matom = 1.187883838e57
+            pc_to_cm = 9.521e36
+            rms_Msun = coldens_atom_cm / Msol_to_matom * pc_to_cm
+        else:
+            rms_Msun = rms * alpha_co
 
         if hires:
             limit = 0
