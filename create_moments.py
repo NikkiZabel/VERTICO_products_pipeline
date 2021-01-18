@@ -354,6 +354,8 @@ class MomentMaps:
             else:
                 mom0 *= alpha_co
         elif units == 'K km/s':
+            #if self.sample == 'viva':
+            #    mom0 = mom0 * 1.222e3 / (cube.header['BMAJ'] * 3600 * cube.header['BMIN'] * 3600) / (1.420405751) ** 2
             pass
         else:
             raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
@@ -376,7 +378,8 @@ class MomentMaps:
         # Change or add any (additional) keywords to the headers
         if units == 'M_Sun/pc^2':
             mom0_hdu.header['BTYPE'] = 'Column density'
-            mom0_hdu.header.comments['BTYPE'] = 'Total molecular gas (H_2 + He)'
+            if not self.sample == 'viva':
+                mom0_hdu.header.comments['BTYPE'] = 'Total molecular gas (H_2 + He)'
         else:
             mom0_hdu.header['BTYPE'] = 'Integrated intensity'
 
@@ -385,7 +388,8 @@ class MomentMaps:
         mom0_hdu.header['BUNIT'] = units; mom0_hdu.header.comments['BUNIT'] = ''
         mom1_hdu.header['BUNIT'] = 'km/s'; mom1_hdu.header.comments['BUNIT'] = ''
         mom2_hdu.header['BUNIT'] = 'km/s'; mom2_hdu.header.comments['BUNIT'] = ''
-        mom0_hdu.header['ALPHA_CO'] = alpha_co; #mom0_hdu.header.comments['ALPHA_CO'] = 'Assuming a line ratio of 0.7'
+        if not self.sample == 'viva':
+            mom0_hdu.header['ALPHA_CO'] = alpha_co; #mom0_hdu.header.comments['ALPHA_CO'] = 'Assuming a line ratio of 0.7'
         mom1_hdu.header['SYSVEL'] = sysvel; mom1_hdu.header.comments['SYSVEL'] = 'km/s'
 
         self.add_clipping_keywords(mom0_hdu.header)
@@ -396,7 +400,10 @@ class MomentMaps:
             if units == 'M_Sun/pc^2':
                 mom0_hdu.writeto(self.savepath + 'mom0_Msun.fits', overwrite=True)
             if units == 'K km/s':
-                mom0_hdu.writeto(self.savepath + 'mom0_Kkms-1.fits', overwrite=True)
+                if self.sample == 'viva':
+                    mom0_hdu.writeto(self.savepath + 'mom0_Jyb-1.fits', overwrite=True)
+                else:
+                    mom0_hdu.writeto(self.savepath + 'mom0_Kkms-1.fits', overwrite=True)
             mom1_hdu.writeto(self.savepath + 'mom1.fits', overwrite=True)
             mom2_hdu.writeto(self.savepath + 'mom2.fits', overwrite=True)
 
@@ -551,7 +558,10 @@ class MomentMaps:
             pvd_header['ORIGIN'] = clipped_cube.header['ORIGIN']
         except:
             pass
-        pvd_header['BUNIT'] = 'K km/s'
+        if self.sample == 'viva':
+            pvd_header['BUNIT'] = 'Jy/b km/s'
+        else:
+            pvd_header['BUNIT'] = 'K km/s'
         self.add_clipping_keywords(pvd_header)
 
         pvd_hdu = fits.PrimaryHDU(PV, pvd_header)
@@ -604,22 +614,37 @@ class MomentMaps:
         try:
             rest_frequency = cube_pbcorr.header['RESTFRQ']
         except:
-            print('Warning: assuming the CO(2-1) line was observed and setting rest frequency to 230.53800000 GHz.')
-            rest_frequency = 230538000000
+            if self.sample == 'viva':
+                print('Warning: setting rest frequency to 1.420 GHz')
+                rest_frequency = 1420405751
+            else:
+                print('Warning: assuming the CO(2-1) line was observed and setting rest frequency to 230.53800000 GHz.')
+                rest_frequency = 230538000000
+
         spectrum_frequencies = rest_frequency * (1 - spectrum_velocities / 299792.458) / 1e9
 
         if self.tosave:
             clip_rms = self.uncertainty_maps(calc_rms=True)
             if self.sun:
+                if self.sample == 'viva':
+                    csv_header = 'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' Jy/b km/s \n \n '
+                    'Spectrum (Jy/b), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)'
+                else:
+                    csv_header = 'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n '
+                    'Spectrum (K), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)'
                 np.savetxt(self.savepath + 'spectrum.csv',
                            np.column_stack((spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies)),
-                           delimiter=',', header='Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n '
-                            'Spectrum (K), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)')
+                           delimiter=',', header=csv_header)
             else:
+                if self.sample == 'viva':
+                    csv_header = 'Clipping method = Dame11; rms = ' + str(clip_rms) + ' Jy/b km/s \n \n '
+                    'Spectrum (Jy/b), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)'
+                else:
+                    csv_header = 'Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n '
+                    'Spectrum (K), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)'
                 np.savetxt(self.savepath + 'spectrum.csv',
                            np.column_stack((spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies)),
-                           delimiter=',', header='Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n '
-                            'Spectrum (K), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)')
+                           delimiter=',', header=csv_header)
 
         # Estimate the rms in the spectrum
         #emis, noise = self.splitCube(cutout, self.galaxy.start, self.galaxy.stop)
@@ -824,38 +849,74 @@ class MomentMaps:
 
         if hi_inc:
             if self.sun:
-                csv_header = 'Slices parallel to the minor axis centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
-                             '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
-                             '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
-                            'Radii are equal to one beamsize.  \n ' \
-                             'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n' \
-                             'Surface density (K km/s), RMS error (K km/s), ' \
-                             'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                if self.sample == 'viva':
+                    csv_header = 'Slices parallel to the minor axis centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                                 '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
+                                 '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
+                                'Radii are equal to one beamsize.  \n ' \
+                                 'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' Jy/b km/s \n \n' \
+                                 'Surface density (Jy/b km/s), RMS error (Jy/b km/s), ' \
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                else:
+                    csv_header = 'Slices parallel to the minor axis centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                                 '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
+                                 '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
+                                'Radii are equal to one beamsize.  \n ' \
+                                 'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n' \
+                                 'Surface density (K km/s), RMS error (K km/s), ' \
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
             else:
-                csv_header = 'Slices parallel to the minor axis centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
-                             '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
-                             '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
-                            'Radii are equal to one beamsize. \n' \
-                             'Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n' \
-                             'Surface density (K km/s), RMS error (K km/s), ' \
-                             'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                if self.sample == 'viva':
+                    csv_header = 'Slices parallel to the minor axis centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                                 '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
+                                 '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
+                                'Radii are equal to one beamsize. \n' \
+                                 'Clipping method = Dame11; rms = ' + str(clip_rms) + ' Jy/b km/s \n \n' \
+                                 'Surface density (Jy/b km/s), RMS error (Jy/b km/s), ' \
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                else:
+                    csv_header = 'Slices parallel to the minor axis centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                                 '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
+                                 '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
+                                'Radii are equal to one beamsize. \n' \
+                                 'Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n' \
+                                 'Surface density (K km/s), RMS error (K km/s), ' \
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
         else:
             if self.sun:
-                csv_header = 'Elliptical apertures centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
-                             '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
-                             '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
-                            'Radii are defined as the semi-major axes of these apertures. \n ' \
-                            'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n' \
-                            'Surface density (K km/s), RMS error (K km/s), ' \
-                             'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                if self.sample == 'viva':
+                    csv_header = 'Elliptical apertures centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                                 '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
+                                 '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
+                                'Radii are defined as the semi-major axes of these apertures. \n ' \
+                                'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' Jy/b km/s \n \n' \
+                                'Surface density (Jy/b km/s), RMS error (Jy/b km/s), ' \
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                else:
+                    csv_header = 'Elliptical apertures centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                                 '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
+                                 '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
+                                'Radii are defined as the semi-major axes of these apertures. \n ' \
+                                'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n' \
+                                'Surface density (K km/s), RMS error (K km/s), ' \
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
             else:
-                csv_header = 'Elliptical apertures centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
-                             '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
-                             '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
-                            'Radii are defined as the semi-major axes of these apertures. \n' \
-                            'Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n' \
-                            'Surface density (K km/s), RMS error (K km/s), ' \
-                             'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                if self.sample == 'viva':
+                    csv_header = 'Elliptical apertures centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                                 '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
+                                 '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
+                                'Radii are defined as the semi-major axes of these apertures. \n' \
+                                'Clipping method = Dame11; rms = ' + str(clip_rms) + ' Jy/b km/s \n \n' \
+                                'Surface density (Jy/b km/s), RMS error (Jy/b km/s), ' \
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                else:
+                    csv_header = 'Elliptical apertures centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
+                                 '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
+                                 '; ' + str(mom0_hdu_K.shape[1] / 2) + ')). ' \
+                                'Radii are defined as the semi-major axes of these apertures. \n' \
+                                'Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n' \
+                                'Surface density (K km/s), RMS error (K km/s), ' \
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
 
         if not hires:
             if self.tosave:

@@ -43,11 +43,11 @@ for file in data:
             os.mkdir(path + 'products_v' + version + '/sun18_method/' + galaxy + '/')
         else:
             continue
-        savepath = path + 'products_v' + version + '/sun18_method/' + galaxy + '/'
+        savepath = path + 'products_v' + version + '/sun18_method/' + galaxy + '/' + galaxy + '_reprojected_15_arcsec_'
 
         # Moment maps
-        #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-        #              sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -67,17 +67,17 @@ for file in data:
         if not galaxy == 'ngc4579':
             CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                          sun=sun, tosave=tosave).PVD(axis='major', find_angle=False, check_slit=False)
-            if not galaxy == 'ngc4450':
-                CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                             sun=sun, tosave=tosave).PVD(axis='minor', check_slit=False)
+        if not galaxy == 'ngc4450' or galaxy == 'ngc4536':
+            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                         sun=sun, tosave=tosave).PVD(axis='minor', check_slit=False)
 
         # Spectra
-        #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-        #             sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='vel_offset')
-        #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-        #             sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='velocity')
-        #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-        #             sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='frequency')
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='vel_offset')
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='velocity')
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).spectrum(x_axis='frequency')
 
         # Radial profiles
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -86,11 +86,10 @@ for file in data:
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
                                        alpha_co=6.25, table_path=table_path, check_aperture=False)
-        #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-        #            sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='kpc',
-        #                               alpha_co=6.25, table_path=table_path, check_aperture=False)
-        #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-        #             sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
-        #                                                                   alpha_co=6.25, table_path=table_path,
-        #                                                                   check_aperture=False)
-
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                    sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='kpc',
+                                       alpha_co=6.25, table_path=table_path, check_aperture=False)
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
+                                                                           alpha_co=6.25, table_path=table_path,
+                                                                           check_aperture=False)

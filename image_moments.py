@@ -137,9 +137,15 @@ class CreateImages:
 
         cbar = f.colorbar(colors, ticks=ticks)
         if peak:
-            cbar.set_label('Peak temperature [K]')
+            if self.sample == 'viva':
+                cbar.set_label('Peak temperature [Jy b$^{-1}$]')
+            else:
+                cbar.set_label('Peak temperature [K]')
         elif units == 'K km/s':
-            cbar.set_label(r'Integrated intensity [K km s$^{-1}$]')
+            if self.sample == 'viva':
+                cbar.set_label(r'Integrated intensity [Jy b$^{-1}$ km s$^{-1}$]')
+            else:
+                cbar.set_label(r'Integrated intensity [K km s$^{-1}$]')
         elif units == 'M_Sun/pc^2':
             cbar.set_label(r'Surface density [M$_\odot$ pc$^{-2}$]')
         else:
@@ -392,7 +398,10 @@ class CreateImages:
         # Add a colourbar
         cbar = fig.colorbar(C1, pad=0.1, format='%.2f')
         cbar.add_lines(C2)
-        cbar.set_label('Brightness temperature [K]')
+        if self.sample == 'viva':
+            cbar.set_label('Brightness temperature [Jy b${-1}$]')
+        else:
+            cbar.set_label('Brightness temperature [K]')
 
         # Make the plot pretty
         ax.set_xlim(np.amin(offset) - 0.2 * np.amax(offset), np.amax(offset) + 0.2 * np.amax(offset))
@@ -467,7 +476,10 @@ class CreateImages:
         zeroline = np.zeros(len(x))
         plt.plot(x, zeroline, linestyle=':', c='r', linewidth=1)
 
-        ax.set_ylabel('Brightness temperature [K]')
+        if self.sample == 'viva':
+            ax.set_ylabel('Brightness temperature [Jy b${-1}$]')
+        else:
+            ax.set_ylabel('Brightness temperature [K]')
 
         plt.tight_layout()
 
@@ -511,7 +523,10 @@ class CreateImages:
             if y_units == 'K km/s':
                 plt.errorbar(radii_kpc, np.log10(rad_prof_K), yerr=rad_prof_K_err/rad_prof_K * 0.434, c='k', linestyle='None',
                              marker='o', ms=10)
-                plt.ylabel(r'log(Surface density [K km s$^{-1}$])')
+                if self.sample == 'viva':
+                    plt.ylabel(r'log(Surface density [Jy b${-1}$ km s$^{-1}$])')
+                else:
+                    plt.ylabel(r'log(Surface density [K km s$^{-1}$])')
             else:
                 plt.errorbar(radii_kpc, np.log10(rad_prof_Msun), yerr=rad_prof_Msun_err/rad_prof_Msun * 0.434, c='k', linestyle='None',
                              marker='o', ms=10)
@@ -521,7 +536,10 @@ class CreateImages:
             if y_units == 'K km/s':
                 plt.errorbar(radii_arcsec, np.log10(rad_prof_K), yerr=rad_prof_K_err/rad_prof_K * 0.434, c='k', linestyle='None',
                              marker='o', ms=10)
-                plt.ylabel(r'log(Surface density [K km s$^{-1}$])')
+                if self.sample == 'viva':
+                    plt.ylabel(r'log(Surface density [Jy b${-1}$ km s$^{-1}$])')
+                else:
+                    plt.ylabel(r'log(Surface density [K km s$^{-1}$])')
             else:
                 plt.errorbar(radii_arcsec, np.log10(rad_prof_Msun), yerr=rad_prof_Msun_err/rad_prof_Msun * 0.434, c='k', linestyle='None',
                              marker='o', ms=10)
@@ -529,7 +547,8 @@ class CreateImages:
 
         plt.xlim(-0.01)
         if y_units == 'K km/s':
-            plt.ylim(-1)
+            if not self.sample == 'viva':
+                plt.ylim(-1)
         else:
             plt.ylim(0)
 
