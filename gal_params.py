@@ -10,7 +10,28 @@ def parameters(galaxy, sample=None):
         except:
             pass
 
-    if galaxy == 'NGC4698':
+    if galaxy == 'NGC1436':
+        vrange = 120
+        vrange_2 = 20
+        cliplevel = 1.5
+        stokes = False
+        sysvel_offset = 0
+        angle = 345
+        full_width = True
+        distance = 19.95
+        nchan_low = 1
+        cliplevel_low = 1
+        nchan_high = 2
+        cliplevel_high = 3
+        prune_by_npix = None
+        prune_by_fracbeam = 1
+        expand_by_fracbeam = None
+        expand_by_npix = None
+        expand_by_nchan = 2
+        inclination = 47
+        eccentricity = None
+
+    elif galaxy == 'NGC4698':
         vrange = 250
         vrange_2 = 20
         cliplevel = 1.5
@@ -1117,16 +1138,17 @@ def parameters(galaxy, sample=None):
                             pa = 121
                         return inclination, pa
 
+            def get_dist(galaxy):
+                dist_tab = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/heracles/heracles_distances.csv',
+                                         delimiter=',', skip_header=1, usecols=[1])
+                dist_tab_names = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/heracles/heracles_distances.csv',
+                                         delimiter=',', skip_header=1, usecols=[0], dtype=str)
+                return dist_tab[dist_tab_names == galaxy]
+
             inclination, pa = get_inc_pa(galaxy)
+            distance = get_dist(galaxy)
 
             angle = pa + 90
-
-            distances = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/heracles/heracles_distances.csv',
-                                      delimiter=',', usecols=[1])
-            dist_names = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/heracles/heracles_distances.csv',
-                                      delimiter=',', usecols=[0], dtype='str')
-
-            distance = distances[dist_names == galaxy]
 
     if sample == 'viva':
         if galaxy == 'NGC4580' or galaxy == 'NGC4654':

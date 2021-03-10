@@ -19,9 +19,13 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Convert Jy/b to Msol/pc for the VIVA sample">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Changed units VIVA back to Jy/beam and changed appropriate header keywords and axis labels">
+      <change afterPath="$PROJECT_DIR$/random.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clip_cube.py" beforeDir="false" afterPath="$PROJECT_DIR$/clip_cube.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/heracles.py" beforeDir="false" afterPath="$PROJECT_DIR$/heracles.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/image_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_moments.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/viva.py" beforeDir="false" afterPath="$PROJECT_DIR$/viva.py" afterDir="false" />
     </list>
@@ -69,13 +73,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00053" summary="Bug in the moment 0 map">
-      <created>1591040857306</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1591040857307</updated>
     </task>
     <task id="LOCAL-00054" summary="Small change in edge radial profiles.">
       <created>1591087631831</created>
@@ -413,7 +410,14 @@
       <option name="project" value="LOCAL" />
       <updated>1610877392342</updated>
     </task>
-    <option name="localTasksCounter" value="102" />
+    <task id="LOCAL-00102" summary="Changed units VIVA back to Jy/beam and changed appropriate header keywords and axis labels">
+      <created>1610963105371</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1610963105372</updated>
+    </task>
+    <option name="localTasksCounter" value="103" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -429,7 +433,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Small change in directory structure" />
     <MESSAGE value="Automated finding channels with emission and estimating the noise." />
     <MESSAGE value="Updated some figure parameters" />
     <MESSAGE value="Overwriting some parameters manually for some galaxies" />
@@ -454,6 +457,7 @@
     <MESSAGE value="Added code to run VIVA products through pipeline" />
     <MESSAGE value="Added correct table path to radial profile call." />
     <MESSAGE value="Convert Jy/b to Msol/pc for the VIVA sample" />
-    <option name="LAST_COMMIT_MESSAGE" value="Convert Jy/b to Msol/pc for the VIVA sample" />
+    <MESSAGE value="Changed units VIVA back to Jy/beam and changed appropriate header keywords and axis labels" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed units VIVA back to Jy/beam and changed appropriate header keywords and axis labels" />
   </component>
 </project>

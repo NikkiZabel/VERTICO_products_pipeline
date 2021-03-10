@@ -351,6 +351,9 @@ class MomentMaps:
                 pc_to_cm = 9.521e36
                 coldens_Msol_pc = coldens_atom_cm / Msol_to_matom * pc_to_cm
                 mom0 = coldens_Msol_pc
+            elif self.sample == None:
+                xco = 1.23361968e+20
+                mom0 *= 91.9 * xco / (cube.header['BMAJ'] * 3600 * cube.header['BMIN'] * 3600) * 1.6014457E-20
             else:
                 mom0 *= alpha_co
         elif units == 'K km/s':
@@ -574,7 +577,7 @@ class MomentMaps:
 
         return pvd_hdu
 
-    def spectrum(self):
+    def spectrum(self, useclipped=False):
         """
         Calculate the spectrum from the spectral cube.
         :return: array containing the spectrum in whatever units the cube is in, without the beam^-1 (so probably K or
@@ -583,6 +586,9 @@ class MomentMaps:
 
         cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
                         tosave=self.tosave, sample=self.sample).readfits()
+
+        if useclipped:
+            cutout = fits.open(self.savepath + 'unclipped_trimmed.fits')[0]
 
         clipped_cube, _, _, _, sysvel = self.calc_moms()
 
@@ -602,13 +608,15 @@ class MomentMaps:
         spectrum = np.nansum(cube_pbcorr.data, axis=(1, 2))
         _, _, vel_array_full = self.create_vel_array(cube_pbcorr)
 
-        if self.galaxy.start - 5 < 0:
-            spectrum_velocities = vel_array_full[0:self.galaxy.stop + 5]
-            spectrum = spectrum[0:self.galaxy.stop + 5]
+        extra_chans = 5
+
+        if self.galaxy.start - extra_chans < 0:
+            spectrum_velocities = vel_array_full[0:self.galaxy.stop + extra_chans]
+            spectrum = spectrum[0:self.galaxy.stop + extra_chans]
             spectrum_vel_offset = spectrum_velocities - sysvel + self.galaxy.sysvel_offset
         else:
-            spectrum_velocities = vel_array_full[self.galaxy.start - 5:self.galaxy.stop + 5]
-            spectrum = spectrum[self.galaxy.start - 5:self.galaxy.stop + 5]
+            spectrum_velocities = vel_array_full[self.galaxy.start - extra_chans:self.galaxy.stop + extra_chans]
+            spectrum = spectrum[self.galaxy.start - extra_chans:self.galaxy.stop + extra_chans]
             spectrum_vel_offset = spectrum_velocities - sysvel + self.galaxy.sysvel_offset
 
         try:

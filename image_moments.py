@@ -44,7 +44,7 @@ class CreateImages:
 
         return my_cmap
 
-    def moment_zero(self, units='M_Sun/pc^2', path='', peak=False):
+    def moment_zero(self, units='M_Sun/pc^2', path='', alpha_co=6.25, peak=False):
 
         if peak:
             if self.refresh:
@@ -63,8 +63,8 @@ class CreateImages:
             if units == 'M_Sun/pc^2':
                 if self.overwrite:
                     _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                                    savepath=self.savepath, tosave=True, sample=self.sample,
-                                                   redo_clip=self.redo_clip).calc_moms(units='M_Sun/pc^2')
+                                            savepath=self.savepath, tosave=True, sample=self.sample,
+                                            redo_clip=self.redo_clip).calc_moms(units='M_Sun/pc^2', alpha_co=alpha_co)
                 else:
                     _, image, _, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                                     tosave=False, sample=self.sample, redo_clip=self.redo_clip).\
@@ -137,12 +137,12 @@ class CreateImages:
 
         cbar = f.colorbar(colors, ticks=ticks)
         if peak:
-            if self.sample == 'viva':
+            if self.sample == 'viva' or self.sample == None:
                 cbar.set_label('Peak temperature [Jy b$^{-1}$]')
             else:
                 cbar.set_label('Peak temperature [K]')
         elif units == 'K km/s':
-            if self.sample == 'viva':
+            if self.sample == 'viva' or self.sample == None:
                 cbar.set_label(r'Integrated intensity [Jy b$^{-1}$ km s$^{-1}$]')
             else:
                 cbar.set_label(r'Integrated intensity [K km s$^{-1}$]')
@@ -169,7 +169,10 @@ class CreateImages:
             if peak:
                 plt.savefig(self.savepath + 'peak_temp.pdf', bbox_inches='tight')
             elif units == 'K km/s':
-                plt.savefig(self.savepath + 'mom0_Kkms-1.pdf', bbox_inches='tight')
+                if self.sample == 'viva' or self.sample == None:
+                    plt.savefig(self.savepath + 'mom0_Jyb-1kms-1.pdf', bbox_inches='tight')
+                else:
+                    plt.savefig(self.savepath + 'mom0_Kkms-1.pdf', bbox_inches='tight')
             elif units == 'M_Sun/pc^2':
                 plt.savefig(self.savepath + 'mom0_Msun.pdf', bbox_inches='tight')
         return
@@ -398,7 +401,7 @@ class CreateImages:
         # Add a colourbar
         cbar = fig.colorbar(C1, pad=0.1, format='%.2f')
         cbar.add_lines(C2)
-        if self.sample == 'viva':
+        if self.sample == 'viva' or self.sample == None:
             cbar.set_label('Brightness temperature [Jy b${-1}$]')
         else:
             cbar.set_label('Brightness temperature [K]')
@@ -426,18 +429,18 @@ class CreateImages:
             if axis == 'minor':
                 plt.savefig(self.savepath + 'PVD_minor.pdf', bbox_inches='tight')
 
-    def spectrum(self, x_axis='velocity'):
+    def spectrum(self, x_axis='velocity', useclipped=False):
 
         if self.refresh:
             if self.overwrite:
                 spectrum, velocity, v_off, frequency = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                     sun=self.sun, savepath=self.savepath, tosave=True,
-                                                                  sample=self.sample, redo_clip=self.redo_clip).spectrum()
+                                                                  sample=self.sample, redo_clip=self.redo_clip).spectrum(useclipped=useclipped)
 
             else:
                 spectrum, velocity, v_off, frequency = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                     sun=self.sun, savepath=self.savepath, tosave=False,
-                                                                  sample=self.sample, redo_clip=self.redo_clip).spectrum()
+                                                                  sample=self.sample, redo_clip=self.redo_clip).spectrum(useclipped=useclipped)
 
         else:
             temp = np.loadtxt(self.savepath + 'spectrum.csv', delimiter=',')
@@ -452,21 +455,23 @@ class CreateImages:
 
         fig, ax = plt.subplots(figsize=(7, 7))
 
+        extra_chans = 5
+
         if x_axis == 'velocity':
             ax.plot(velocity, spectrum, color='k', drawstyle='steps')
             x = np.arange(np.amin(velocity) - 100, np.amax(velocity) + 100, 1)
-            ax.set_xlim(velocity[len(velocity) - 1] + 5, velocity[0] - 5)
+            ax.set_xlim(velocity[len(velocity) - 1] + extra_chans, velocity[0] - extra_chans)
             ax.set_xlabel(r'Velocity [km s$^{-1}$]')
 
         elif x_axis == 'vel_offset':
             ax.plot(v_off, spectrum, color='k', drawstyle='steps')
             x = np.arange(np.amin(v_off) - 100, np.amax(v_off) + 100, 1)
-            ax.set_xlim(v_off[len(v_off) - 1] + 5, v_off[0] - 5)
+            ax.set_xlim(v_off[len(v_off) - 1] + extra_chans, v_off[0] - extra_chans)
             ax.set_xlabel(r'Velocity offset [km s$^{-1}$]')
 
         elif x_axis == 'frequency':
             ax.plot(frequency, spectrum, color='k', drawstyle='steps')
-            x = np.arange(np.amin(frequency) - 5, np.amax(frequency) + 5, 1)
+            x = np.arange(np.amin(frequency) - extra_chans, np.amax(frequency) + extra_chans, 1)
             ax.set_xlim(frequency[len(frequency) - 1], frequency[0])
             ax.set_xlabel(r'Frequency [GHz]')
         else:
@@ -476,7 +481,7 @@ class CreateImages:
         zeroline = np.zeros(len(x))
         plt.plot(x, zeroline, linestyle=':', c='r', linewidth=1)
 
-        if self.sample == 'viva':
+        if self.sample == 'viva' or self.sample == None:
             ax.set_ylabel('Brightness temperature [Jy b${-1}$]')
         else:
             ax.set_ylabel('Brightness temperature [K]')
@@ -523,8 +528,8 @@ class CreateImages:
             if y_units == 'K km/s':
                 plt.errorbar(radii_kpc, np.log10(rad_prof_K), yerr=rad_prof_K_err/rad_prof_K * 0.434, c='k', linestyle='None',
                              marker='o', ms=10)
-                if self.sample == 'viva':
-                    plt.ylabel(r'log(Surface density [Jy b${-1}$ km s$^{-1}$])')
+                if self.sample == 'viva' or self.sample == None:
+                    plt.ylabel(r'log(Surface density [Jy b$^{-1}$ km s$^{-1}$])')
                 else:
                     plt.ylabel(r'log(Surface density [K km s$^{-1}$])')
             else:
@@ -536,7 +541,7 @@ class CreateImages:
             if y_units == 'K km/s':
                 plt.errorbar(radii_arcsec, np.log10(rad_prof_K), yerr=rad_prof_K_err/rad_prof_K * 0.434, c='k', linestyle='None',
                              marker='o', ms=10)
-                if self.sample == 'viva':
+                if self.sample == 'viva' or self.sample == None:
                     plt.ylabel(r'log(Surface density [Jy b${-1}$ km s$^{-1}$])')
                 else:
                     plt.ylabel(r'log(Surface density [K km s$^{-1}$])')
@@ -547,7 +552,7 @@ class CreateImages:
 
         plt.xlim(-0.01)
         if y_units == 'K km/s':
-            if not self.sample == 'viva':
+            if not self.sample == 'viva' or self.sample == None:
                 plt.ylim(-1)
         else:
             plt.ylim(0)
@@ -557,12 +562,18 @@ class CreateImages:
         if self.tosave:
             if x_units == 'kpc':
                 if y_units == 'K km/s':
-                    plt.savefig(self.savepath + 'rad_prof_kpc_Kkms-1.pdf', bbox_inches='tight')
+                    if self.sample == 'viva' or self.sample == None:
+                        plt.savefig(self.savepath + 'rad_prof_kpc_Jyb-1kms-1.pdf', bbox_inches='tight')
+                    else:
+                        plt.savefig(self.savepath + 'rad_prof_kpc_Kkms-1.pdf', bbox_inches='tight')
                 else:
                     plt.savefig(self.savepath + 'radi_prof_kpc_Msun_pc-2.pdf', bbox_inches='tight')
             if x_units == 'arcsec':
                 if y_units == 'K km/s':
-                    plt.savefig(self.savepath + 'rad_prof_arcsec_Kkms-1.pdf', bbox_inches='tight')
+                    if self.sample == 'viva' or self.sample == None:
+                        plt.savefig(self.savepath + 'rad_prof_arcsec_Jyb-1kms-1.pdf', bbox_inches='tight')
+                    else:
+                        plt.savefig(self.savepath + 'rad_prof_arcsec_Kkms-1.pdf', bbox_inches='tight')
                 else:
                     plt.savefig(self.savepath + 'rad_prof_arcsec_Msun_pc-2.pdf', bbox_inches='tight')
 

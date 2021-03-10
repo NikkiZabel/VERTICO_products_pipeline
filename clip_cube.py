@@ -353,7 +353,7 @@ class ClipCube:
 
         return emiscube_hdu, noisecube_hdu
 
-    def clip(self, smooth_cube):
+    def create_smooth_mask(self, emiscube_smooth, noisecube, return_rms=False):
         """
         Creates a mask of the input cube where spaxels above the desired SNR are 1 and spaxels below the desired SNR
         are 0.
@@ -361,13 +361,16 @@ class ClipCube:
         :return: boolean mask with the spaxels above the provided level set to 1 and the spaxels below to 0
         """
 
-        cube_pbcorr, cube_uncorr = self.readfits()
+        #cube_pbcorr, cube_uncorr = self.readfits()
 
-        emiscube, noisecube = self.split_cube(cube_uncorr)
+        #emiscube, noisecube = self.split_cube(cube_uncorr)
         inner_noisecube = self.innersquare(noisecube.data)
         rms = np.nanstd(inner_noisecube)
 
-        emiscube_smooth, noisecube_smooth = self.split_cube(smooth_cube)
+        if return_rms:
+            return rms
+
+        #emiscube_smooth, noisecube_smooth = self.split_cube(smooth_cube)
 
         emiscube_smooth.data[emiscube_smooth.data < self.galaxy.cliplevel * rms] = 0
         emiscube_smooth.data[emiscube_smooth.data > self.galaxy.cliplevel * rms] = 1
@@ -502,7 +505,7 @@ class ClipCube:
 
         return mask
 
-    def smooth_mask(self, cube):
+    def smooth_mask(self, cube, noisecube, return_rms=False):
         """
         Apply a Gaussian blur, using sigma = 4 in the velocity direction (seems to work best), to the uncorrected cube.
         The mode 'nearest' seems to give the best results.
@@ -542,7 +545,7 @@ class ClipCube:
         smooth_cube = ndimage.uniform_filter(cube.data, size=[4, sigma, sigma], mode='constant')  # mode='nearest'
 
         smooth_hdu = fits.PrimaryHDU(smooth_cube, cube.header)
-        mask = self.clip(smooth_hdu)
+        mask = self.create_smooth_mask(smooth_hdu, noisecube, return_rms=return_rms)
 
         return mask
 
@@ -629,33 +632,82 @@ class ClipCube:
                 mask_hdu.writeto(self.savepath + 'mask_cube.fits', overwrite=True)
 
         else:
-            mask = self.smooth_mask(cube_uncorr_copy)
+            # Get a rough estimate of the noise in order to do the clipping
+            noisecube_temp = np.concatenate((cube_uncorr_copy.data[:10, :, :], cube_uncorr_copy.data[-10:, :, :]),
+                                            axis=0)
+            noisecube_temp_hdu = fits.PrimaryHDU(noisecube_temp, cube_uncorr_copy.header)
+
+            # Create an initial mask and identify first and last channel containing emission
+            mask_full = self.smooth_mask(cube_uncorr_copy, noisecube_temp_hdu)
+            mask_idx = np.where(mask_full == 1)[0]
+            start = mask_idx[0]
+            stop = mask_idx[-1]
+
+            # Create an updated noise cube
+            noisecube_uncorr = np.concatenate((cube_uncorr_copy.data[:start, :, :],
+                                               cube_uncorr_copy.data[stop:, :, :]), axis=0)
+            noisecube_uncorr_hdu = fits.PrimaryHDU(noisecube_uncorr, cube_uncorr_copy.header)
+
+            # Make a more accurate mask based on the new noise cube
+            mask_full = self.smooth_mask(cube_uncorr_copy, noisecube_uncorr_hdu)
+            mask_hdu = fits.PrimaryHDU(mask_full.astype(int), cube_pbcorr.header)
+            mask_idx = np.where(mask_full == 1)[0]
+            start = mask_idx[0]
+            stop = mask_idx[-1]
+
+            if get_chans:
+                return start, stop
+
+            # Spit the cube in an emission and noise part
+            emiscube_pbcorr = cube_pbcorr.data[start:stop, :, :]
+            emiscube_uncorr = cube_uncorr.data[start:stop, :, :]
+
+            noisecube_pbcorr = np.concatenate((cube_pbcorr.data[:start, :, :],
+                                               cube_pbcorr.data[stop:, :, :]), axis=0)
+            noisecube_uncorr = np.concatenate((cube_uncorr_copy.data[:start, :, :],
+                                               cube_uncorr_copy.data[stop:, :, :]), axis=0)
+
+            emiscube_uncorr_hdu = fits.PrimaryHDU(emiscube_uncorr, cube_uncorr_copy.header)
+            noisecube_uncorr_hdu = fits.PrimaryHDU(noisecube_uncorr, cube_uncorr_copy.header)
+
+            mask = self.smooth_mask(emiscube_uncorr_hdu, noisecube_uncorr_hdu)
 
             mask_idx = np.where(mask == 1)[0]
             self.galaxy.start = mask_idx[0]
             self.galaxy.stop = mask_idx[-1]
 
             mask_hdu = fits.PrimaryHDU(mask.astype(int), cube_pbcorr.header)
+
             if self.tosave:
                 mask_hdu.header.add_comment('Cube was clipped using the Dame11 masking method', before='BUNIT')
                 mask_hdu.header.pop('BTYPE')
                 mask_hdu.header.pop('BUNIT')
-                mask_hdu.header.pop('DATAMAX')
-                mask_hdu.header.pop('DATAMIN')
-                mask_hdu.header.pop('JTOK')
+                try:
+                    mask_hdu.header.pop('DATAMAX')
+                    mask_hdu.header.pop('DATAMIN')
+                except:
+                    pass
+                try:
+                    mask_hdu.header.pop('JTOK')
+                except:
+                    pass
                 mask_hdu.header.pop('RESTFRQ')
-                mask_hdu.header['CLIP_RMS'] = self.sun_method(emiscube_uncorr, noisecube_uncorr, calc_rms=True)
+                mask_hdu.header['CLIP_RMS'] = self.smooth_mask(emiscube_uncorr_hdu, noisecube_uncorr_hdu, return_rms=True)
                 mask_hdu.header.comments['CLIP_RMS'] = 'rms value used for clipping in K km/s'
                 mask_hdu.writeto(self.savepath + 'mask_cube.fits', overwrite=True)
 
         emiscube_pbcorr[mask == 0] = 0
         clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr, cube_pbcorr.header)
 
-        #if self.tosave:
-        #    clipped_hdu.writeto(self.savepath + 'cube_clipped.fits', overwrite=True)
+        if self.tosave:
+            clipped_hdu.writeto(self.savepath + 'cube_clipped.fits', overwrite=True)
 
         # Do some pre-processing to make the creation of the moments easier
-        clipped_hdu, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=clip_also)
+        clipped_hdu_temp, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=clip_also)
+        temp1, unclipped_trimmed_hdu = self.cut_empty_columns(mask_hdu, noisecube=cube_pbcorr)
+        temp2, unclipped_trimmed_hdu = self.cut_empty_rows(temp1, noisecube=unclipped_trimmed_hdu)
+        unclipped_trimmed_hdu.writeto(self.savepath + 'unclipped_trimmed.fits', overwrite=True)
+        clipped_hdu = clipped_hdu_temp
 
         if self.tosave:
             clipped_hdu.writeto(self.savepath + 'cube_clipped_trimmed.fits', overwrite=True)

@@ -59,9 +59,9 @@ for file in data:
 
         # Uncertainty maps
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                     sun=sun, tosave=tosave, redo_clip=redo_clip).mom0_noise_maps()
+                     sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).mom0_noise_maps()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                     sun=sun, tosave=tosave, redo_clip=redo_clip).mom1_2_noise_maps()
+                     sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).mom1_2_noise_maps()
 
         # PVDs
         if not galaxy == 'ngc4579':
