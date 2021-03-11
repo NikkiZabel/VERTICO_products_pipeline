@@ -5,8 +5,8 @@ import os
 from glob import glob
 
 sample = 'viva'
-version = '1_0'
-path = '/home/nikki/Documents/Data/VERTICO/VIVA/Reprojected_15_arcsec_new/'
+version = '1_1'
+path = '/home/nikki/Documents/Data/VERTICO/VIVA/Reprojected_15_arcsec_newer/'
 table_path = '/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits'
 
 refresh = True
@@ -39,11 +39,14 @@ for file in data:
         file_pbcorr = file
         file_uncorr = file
 
-        if not os.path.exists(path + 'products_v' + version + '/sun18_method/' + galaxy + '/'):
-            os.mkdir(path + 'products_v' + version + '/sun18_method/' + galaxy + '/')
+        if not os.path.exists(path + 'products_v' + version + '/' + galaxy + '/'):
+            os.mkdir(path + 'products_v' + version + '/' + galaxy + '/')
         else:
             continue
-        savepath = path + 'products_v' + version + '/sun18_method/' + galaxy + '/' + galaxy + '_reprojected_15_arcsec_'
+        savepath = path + 'products_v' + version + '/' + galaxy + '/' + galaxy + '_reprojected_15_arcsec_'
+
+        if os.path.exists(savepath + galaxy):
+            continue
 
         # Moment maps
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,

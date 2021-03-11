@@ -39,9 +39,9 @@ for file in data:
         file_pbcorr = file
         file_uncorr = file
 
-        if not os.path.exists(path + 'products_v' + version + '/native/sun18_method/' + galaxy + '/'):
-            os.mkdir(path + 'products_v' + version + '/native/sun18_method/' + galaxy + '/')
-        savepath = path + 'products_v' + version + '/native/sun18_method/' + galaxy + '/' + galaxy + '_'
+        if not os.path.exists(path + 'products_v' + version + '/native/' + galaxy + '/'):
+            os.mkdir(path + 'products_v' + version + '/native/' + galaxy + '/')
+        savepath = path + 'products_v' + version + '/native/' + galaxy + '/' + galaxy + '_'
 
         #if os.path.exists(savepath + 'mom0_Kkms-1.pdf'):
         #    continue
@@ -61,13 +61,13 @@ for file in data:
         file_pbcorr = file
         file_uncorr = file
 
-        if not os.path.exists(path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/'):
-            os.mkdir(path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/')
+        if not os.path.exists(path + 'products_v' + version + '/' + str(resolution) + 'pc/' + galaxy + '/'):
+            os.mkdir(path + 'products_v' + version + '/' + str(resolution) + 'pc/' + galaxy + '/')
 
         if resolution == 1200:
-            savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/' + galaxy + '_exact_1200pc_'
+            savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/' + galaxy + '/' + galaxy + '_exact_1200pc_'
         else:
-            savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/sun18_method/' + galaxy + '/' + galaxy + '_exact_720pc_'
+            savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/' + galaxy + '/' + galaxy + '_exact_720pc_'
 
         if os.path.exists(savepath + 'mom0_Kkms-1.fits'):
             continue
@@ -88,13 +88,13 @@ for file in data:
         file_uncorr = file
 
         if resolution == 'nearest_1200':
-            if not os.path.exists(path + 'products_v' + version + '/nearest_aniano_1200pc/sun18_method/' + galaxy + '/'):
-                os.mkdir(path + 'products_v' + version + '/nearest_aniano_1200pc/sun18_method/' + galaxy + '/')
-            savepath = path + 'products_v' + version + '/nearest_aniano_1200pc/sun18_method/' + galaxy + '/' + long_str + '_'
+            if not os.path.exists(path + 'products_v' + version + '/nearest_aniano_1200pc/' + galaxy + '/'):
+                os.mkdir(path + 'products_v' + version + '/nearest_aniano_1200pc/' + galaxy + '/')
+            savepath = path + 'products_v' + version + '/nearest_aniano_1200pc/' + galaxy + '/' + long_str + '_'
         elif resolution == 'nearest_720':
-            if not os.path.exists(path + 'products_v' + version + '/nearest_aniano_720pc/sun18_method/' + galaxy + '/'):
-                os.mkdir(path + 'products_v' + version + '/nearest_aniano_720pc/sun18_method/' + galaxy + '/')
-            savepath = path + 'products_v' + version + '/nearest_aniano_720pc/sun18_method/' + galaxy + \
+            if not os.path.exists(path + 'products_v' + version + '/nearest_aniano_720pc/' + galaxy + '/'):
+                os.mkdir(path + 'products_v' + version + '/nearest_aniano_720pc/' + galaxy + '/')
+            savepath = path + 'products_v' + version + '/nearest_aniano_720pc/' + galaxy + \
                        '/' + long_str + '_'
 
         if os.path.exists(savepath + 'mom0_Kkms-1.fits'):

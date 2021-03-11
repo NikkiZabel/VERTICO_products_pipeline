@@ -40,10 +40,10 @@ def parameters(galaxy, sample=None):
         angle = 165
         full_width = True
         distance = 16.5
-        nchan_low = 2
+        nchan_low = 1
         cliplevel_low = 2
-        nchan_high = 3
-        cliplevel_high = 3.5
+        nchan_high = 1
+        cliplevel_high = 2.5
         prune_by_npix = None
         prune_by_fracbeam = 1
         expand_by_fracbeam = None
@@ -120,48 +120,50 @@ def parameters(galaxy, sample=None):
         figsize = (10, 6.5)
 
     elif galaxy == 'NGC4579':
-        vrange = 200
-        vrange_2 = 120
-        cliplevel = 1.5
-        stokes = False
-        sysvel_offset = 0
-        angle = 90
-        full_width = False
-        distance = 16.5
-        nchan_low = 2
-        cliplevel_low = 2
-        nchan_high = 3
-        cliplevel_high = 3.5
-        prune_by_npix = None
-        prune_by_fracbeam = 1
-        expand_by_fracbeam = None
-        expand_by_npix = None
-        expand_by_nchan = 2
-        inclination = None
-        eccentricity = None
-        figsize = (10, 7)
+        if not sample == 'heracles':
+            vrange = 200
+            vrange_2 = 120
+            cliplevel = 1.5
+            stokes = False
+            sysvel_offset = 0
+            angle = 90
+            full_width = False
+            distance = 16.5
+            nchan_low = 2
+            cliplevel_low = 2
+            nchan_high = 3
+            cliplevel_high = 3.5
+            prune_by_npix = None
+            prune_by_fracbeam = 1
+            expand_by_fracbeam = None
+            expand_by_npix = None
+            expand_by_nchan = 2
+            inclination = None
+            eccentricity = None
+            figsize = (10, 7)
 
     elif galaxy == 'NGC4569':
-        vrange = 200
-        vrange_2 = 80
-        cliplevel = 1.5
-        stokes = False
-        sysvel_offset = 0
-        angle = 15
-        full_width = False
-        distance = 16.5
-        nchan_low = 2
-        cliplevel_low = 2
-        nchan_high = 3
-        cliplevel_high = 3.5
-        prune_by_npix = None
-        prune_by_fracbeam = 1
-        expand_by_fracbeam = None
-        expand_by_npix = None
-        expand_by_nchan = 2
-        inclination = None
-        eccentricity = None
-        figsize = (9.5, 10)
+        if not sample == 'heracles':
+            vrange = 200
+            vrange_2 = 80
+            cliplevel = 1.5
+            stokes = False
+            sysvel_offset = 0
+            angle = 15
+            full_width = False
+            distance = 16.5
+            nchan_low = 2
+            cliplevel_low = 2
+            nchan_high = 3
+            cliplevel_high = 3.5
+            prune_by_npix = None
+            prune_by_fracbeam = 1
+            expand_by_fracbeam = None
+            expand_by_npix = None
+            expand_by_nchan = 2
+            inclination = None
+            eccentricity = None
+            figsize = (9.5, 10)
 
     elif galaxy == 'NGC4548':
         vrange = 150
@@ -296,26 +298,27 @@ def parameters(galaxy, sample=None):
         figsize = (15, 5.1)
 
     elif galaxy == 'NGC4321':
-        vrange = 150
-        vrange_2 = 60
-        cliplevel = 1.5
-        stokes = False
-        sysvel_offset = 0
-        angle = 165
-        full_width = False
-        distance = 16.5
-        nchan_low = 2
-        cliplevel_low = 2
-        nchan_high = 3
-        cliplevel_high = 3.5
-        prune_by_npix = None
-        prune_by_fracbeam = 1
-        expand_by_fracbeam = None
-        expand_by_npix = None
-        expand_by_nchan = 2
-        inclination = None
-        eccentricity = None
-        figsize = (10, 7)
+        if not sample == 'heracles':
+            vrange = 150
+            vrange_2 = 60
+            cliplevel = 1.5
+            stokes = False
+            sysvel_offset = 0
+            angle = 165
+            full_width = False
+            distance = 16.5
+            nchan_low = 2
+            cliplevel_low = 2
+            nchan_high = 3
+            cliplevel_high = 3.5
+            prune_by_npix = None
+            prune_by_fracbeam = 1
+            expand_by_fracbeam = None
+            expand_by_npix = None
+            expand_by_nchan = 2
+            inclination = None
+            eccentricity = None
+            figsize = (10, 7)
 
     elif galaxy == 'NGC4298':
         vrange = 150
@@ -362,26 +365,27 @@ def parameters(galaxy, sample=None):
         figsize = (10, 5.5)
 
     elif galaxy == 'NGC4254':
-        vrange = 150
-        vrange_2 = 40
-        cliplevel = 1.5
-        stokes = False
-        sysvel_offset = 0
-        angle = 50
-        full_width = False
-        distance = 16.5
-        nchan_low = 2
-        cliplevel_low = 2
-        nchan_high = 3
-        cliplevel_high = 3.5
-        prune_by_npix = None
-        prune_by_fracbeam = 1
-        expand_by_fracbeam = None
-        expand_by_npix = None
-        expand_by_nchan = 2
-        inclination = None
-        eccentricity = None
-        figsize = (9, 7.5)
+        if not sample == 'heracles':
+            vrange = 150
+            vrange_2 = 40
+            cliplevel = 1.5
+            stokes = False
+            sysvel_offset = 0
+            angle = 50
+            full_width = False
+            distance = 16.5
+            nchan_low = 2
+            cliplevel_low = 2
+            nchan_high = 3
+            cliplevel_high = 3.5
+            prune_by_npix = None
+            prune_by_fracbeam = 1
+            expand_by_fracbeam = None
+            expand_by_npix = None
+            expand_by_nchan = 2
+            inclination = None
+            eccentricity = None
+            figsize = (9, 7.5)
 
     elif galaxy == 'NGC4561':
         vrange = 30
@@ -395,7 +399,7 @@ def parameters(galaxy, sample=None):
         nchan_low = 1
         cliplevel_low = 2
         nchan_high = 2
-        cliplevel_high = 3.5
+        cliplevel_high = 2.5
         prune_by_npix = None
         prune_by_fracbeam = 1
         expand_by_fracbeam = None
@@ -1139,11 +1143,13 @@ def parameters(galaxy, sample=None):
                         return inclination, pa
 
             def get_dist(galaxy):
-                dist_tab = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/heracles/heracles_distances.csv',
-                                         delimiter=',', skip_header=1, usecols=[1])
-                dist_tab_names = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/heracles/heracles_distances.csv',
-                                         delimiter=',', skip_header=1, usecols=[0], dtype=str)
-                return dist_tab[dist_tab_names == galaxy]
+                from astropy.io import fits
+                from astropy.cosmology import luminosity_distance
+                dist_table = fits.open('/home/nikki/Documents/Data/VERTICO/heracles/heracles_basic.fits')[1]
+                try:
+                    return dist_table['dist_L19'][dist_table['Galaxy'] == galaxy]
+                except:
+                    return luminosity_distance(dist_table['Redshift'][dist_table['Galaxy'] == galaxy])
 
             inclination, pa = get_inc_pa(galaxy)
             distance = get_dist(galaxy)
@@ -1157,6 +1163,9 @@ def parameters(galaxy, sample=None):
 
     name = galaxy
     figsize = (10, 8.5)
+
+    if sample == 'things':
+        stokes = True
 
     return name, vrange, vrange_2, cliplevel, stokes, sysvel_offset, angle, \
            full_width, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \

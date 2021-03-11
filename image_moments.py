@@ -44,7 +44,7 @@ class CreateImages:
 
         return my_cmap
 
-    def moment_zero(self, units='M_Sun/pc^2', path='', alpha_co=6.25, peak=False):
+    def moment_zero(self, units='M_Sun/pc^2', path='', alpha_co=5.4, peak=False):
 
         if peak:
             if self.refresh:
@@ -137,12 +137,12 @@ class CreateImages:
 
         cbar = f.colorbar(colors, ticks=ticks)
         if peak:
-            if self.sample == 'viva' or self.sample == None:
+            if self.sample == 'viva' or self.sample == 'things' or self.sample == None:
                 cbar.set_label('Peak temperature [Jy b$^{-1}$]')
             else:
                 cbar.set_label('Peak temperature [K]')
         elif units == 'K km/s':
-            if self.sample == 'viva' or self.sample == None:
+            if self.sample == 'viva' or self.sample == 'things' or self.sample == None:
                 cbar.set_label(r'Integrated intensity [Jy b$^{-1}$ km s$^{-1}$]')
             else:
                 cbar.set_label(r'Integrated intensity [K km s$^{-1}$]')
@@ -169,7 +169,7 @@ class CreateImages:
             if peak:
                 plt.savefig(self.savepath + 'peak_temp.pdf', bbox_inches='tight')
             elif units == 'K km/s':
-                if self.sample == 'viva' or self.sample == None:
+                if self.sample == 'viva' or self.sample == 'things' or self.sample == None:
                     plt.savefig(self.savepath + 'mom0_Jyb-1kms-1.pdf', bbox_inches='tight')
                 else:
                     plt.savefig(self.savepath + 'mom0_Kkms-1.pdf', bbox_inches='tight')
@@ -401,7 +401,7 @@ class CreateImages:
         # Add a colourbar
         cbar = fig.colorbar(C1, pad=0.1, format='%.2f')
         cbar.add_lines(C2)
-        if self.sample == 'viva' or self.sample == None:
+        if self.sample == 'viva' or self.sample == 'things' or self.sample == None:
             cbar.set_label('Brightness temperature [Jy b${-1}$]')
         else:
             cbar.set_label('Brightness temperature [K]')
@@ -481,7 +481,7 @@ class CreateImages:
         zeroline = np.zeros(len(x))
         plt.plot(x, zeroline, linestyle=':', c='r', linewidth=1)
 
-        if self.sample == 'viva' or self.sample == None:
+        if self.sample == 'viva' or self.sample == 'things' or self.sample == None:
             ax.set_ylabel('Brightness temperature [Jy b${-1}$]')
         else:
             ax.set_ylabel('Brightness temperature [K]')
@@ -496,7 +496,7 @@ class CreateImages:
             if x_axis == 'vel_offset':
                 plt.savefig(self.savepath + 'spectrum_vel_offset.pdf', bbox_inches='tight')
 
-    def radial_profile(self, y_units='K kms', x_units='kpc', alpha_co=6.25, table_path=None, check_aperture=False):
+    def radial_profile(self, y_units='K kms', x_units='kpc', alpha_co=5.4, table_path=None, check_aperture=False):
 
         if not ((y_units == 'K km/s') or (y_units == 'M_Sun pc^-2')):
             raise AttributeError('Please choose between "K kms" and "M_Sun pc^-2" for the keyword "y_units".')
@@ -528,31 +528,31 @@ class CreateImages:
             if y_units == 'K km/s':
                 plt.errorbar(radii_kpc, np.log10(rad_prof_K), yerr=rad_prof_K_err/rad_prof_K * 0.434, c='k', linestyle='None',
                              marker='o', ms=10)
-                if self.sample == 'viva' or self.sample == None:
-                    plt.ylabel(r'log(Surface density [Jy b$^{-1}$ km s$^{-1}$])')
+                if self.sample == 'viva' or self.sample == 'things' or self.sample == None:
+                    plt.ylabel(r'log(Integrated intensity [Jy b$^{-1}$ km s$^{-1}$])')
                 else:
-                    plt.ylabel(r'log(Surface density [K km s$^{-1}$])')
+                    plt.ylabel(r'log(Integrated intensity [K km s$^{-1}$])')
             else:
                 plt.errorbar(radii_kpc, np.log10(rad_prof_Msun), yerr=rad_prof_Msun_err/rad_prof_Msun * 0.434, c='k', linestyle='None',
                              marker='o', ms=10)
-                plt.ylabel(r'log(Surface density [$M_\odot$ pc$^{-2}$])')
+                plt.ylabel(r'log(Integrated intensity [$M_\odot$ pc$^{-2}$])')
         elif x_units == 'arcsec':
             plt.xlabel(r'Radius [$^{\prime\prime}$]')
             if y_units == 'K km/s':
                 plt.errorbar(radii_arcsec, np.log10(rad_prof_K), yerr=rad_prof_K_err/rad_prof_K * 0.434, c='k', linestyle='None',
                              marker='o', ms=10)
-                if self.sample == 'viva' or self.sample == None:
-                    plt.ylabel(r'log(Surface density [Jy b${-1}$ km s$^{-1}$])')
+                if self.sample == 'viva' or self.sample == 'things' or self.sample == None:
+                    plt.ylabel(r'log(Integrated intensity [Jy b${-1}$ km s$^{-1}$])')
                 else:
-                    plt.ylabel(r'log(Surface density [K km s$^{-1}$])')
+                    plt.ylabel(r'log(Integrated intensity [K km s$^{-1}$])')
             else:
                 plt.errorbar(radii_arcsec, np.log10(rad_prof_Msun), yerr=rad_prof_Msun_err/rad_prof_Msun * 0.434, c='k', linestyle='None',
                              marker='o', ms=10)
-                plt.ylabel(r'log(Surface density [$M_\odot$ pc$^{-2}$])')
+                plt.ylabel(r'log(Integrated intensity [$M_\odot$ pc$^{-2}$])')
 
         plt.xlim(-0.01)
         if y_units == 'K km/s':
-            if not self.sample == 'viva' or self.sample == None:
+            if not self.sample == 'viva' or self.sample == 'things' or self.sample == None:
                 plt.ylim(-1)
         else:
             plt.ylim(0)
@@ -562,7 +562,7 @@ class CreateImages:
         if self.tosave:
             if x_units == 'kpc':
                 if y_units == 'K km/s':
-                    if self.sample == 'viva' or self.sample == None:
+                    if self.sample == 'viva' or self.sample == 'things' or self.sample == None:
                         plt.savefig(self.savepath + 'rad_prof_kpc_Jyb-1kms-1.pdf', bbox_inches='tight')
                     else:
                         plt.savefig(self.savepath + 'rad_prof_kpc_Kkms-1.pdf', bbox_inches='tight')
@@ -570,7 +570,7 @@ class CreateImages:
                     plt.savefig(self.savepath + 'radi_prof_kpc_Msun_pc-2.pdf', bbox_inches='tight')
             if x_units == 'arcsec':
                 if y_units == 'K km/s':
-                    if self.sample == 'viva' or self.sample == None:
+                    if self.sample == 'viva' or self.sample == 'things' or self.sample == None:
                         plt.savefig(self.savepath + 'rad_prof_arcsec_Jyb-1kms-1.pdf', bbox_inches='tight')
                     else:
                         plt.savefig(self.savepath + 'rad_prof_arcsec_Kkms-1.pdf', bbox_inches='tight')
@@ -582,7 +582,8 @@ class CreateImages:
         if self.refresh:
             if self.overwrite:
                 mom0_unc, mom0_SN, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                       tosave=True, savepath=self.savepath, sample=self.sample, redo_clip=self.redo_clip).uncertainty_maps()
+                                    tosave=True, savepath=self.savepath, sample=self.sample,
+                                                     redo_clip=self.redo_clip).uncertainty_maps()
             else:
                 mom0_unc, mom0_SN, _, _ = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                        tosave=False, sample=self.sample, redo_clip=self.redo_clip).uncertainty_maps()
