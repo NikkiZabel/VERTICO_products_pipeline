@@ -34,6 +34,7 @@ for file in data:
     savepath = path + 'products_v' + version + '/' + galaxy + '/' + galaxy + '_'
 
     # Moment maps
+
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -79,3 +80,4 @@ for file in data:
                  sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
                                                                        alpha_co=6.25, table_path=None,
                                                                        check_aperture=False)
+

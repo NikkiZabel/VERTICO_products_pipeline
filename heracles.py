@@ -12,7 +12,7 @@ refresh = True
 overwrite = True
 sun = True
 tosave = True
-resolution = 'nearest_720'
+resolution = 720
 
 if resolution == 'native':
     data = [f for f in glob(path + 'cubes_10kms/native/' + '*hans.fits')]

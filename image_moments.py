@@ -535,7 +535,7 @@ class CreateImages:
             else:
                 plt.errorbar(radii_kpc, np.log10(rad_prof_Msun), yerr=rad_prof_Msun_err/rad_prof_Msun * 0.434, c='k', linestyle='None',
                              marker='o', ms=10)
-                plt.ylabel(r'log(Integrated intensity [$M_\odot$ pc$^{-2}$])')
+                plt.ylabel(r'log(Surface density [$M_\odot$ pc$^{-2}$])')
         elif x_units == 'arcsec':
             plt.xlabel(r'Radius [$^{\prime\prime}$]')
             if y_units == 'K km/s':
@@ -548,7 +548,7 @@ class CreateImages:
             else:
                 plt.errorbar(radii_arcsec, np.log10(rad_prof_Msun), yerr=rad_prof_Msun_err/rad_prof_Msun * 0.434, c='k', linestyle='None',
                              marker='o', ms=10)
-                plt.ylabel(r'log(Integrated intensity [$M_\odot$ pc$^{-2}$])')
+                plt.ylabel(r'log(Surface density [$M_\odot$ pc$^{-2}$])')
 
         plt.xlim(-0.01)
         if y_units == 'K km/s':

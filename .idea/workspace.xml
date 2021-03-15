@@ -19,15 +19,13 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Small updates in HERACLES script.">
-      <change afterPath="$PROJECT_DIR$/things.py" afterDir="false" />
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Minor tweaks + added a script to push THINGS through.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/heracles.py" beforeDir="false" afterPath="$PROJECT_DIR$/heracles.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/image_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_moments.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/viva.py" beforeDir="false" afterPath="$PROJECT_DIR$/viva.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/things.py" beforeDir="false" afterPath="$PROJECT_DIR$/things.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,7 +57,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../vertico_quenching_mechs" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -73,13 +71,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00055" summary="Changed mosaic to include all galaxies">
-      <created>1591092388826</created>
-      <option name="number" value="00055" />
-      <option name="presentableId" value="LOCAL-00055" />
-      <option name="project" value="LOCAL" />
-      <updated>1591092388826</updated>
     </task>
     <task id="LOCAL-00056" summary="Can now deal with 3rd axis in frequency and paths to data with different resolution.">
       <created>1592476008689</created>
@@ -417,7 +408,14 @@
       <option name="project" value="LOCAL" />
       <updated>1615383368652</updated>
     </task>
-    <option name="localTasksCounter" value="104" />
+    <task id="LOCAL-00104" summary="Minor tweaks + added a script to push THINGS through.">
+      <created>1615492871795</created>
+      <option name="number" value="00104" />
+      <option name="presentableId" value="LOCAL-00104" />
+      <option name="project" value="LOCAL" />
+      <updated>1615492871796</updated>
+    </task>
+    <option name="localTasksCounter" value="105" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -433,7 +431,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updated some figure parameters" />
     <MESSAGE value="Overwriting some parameters manually for some galaxies" />
     <MESSAGE value="Updated paths to new 9 arcsec and 15 arcsec data" />
     <MESSAGE value="Updated paths and additional resolution products in overview plots script" />
@@ -458,6 +455,7 @@
     <MESSAGE value="Convert Jy/b to Msol/pc for the VIVA sample" />
     <MESSAGE value="Changed units VIVA back to Jy/beam and changed appropriate header keywords and axis labels" />
     <MESSAGE value="Small updates in HERACLES script." />
-    <option name="LAST_COMMIT_MESSAGE" value="Small updates in HERACLES script." />
+    <MESSAGE value="Minor tweaks + added a script to push THINGS through." />
+    <option name="LAST_COMMIT_MESSAGE" value="Minor tweaks + added a script to push THINGS through." />
   </component>
 </project>

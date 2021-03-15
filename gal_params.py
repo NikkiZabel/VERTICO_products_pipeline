@@ -10,6 +10,27 @@ def parameters(galaxy, sample=None):
         except:
             pass
 
+    vrange = None
+    vrange_2 = None
+    cliplevel = 1.5
+    stokes = False
+    sysvel_offset = 0
+    angle = 0
+    full_width = False
+    distance = 0
+    nchan_low = 2
+    cliplevel_low = 2
+    nchan_high = 3
+    cliplevel_high = 3.5
+    prune_by_npix = None
+    prune_by_fracbeam = 1
+    expand_by_fracbeam = None
+    expand_by_npix = None
+    expand_by_nchan = 2
+    inclination = None
+    eccentricity = None
+    figsize = (10, 8.5)
+
     if galaxy == 'NGC1436':
         vrange = 120
         vrange_2 = 20
@@ -1092,28 +1113,7 @@ def parameters(galaxy, sample=None):
         figsize = (10, 8)
 
     else:
-        vrange = None
-        vrange_2 = None
-        cliplevel = 1.5
-        stokes = False
-        sysvel_offset = 0
-        angle = 0
-        full_width = False
-        distance = 0
-        nchan_low = 2
-        cliplevel_low = 2
-        nchan_high = 3
-        cliplevel_high = 3.5
-        prune_by_npix = None
-        prune_by_fracbeam = 1
-        expand_by_fracbeam = None
-        expand_by_npix = None
-        expand_by_nchan = 2
-        inclination = None
-        eccentricity = None
-        figsize = (10, 8.5)
-
-        if sample == 'heracles':
+        if sample == 'heracles' or sample == 'things':
             import numpy as np
 
             def get_inc_pa(galaxy):
@@ -1121,7 +1121,6 @@ def parameters(galaxy, sample=None):
                 table = fits.open('/home/nikki/Documents/Data/VERTICO/heracles/heracles_sdss_r_properties.fits')[1]
                 gal_name_table = table.data['Galaxy']
                 gal_num_table = np.array([n.split('C')[1] for n in gal_name_table])
-
                 try:
                     incl = table.data['inclination'][gal_name_table == galaxy]
                     pa = table.data['pa'][gal_name_table == galaxy]
@@ -1144,13 +1143,12 @@ def parameters(galaxy, sample=None):
 
             def get_dist(galaxy):
                 from astropy.io import fits
-                from astropy.cosmology import luminosity_distance
                 dist_table = fits.open('/home/nikki/Documents/Data/VERTICO/heracles/heracles_basic.fits')[1]
                 try:
-                    return dist_table['dist_L19'][dist_table['Galaxy'] == galaxy]
+                    return float(dist_table.data['dist_L19'][dist_table.data['Galaxy'] == galaxy])
                 except:
-                    return luminosity_distance(dist_table['Redshift'][dist_table['Galaxy'] == galaxy])
-
+                    from astropy.coordinates import Distance
+                    return Distance(z=dist_table.data['Redshift'][dist_table.data['Galaxy'] == galaxy]).value
             inclination, pa = get_inc_pa(galaxy)
             distance = get_dist(galaxy)
 

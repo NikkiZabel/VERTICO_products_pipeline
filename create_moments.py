@@ -274,6 +274,8 @@ class MomentMaps:
                 v_val = 299792.458 * (1 - (cube.header['CRVAL3'] / 1e9) / 1.420405752)
                 v_shift = 299792.458 * (1 - ((cube.header['CRVAL3'] + cube.header['CDELT3']) / 1e9) / 1.420405752)
                 v_step = - (v_val - v_shift)
+                print(v_shift)
+                print(v_step)
             else:
                 v_val = 299792.458 * (1 - (cube.header['CRVAL3'] / 1e9) / 230.538000)
                 v_shift = 299792.458 * (1 - ((cube.header['CRVAL3'] + cube.header['CDELT3']) / 1e9) / 230.538000)
@@ -874,7 +876,7 @@ class MomentMaps:
                                 'Radii are equal to one beamsize.  \n ' \
                                  'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' Jy/b km/s \n \n' \
                                  'Integrated intensity (Jy/b km/s), RMS error (Jy/b km/s), ' \
-                                 'Integrated intensity (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
                 else:
                     csv_header = 'Slices parallel to the minor axis centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
                                  '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
@@ -882,7 +884,7 @@ class MomentMaps:
                                 'Radii are equal to one beamsize.  \n ' \
                                  'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n' \
                                  'Integrated intensity (K km/s), RMS error (K km/s), ' \
-                                 'Integrated intensity (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
             else:
                 if self.sample == 'viva' or self.sample == 'things':
                     csv_header = 'Slices parallel to the minor axis centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
@@ -891,7 +893,7 @@ class MomentMaps:
                                 'Radii are equal to one beamsize. \n' \
                                  'Clipping method = Dame11; rms = ' + str(clip_rms) + ' Jy/b km/s \n \n' \
                                  'Integrated intensity (Jy/b km/s), RMS error (Jy/b km/s), ' \
-                                 'Integrated intensity (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
                 else:
                     csv_header = 'Slices parallel to the minor axis centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
                                  '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
@@ -899,7 +901,7 @@ class MomentMaps:
                                 'Radii are equal to one beamsize. \n' \
                                  'Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n' \
                                  'Integrated intensity (K km/s), RMS error (K km/s), ' \
-                                 'Integrated intensity (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
         else:
             if self.sun:
                 if self.sample == 'viva' or self.sample == 'things':
@@ -917,7 +919,7 @@ class MomentMaps:
                                 'Radii are defined as the semi-major axes of these apertures. \n ' \
                                 'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n' \
                                 'Integrated intensity (K km/s), RMS error (K km/s), ' \
-                                 'Integrated intensity (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
             else:
                 if self.sample == 'viva' or self.sample == 'things':
                     csv_header = 'Elliptical apertures centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
@@ -926,7 +928,7 @@ class MomentMaps:
                                 'Radii are defined as the semi-major axes of these apertures. \n' \
                                 'Clipping method = Dame11; rms = ' + str(clip_rms) + ' Jy/b km/s \n \n' \
                                 'Integrated intensity (Jy/b km/s), RMS error (Jy/b km/s), ' \
-                                 'Integrated intensity (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
                 else:
                     csv_header = 'Elliptical apertures centered around (RA; Dec) = (' + str(np.round(centre_sky.ra.deg, 2)) + \
                                  '; ' + str(np.round(centre_sky.dec.deg, 2)) + ') (pixel value = (' + str(mom0_hdu_K.shape[0] / 2) + \
@@ -934,7 +936,7 @@ class MomentMaps:
                                 'Radii are defined as the semi-major axes of these apertures. \n' \
                                 'Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n' \
                                 'Integrated intensity (K km/s), RMS error (K km/s), ' \
-                                 'Integrated intensity (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
+                                 'Surface density (M_Sun pc^-2), RMS error (M_Sun pc^-2), Radii (arcsec), Radii (kpc)'
 
         if not hires:
             if self.tosave:
