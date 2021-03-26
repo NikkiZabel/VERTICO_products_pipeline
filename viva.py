@@ -69,18 +69,18 @@ for file in data:
         # PVDs
         if not galaxy == 'ngc4579':
             CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                         sun=sun, tosave=tosave).PVD(axis='major', find_angle=False, check_slit=False)
+                         sun=sun, tosave=tosave, sample=sample).PVD(axis='major', find_angle=False, check_slit=False)
         if not galaxy == 'ngc4450' or galaxy == 'ngc4536':
             CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                         sun=sun, tosave=tosave).PVD(axis='minor', check_slit=False)
+                         sun=sun, tosave=tosave, sample=sample).PVD(axis='minor', check_slit=False)
 
         # Spectra
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                     sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='vel_offset')
+                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).spectrum(x_axis='vel_offset')
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                     sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='velocity')
+                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).spectrum(x_axis='velocity')
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                     sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).spectrum(x_axis='frequency')
+                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).spectrum(x_axis='frequency')
 
         # Radial profiles
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,

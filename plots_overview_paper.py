@@ -10,6 +10,7 @@ from gal_params import parameters
 from astropy.wcs.utils import proj_plane_pixel_scales, skycoord_to_pixel, pixel_to_skycoord
 from astropy.wcs import WCS
 import yt; cmap_name = 'RED TEMPERATURE_r'
+#import rsmf
 
 distance = 16.5  # Mpc
 
@@ -26,7 +27,7 @@ def set_rc_params():
         'mathtext.sf': 'Times New Roman',
         'mathtext.tt': 'Times New Roman',
         'mathtext.cal': 'Times New Roman: italic',
-        'font.size': 13,
+        'font.size': 12,
         'xtick.labelsize': 12,
         'xtick.minor.width': 1,
         'ytick.minor.width': 1,
@@ -189,7 +190,7 @@ def image_mom0(hdu, units='K km/s', peak=False, show_beam=True, show_scalebar=Tr
 
     fig.axis_labels.set_xtext('x-offset [arcsec]')
     fig.axis_labels.set_ytext('y-offset [arcsec]')
-    fig.axis_labels.set_font(size=16)
+    #fig.axis_labels.set_font(size=16)
 
 
 def image_mom1_2(hdu, galaxy, sysvel, moment=1, show_beam=True, show_scalebar=True):
@@ -207,25 +208,25 @@ def image_mom1_2(hdu, galaxy, sysvel, moment=1, show_beam=True, show_scalebar=Tr
     if sun:
         if resolution == 9:
             try:
-                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_0/9_arcsec/sun18_method/' + galaxy + '/' + galaxy +
-                                          '_7m+tp_co21_pbcorr_round_k_9_arcsec_sun18_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
+                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_1/9arcsec/' + galaxy + '/' + galaxy +
+                                          '_7m+tp_co21_pbcorr_round_k_9_arcsec_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
             except:
-                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_0/9_arcsec/sun18_method/' + galaxy + '/' + galaxy +
-                                          '_7m_co21_pbcorr_round_k_9_arcsec_sun18_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
+                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_1/9arcsec/' + galaxy + '/' + galaxy +
+                                          '_7m_co21_pbcorr_round_k_9_arcsec_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
         elif resolution == 15:
             try:
-                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_0/15_arcsec/sun18_method/' + galaxy + '/' + galaxy +
-                                          '_7m+tp_co21_pbcorr_round_k_15_arcsec_sun18_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
+                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_1/15arcsec/' + galaxy + '/' + galaxy +
+                                          '_7m+tp_co21_pbcorr_round_k_15_arcsec_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
             except:
-                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_0/15_arcsec/sun18_method/' + galaxy + '/' + galaxy +
-                                          '_7m_co21_pbcorr_round_k_15_arcsec_sun18_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
+                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_1/15arcsec/' + galaxy + '/' + galaxy +
+                                          '_7m_co21_pbcorr_round_k_15_arcsec_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
         else:
             try:
-                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_0/native/sun18_method/' + galaxy + '/' + galaxy +
-                                          '_7m+tp_co21_pbcorr_round_k_sun18_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
+                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_1/native/' + galaxy + '/' + galaxy +
+                                          '_7m+tp_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
             except:
-                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_0/native/sun18_method/' + galaxy + '/' + galaxy +
-                                          '_7m_co21_pbcorr_round_k_sun18_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
+                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_1/native/' + galaxy + '/' + galaxy +
+                                          '_7m_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
 
     sysvel = (sysvel + 5) // 10 * 10
 
@@ -325,7 +326,7 @@ def image_mom1_2(hdu, galaxy, sysvel, moment=1, show_beam=True, show_scalebar=Tr
 
     fig.axis_labels.set_xtext('x-offset [arcsec]')
     fig.axis_labels.set_ytext('y-offset [arcsec]')
-    fig.axis_labels.set_font(size=16)
+    #fig.axis_labels.set_font(size=16)
 
     return
 
@@ -347,8 +348,7 @@ def contour_plot(image, contours, galaxy, number=3):
     subplot[3] += 0.03
     fig = apl.FITSFigure(image, figure=f, subplot=subplot)
     fig.show_rgb('/home/nikki/Documents/Data/VERTICO/SDSS/gri/' + galaxy + '_gri.tif')
-    fig.show_contour(contour_plot, levels=np.linspace(np.nanmax(contours.data)*1e-1, np.nanmax(contours.data), number),
-                     cmap='winter_r', linewidths=1)
+    fig.show_contour(contour_plot, levels = np.nanpercentile(a=mom0.data, q=[10,50,90]), cmap='winter_r', linewidths=1)
 
     # Show FoV
     try:
@@ -397,18 +397,19 @@ def contour_plot(image, contours, galaxy, number=3):
     fig.scalebar.set_color('white')
 
     # Add galaxy name and some other stuff in the upper left corner
-    fig.add_label(0.06, 0.87, galaxy + '\n SDSS $\it{gri}$ \n CO(2-1)', color='white', relative=True, size=20,
+    fig.add_label(0.06, 0.9, galaxy + '\n SDSS $\it{gri}$ \n CO(2-1)', color='white', relative=True,
                   horizontalalignment='left')
 
     # Make some adjustments
     plt.gca().tick_params(which='both', length=10, width=1.5)
     plt.gca().tick_params(which='minor', length=5)
-    fig.tick_labels.set_font(size=17)
-    fig.axis_labels.set_font(size=20)
+    #fig.tick_labels.set_font(size=17)
+    #fig.axis_labels.set_font(size=20)
 
     return
 
 ### MAIN ###
+
 set_rc_params()
 
 sun = True
@@ -421,7 +422,7 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
             'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689',
             'NGC4698']
 
-#galaxies = ['NGC4561', 'NGC4694']
+#galaxies = ['NGC4569']
 
 for i in range(len(galaxies)):
 
@@ -430,45 +431,47 @@ for i in range(len(galaxies)):
     # Read in the desired data products
     if sun:
         if resolution == 9:
-            path = '/home/nikki/Documents/Data/VERTICO/products_v1_0/9_arcsec/sun18_method/' + galaxies[i] + '/'
+            if galaxies[i] == 'NGC4321':
+                continue
+            path = '/home/nikki/Documents/Data/VERTICO/products_v1_1/9arcsec/' + galaxies[i] + '/'
         elif resolution == 15:
-            path = '/home/nikki/Documents/Data/VERTICO/products_v1_0/15_arcsec/sun18_method/' + galaxies[i] + '/'
+            path = '/home/nikki/Documents/Data/VERTICO/products_v1_1/15arcsec/' + galaxies[i] + '/'
         else:
-            path = '/home/nikki/Documents/Data/VERTICO/products_v1_0/native/sun18_method/' + galaxies[i] + '/'
+            path = '/home/nikki/Documents/Data/VERTICO/products_v1_1/native/' + galaxies[i] + '/'
 
     if resolution == 9:
         try:
-            mom0 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_9_arcsec_sun18_mom0_Kkms-1.fits')[0]
-            mom1 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_9_arcsec_sun18_mom1.fits')[0]
-            mom2 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_9_arcsec_sun18_mom2.fits')[0]
-            peak = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_9_arcsec_sun18_peak_temp.fits')[0]
+            mom0 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_9_arcsec_mom0_Kkms-1.fits')[0]
+            mom1 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_9_arcsec_mom1.fits')[0]
+            mom2 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_9_arcsec_mom2.fits')[0]
+            peak = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_9_arcsec_peak_temp.fits')[0]
         except:
-            mom0 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_9_arcsec_sun18_mom0_Kkms-1.fits')[0]
-            mom1 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_9_arcsec_sun18_mom1.fits')[0]
-            mom2 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_9_arcsec_sun18_mom2.fits')[0]
-            peak = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_9_arcsec_sun18_peak_temp.fits')[0]
+            mom0 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_9_arcsec_mom0_Kkms-1.fits')[0]
+            mom1 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_9_arcsec_mom1.fits')[0]
+            mom2 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_9_arcsec_mom2.fits')[0]
+            peak = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_9_arcsec_peak_temp.fits')[0]
     elif resolution == 15:
         try:
-            mom0 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_15_arcsec_sun18_mom0_Kkms-1.fits')[0]
-            mom1 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_15_arcsec_sun18_mom1.fits')[0]
-            mom2 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_15_arcsec_sun18_mom2.fits')[0]
-            peak = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_15_arcsec_sun18_peak_temp.fits')[0]
+            mom0 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_15_arcsec_mom0_Kkms-1.fits')[0]
+            mom1 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_15_arcsec_mom1.fits')[0]
+            mom2 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_15_arcsec_mom2.fits')[0]
+            peak = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_15_arcsec_peak_temp.fits')[0]
         except:
-            mom0 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_15_arcsec_sun18_mom0_Kkms-1.fits')[0]
-            mom1 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_15_arcsec_sun18_mom1.fits')[0]
-            mom2 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_15_arcsec_sun18_mom2.fits')[0]
-            peak = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_15_arcsec_sun18_peak_temp.fits')[0]
+            mom0 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_15_arcsec_mom0_Kkms-1.fits')[0]
+            mom1 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_15_arcsec_mom1.fits')[0]
+            mom2 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_15_arcsec_mom2.fits')[0]
+            peak = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_15_arcsec_peak_temp.fits')[0]
     else:
         try:
-            mom0 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_sun18_mom0_Kkms-1.fits')[0]
-            mom1 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_sun18_mom1.fits')[0]
-            mom2 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_sun18_mom2.fits')[0]
-            peak = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_sun18_peak_temp.fits')[0]
+            mom0 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_mom0_Kkms-1.fits')[0]
+            mom1 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_mom1.fits')[0]
+            mom2 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_mom2.fits')[0]
+            peak = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_peak_temp.fits')[0]
         except:
-            mom0 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_sun18_mom0_Kkms-1.fits')[0]
-            mom1 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_sun18_mom1.fits')[0]
-            mom2 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_sun18_mom2.fits')[0]
-            peak = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_sun18_peak_temp.fits')[0]
+            mom0 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_mom0_Kkms-1.fits')[0]
+            mom1 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_mom1.fits')[0]
+            mom2 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_mom2.fits')[0]
+            peak = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_peak_temp.fits')[0]
 
     # Set zeros to nans
     mom0.data[mom0.data == 0] = np.nan
@@ -477,13 +480,19 @@ for i in range(len(galaxies)):
     peak.data[peak.data == 0] = np.nan
 
     # Make those images square
-    mom0 = make_square(mom0)
-    mom1 = make_square(mom1)
-    mom2 = make_square(mom2)
-    peak = make_square(peak)
+    #mom0 = make_square(mom0)
+    #mom1 = make_square(mom1)
+    #mom2 = make_square(mom2)
+    #peak = make_square(peak)
 
     # Read in SDSS data
     g_band = fits.open('/home/nikki/Documents/Data/VERTICO/SDSS/g_band/' + galaxies[i] + '_g.fits')[0]
+
+    # set up the figure formatter
+    #formatter = rsmf.setup(r"\documentclass[a4paper,10pt,noarxiv]{revtex4-2}")
+
+    # set up the figure object with all the rc_params etc. taken care of to match aastex
+    #f = formatter.figure(wide=True, aspect_ratio=0.5)
 
     # Prepare the figure layout
     f = plt.figure(figsize=(15, 7.2))
@@ -500,7 +509,7 @@ for i in range(len(galaxies)):
     ax_peak.axis('off')
 
     # Fill the panels with the plots (position on the gridspec is currently hardcoded)
-    contour_plot(g_band, mom0, galaxies[i], number=4)
+    contour_plot(g_band, mom0, galaxies[i])
     image_mom0(mom0, units='K km/s', show_beam=True, show_scalebar=False)
     image_mom1_2(mom1, galaxies[i], mom1.header['SYSVEL'], moment=1, show_beam=False, show_scalebar=False)
     image_mom1_2(mom2, galaxies[i], mom1.header['SYSVEL'], moment=2, show_beam=False, show_scalebar=False)
@@ -508,11 +517,11 @@ for i in range(len(galaxies)):
 
     if sun:
         if resolution == 9:
-            plt.savefig('/home/nikki/Documents/Data/VERTICO/Overview_plots/v1/sun18_method/9_arcsec/' + galaxies[i] + '.pdf',
+            plt.savefig('/home/nikki/Documents/Data/VERTICO/Overview_plots/v1_1/9arcsec/' + galaxies[i] + '.pdf',
                     bbox_inches='tight')
         elif resolution == 15:
-            plt.savefig('/home/nikki/Documents/Data/VERTICO/Overview_plots/v1/sun18_method/15_arcsec/' + galaxies[i] + '.pdf',
+            plt.savefig('/home/nikki/Documents/Data/VERTICO/Overview_plots/v1_1/15arcsec/' + galaxies[i] + '.pdf',
                     bbox_inches='tight')
         else:
-            plt.savefig('/home/nikki/Documents/Data/VERTICO/Overview_plots/v1/sun18_method/native/' + galaxies[i] + '.pdf',
+            plt.savefig('/home/nikki/Documents/Data/VERTICO/Overview_plots/v1_1/native/' + galaxies[i] + '.pdf',
                     bbox_inches='tight')

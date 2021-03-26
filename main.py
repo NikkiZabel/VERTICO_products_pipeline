@@ -11,8 +11,8 @@ overwrite = True
 sun = True
 tosave = True
 pbcor = True
-resolution = 0
-version = '1_0'
+resolution = 15
+version = '1_1'
 
 galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
             'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
@@ -32,7 +32,7 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
 #galaxies = ['NGC4064', 'NGC4222', 'NGC4294', 'NGC4330', 'NGC4388', 'NGC4394', 'NGC4402', 'NGC4405', 'NGC4419',
 #            'NGC4522', 'NGC4533', 'NGC4567', 'NGC4606', 'NGC4607', 'NGC4772']  # These are the 7m only detections
 
-galaxies = ['NGC4561']
+#galaxies = ['NGC4561']
 
 for i in range(len(galaxies)):
 
@@ -43,21 +43,21 @@ for i in range(len(galaxies)):
     path = '/home/nikki/Documents/Data/VERTICO/'
 
     if resolution == 15:
-        readpath = path + 'ReducedData/v1.1/15arcsec/' + galaxy + '/'
+        readpath = path + 'ReducedData/v1_1/15arcsec/' + galaxy + '/'
     elif resolution == 9:
-        readpath = path + 'ReducedData/v1.1/9arcsec/' + galaxy + '/'
+        readpath = path + 'ReducedData/v1_1/9arcsec/' + galaxy + '/'
     else:
-        readpath = path + 'ReducedData/v1.1/native/' + galaxy + '/'
+        readpath = path + 'ReducedData/v1_1/native/' + galaxy + '/'
 
     if sun:
         if resolution == 15:
-            if not os.path.exists(path + 'products_v' + version + '/15_arcsec/' + galaxy + '/'):
-                os.mkdir(path + 'products_v' + version + '/15_arcsec/' + galaxy + '/')
-            savepath_temp = path + 'products_v' + version + '/15_arcsec/' + galaxy + '/'
+            if not os.path.exists(path + 'products_v' + version + '/15arcsec/' + galaxy + '/'):
+                os.mkdir(path + 'products_v' + version + '/15arcsec/' + galaxy + '/')
+            savepath_temp = path + 'products_v' + version + '/15arcsec/' + galaxy + '/'
         elif resolution == 9:
-            if not os.path.exists(path + 'products_v' + version + '/9_arcsec/' + galaxy + '/'):
-                os.mkdir(path + 'products_v' + version + '/9_arcsec/' + galaxy + '/')
-            savepath_temp = path + 'products_v' + version + '/9_arcsec/' + galaxy + '/'
+            if not os.path.exists(path + 'products_v' + version + '/9arcsec/' + galaxy + '/'):
+                os.mkdir(path + 'products_v' + version + '/9arcsec/' + galaxy + '/')
+            savepath_temp = path + 'products_v' + version + '/9arcsec/' + galaxy + '/'
         else:
             if not os.path.exists(path + 'products_v' + version + '/native/' + galaxy + '/'):
                 os.mkdir(path + 'products_v' + version + '/native/' + galaxy + '/')
@@ -168,21 +168,20 @@ for i in range(len(galaxies)):
 
 
     # Moment maps
-    #'''
+
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, redo_clip=redo_clip).moment_zero(units='K km/s')
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #              sun=sun, tosave=tosave, redo_clip=redo_clip).moment_zero()
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #              sun=sun, tosave=tosave, redo_clip=redo_clip).moment_zero(peak=True)
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #             sun=sun, tosave=tosave, redo_clip=redo_clip).moment_1_2()
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #             sun=sun, tosave=tosave, redo_clip=redo_clip).moment_1_2(moment=2)
-    #'''
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave, redo_clip=redo_clip).moment_zero()
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                  sun=sun, tosave=tosave, redo_clip=redo_clip).moment_zero(peak=True)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                 sun=sun, tosave=tosave, redo_clip=redo_clip).moment_1_2()
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                 sun=sun, tosave=tosave, redo_clip=redo_clip).moment_1_2(moment=2)
+
     # Uncertainty maps
 
-    '''
     try:
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                     sun=sun, tosave=tosave, redo_clip=redo_clip).mom0_noise_maps()
@@ -190,30 +189,30 @@ for i in range(len(galaxies)):
                     sun=sun, tosave=tosave, redo_clip=redo_clip).mom1_2_noise_maps()
     except:
         pass
-    '''
+
     #if galaxy == 'NGC4561': continue
 
     # PVDs
-    '''
+
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, redo_clip=redo_clip).\
        PVD(axis='major', find_angle=False, check_slit=True)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, redo_clip=redo_clip).\
         PVD(axis='minor', check_slit=False)
-    '''
+
     # Spectra
-    '''
+
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='vel_offset')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='velocity')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='frequency')
-    '''
+
 
     # Radial profiles
-    '''
+
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave, redo_clip=redo_clip).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
                                     alpha_co=5.4, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
@@ -230,4 +229,3 @@ for i in range(len(galaxies)):
                 sun=sun, tosave=tosave, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
                                    alpha_co=5.4, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
                                                                             check_aperture=False)
-    '''

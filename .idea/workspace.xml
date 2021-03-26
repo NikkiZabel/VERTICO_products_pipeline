@@ -19,13 +19,14 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Minor tweaks + added a script to push THINGS through.">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Typos in axes/headers rad. prof.">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vertico.py.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vertico.py.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/heracles.py" beforeDir="false" afterPath="$PROJECT_DIR$/heracles.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/image_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_moments.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/things.py" beforeDir="false" afterPath="$PROJECT_DIR$/things.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots_overview_paper.py" beforeDir="false" afterPath="$PROJECT_DIR$/plots_overview_paper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/viva.py" beforeDir="false" afterPath="$PROJECT_DIR$/viva.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,13 +72,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00056" summary="Can now deal with 3rd axis in frequency and paths to data with different resolution.">
-      <created>1592476008689</created>
-      <option name="number" value="00056" />
-      <option name="presentableId" value="LOCAL-00056" />
-      <option name="project" value="LOCAL" />
-      <updated>1592476008694</updated>
     </task>
     <task id="LOCAL-00057" summary="Added a script for the figures for the release paper">
       <created>1592731665934</created>
@@ -415,7 +409,14 @@
       <option name="project" value="LOCAL" />
       <updated>1615492871796</updated>
     </task>
-    <option name="localTasksCounter" value="105" />
+    <task id="LOCAL-00105" summary="Typos in axes/headers rad. prof.">
+      <created>1615813192003</created>
+      <option name="number" value="00105" />
+      <option name="presentableId" value="LOCAL-00105" />
+      <option name="project" value="LOCAL" />
+      <updated>1615813192004</updated>
+    </task>
+    <option name="localTasksCounter" value="106" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -431,7 +432,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Overwriting some parameters manually for some galaxies" />
     <MESSAGE value="Updated paths to new 9 arcsec and 15 arcsec data" />
     <MESSAGE value="Updated paths and additional resolution products in overview plots script" />
     <MESSAGE value="Bug in converting frequency to velocity" />
@@ -456,6 +456,7 @@
     <MESSAGE value="Changed units VIVA back to Jy/beam and changed appropriate header keywords and axis labels" />
     <MESSAGE value="Small updates in HERACLES script." />
     <MESSAGE value="Minor tweaks + added a script to push THINGS through." />
-    <option name="LAST_COMMIT_MESSAGE" value="Minor tweaks + added a script to push THINGS through." />
+    <MESSAGE value="Typos in axes/headers rad. prof." />
+    <option name="LAST_COMMIT_MESSAGE" value="Typos in axes/headers rad. prof." />
   </component>
 </project>

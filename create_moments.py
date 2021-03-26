@@ -274,8 +274,6 @@ class MomentMaps:
                 v_val = 299792.458 * (1 - (cube.header['CRVAL3'] / 1e9) / 1.420405752)
                 v_shift = 299792.458 * (1 - ((cube.header['CRVAL3'] + cube.header['CDELT3']) / 1e9) / 1.420405752)
                 v_step = - (v_val - v_shift)
-                print(v_shift)
-                print(v_step)
             else:
                 v_val = 299792.458 * (1 - (cube.header['CRVAL3'] / 1e9) / 230.538000)
                 v_shift = 299792.458 * (1 - ((cube.header['CRVAL3'] + cube.header['CDELT3']) / 1e9) / 230.538000)
