@@ -19,14 +19,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Typos in axes/headers rad. prof.">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vertico.py.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vertico.py.iml" afterDir="false" />
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Made axis labels overview plots smaller.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plots_overview_paper.py" beforeDir="false" afterPath="$PROJECT_DIR$/plots_overview_paper.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/viva.py" beforeDir="false" afterPath="$PROJECT_DIR$/viva.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,13 +67,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00057" summary="Added a script for the figures for the release paper">
-      <created>1592731665934</created>
-      <option name="number" value="00057" />
-      <option name="presentableId" value="LOCAL-00057" />
-      <option name="project" value="LOCAL" />
-      <updated>1592731665934</updated>
     </task>
     <task id="LOCAL-00058" summary="Some tweaks to the plots">
       <created>1592736912815</created>
@@ -416,7 +404,14 @@
       <option name="project" value="LOCAL" />
       <updated>1615813192004</updated>
     </task>
-    <option name="localTasksCounter" value="106" />
+    <task id="LOCAL-00106" summary="Made axis labels overview plots smaller.">
+      <created>1616773509210</created>
+      <option name="number" value="00106" />
+      <option name="presentableId" value="LOCAL-00106" />
+      <option name="project" value="LOCAL" />
+      <updated>1616773509210</updated>
+    </task>
+    <option name="localTasksCounter" value="107" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -432,7 +427,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updated paths to new 9 arcsec and 15 arcsec data" />
     <MESSAGE value="Updated paths and additional resolution products in overview plots script" />
     <MESSAGE value="Bug in converting frequency to velocity" />
     <MESSAGE value="Made some changes to make it work with the HERACLES data products, and made a script to import those data and put them through the pipeline. Distances still need to be implemented." />
@@ -457,6 +451,7 @@
     <MESSAGE value="Small updates in HERACLES script." />
     <MESSAGE value="Minor tweaks + added a script to push THINGS through." />
     <MESSAGE value="Typos in axes/headers rad. prof." />
-    <option name="LAST_COMMIT_MESSAGE" value="Typos in axes/headers rad. prof." />
+    <MESSAGE value="Made axis labels overview plots smaller." />
+    <option name="LAST_COMMIT_MESSAGE" value="Made axis labels overview plots smaller." />
   </component>
 </project>

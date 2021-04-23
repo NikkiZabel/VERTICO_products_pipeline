@@ -14,6 +14,43 @@ import yt; cmap_name = 'RED TEMPERATURE_r'
 
 distance = 16.5  # Mpc
 
+
+def remove_stokes(cube):
+    """
+    If the fits file containing the spectral cube has a Stokes axis, remove it and remove the corresponding
+    header keywords.
+    :param cube (HDU file): HDU file containing the spectral cube and its header
+    :return (HDU file): the input HDU file with the Stokes axis and corresponding header keywords removed.
+    """
+
+    cube.data = np.squeeze(cube.data)
+
+    try:
+        cube.header.pop('PC01_04')
+        cube.header.pop('PC02_04')
+        cube.header.pop('PC03_04')
+        cube.header.pop('PC04_04')
+        cube.header.pop('PC04_01')
+        cube.header.pop('PC04_02')
+        cube.header.pop('PC04_03')
+    except:
+        cube.header.pop('PC1_4')
+        cube.header.pop('PC2_4')
+        cube.header.pop('PC3_4')
+        cube.header.pop('PC4_4')
+        cube.header.pop('PC4_1')
+        cube.header.pop('PC4_2')
+        cube.header.pop('PC4_3')
+
+    cube.header.pop('CTYPE4')
+    cube.header.pop('CRVAL4')
+    cube.header.pop('CRPIX4')
+    cube.header.pop('CUNIT4')
+    cube.header.pop('CDELT4')
+
+    return cube
+
+
 def set_rc_params():
 
     params = {
@@ -352,14 +389,12 @@ def contour_plot(image, contours, galaxy, number=3):
 
     # Show FoV
     try:
-        if resolution == 9:
-            pb = fits.open(
-                '/home/nikki/Documents/Data/VERTICO/ReducedData/v1/9_arcsec/' + galaxy + '/' + galaxy + '_7m_co21_pb_rebin.fits')[ 0]
-        elif resolution == 15:
-            pb = fits.open(
-                '/home/nikki/Documents/Data/VERTICO/ReducedData/v1/15_arcsec/' + galaxy + '/' + galaxy + '_7m_co21_pb_rebin.fits')[0]
-        else:
-            pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/v1/native/' + galaxy + '/' + galaxy + '_7m_co21_pb_rebin.fits')[0]
+        pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/v1_1/native/' + galaxy + '/' + galaxy + '_7m_co21_pb_rebin.fits')[0]
+
+        # If there is a Stokes axis, remove it.
+        if len(pb.shape) == 4:
+            pb = remove_stokes(pb)
+
         pb.data = np.sum(pb.data, axis=0)
         pb.data[np.isfinite(pb.data)] = 1
         pb.data[np.isnan(pb.data)] = 0
@@ -382,6 +417,7 @@ def contour_plot(image, contours, galaxy, number=3):
 
         fig.show_contour(pb, levels=1, colors='white', alpha=0.5, linewidths=1)
     except:
+        print('No pb cube.')
         pass
 
     # Show the beam
@@ -422,7 +458,7 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
             'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689',
             'NGC4698']
 
-#galaxies = ['NGC4569']
+#galaxies = ['NGC4254']
 
 for i in range(len(galaxies)):
 
