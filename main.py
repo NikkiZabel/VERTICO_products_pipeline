@@ -5,14 +5,15 @@ import os
 from matplotlib import pyplot as plt
 
 # Set some parameters to apply to all images below
-redo_clip = False
+redo_clip = True
 refresh = True
 overwrite = True
 sun = True
 tosave = True
 pbcor = True
-resolution = 15
+resolution = 0
 version = '1_1'
+sample = 'vertico'
 
 galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
             'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
@@ -32,7 +33,7 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
 #galaxies = ['NGC4064', 'NGC4222', 'NGC4294', 'NGC4330', 'NGC4388', 'NGC4394', 'NGC4402', 'NGC4405', 'NGC4419',
 #            'NGC4522', 'NGC4533', 'NGC4567', 'NGC4606', 'NGC4607', 'NGC4772']  # These are the 7m only detections
 
-#galaxies = ['NGC4561']
+galaxies = ['NGC4380']
 
 for i in range(len(galaxies)):
 
@@ -124,6 +125,8 @@ for i in range(len(galaxies)):
             continue
         TP = False
 
+    #savepath = '/home/nikki/Documents/Data/VERTICO/mom0_unclipped/' + galaxy + '_'
+
     #galaxy = 'NGC4222'
     #file_pbcorr = '/home/nikki/Documents/Data/VERTICO/ReducedData/test/NGC4222_tapered/NGC4222_7m_co21_pbcorr_round_k.fits'
     #file_uncorr = '/home/nikki/Documents/Data/VERTICO/ReducedData/test/NGC4222_tapered/NGC4222_7m_co21_flat_round_k.fits'
@@ -168,64 +171,64 @@ for i in range(len(galaxies)):
 
 
     # Moment maps
-
+    '''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave, redo_clip=redo_clip).moment_zero(units='K km/s')
+                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).moment_zero(units='K km/s')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave, redo_clip=redo_clip).moment_zero()
+                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).moment_zero()
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave, redo_clip=redo_clip).moment_zero(peak=True)
+                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).moment_zero(peak=True)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave, redo_clip=redo_clip).moment_1_2()
+                 sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).moment_1_2()
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave, redo_clip=redo_clip).moment_1_2(moment=2)
+                 sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).moment_1_2(moment=2)
 
     # Uncertainty maps
 
     try:
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                    sun=sun, tosave=tosave, redo_clip=redo_clip).mom0_noise_maps()
+                    sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).mom0_noise_maps()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                    sun=sun, tosave=tosave, redo_clip=redo_clip).mom1_2_noise_maps()
+                    sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).mom1_2_noise_maps()
     except:
         pass
 
     #if galaxy == 'NGC4561': continue
 
     # PVDs
-
+    '''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave, redo_clip=redo_clip).\
+                 sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).\
        PVD(axis='major', find_angle=False, check_slit=True)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave, redo_clip=redo_clip).\
+                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).\
         PVD(axis='minor', check_slit=False)
-
+    '''
     # Spectra
 
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='vel_offset')
+                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).spectrum(x_axis='vel_offset')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='velocity')
+                 sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).spectrum(x_axis='velocity')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave, redo_clip=redo_clip).spectrum(x_axis='frequency')
-
+                 sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).spectrum(x_axis='frequency')
 
     # Radial profiles
 
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave, redo_clip=redo_clip).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
+                sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
                                     alpha_co=5.4, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
                                                                             check_aperture=False)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave, redo_clip=redo_clip).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
+                sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
                                    alpha_co=5.4, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
                                                                             check_aperture=False)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='kpc',
+                sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).radial_profile(y_units='K km/s', x_units='kpc',
                                    alpha_co=5.4, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
                                                                             check_aperture=False)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
+                sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).radial_profile(y_units='K km/s', x_units='arcsec',
                                    alpha_co=5.4, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
                                                                             check_aperture=False)
+    '''

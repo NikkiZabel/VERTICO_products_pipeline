@@ -1165,6 +1165,14 @@ def parameters(galaxy, sample=None):
     if sample == 'things':
         stokes = True
 
+    # Overwrite PA and inclination with new ones calculated by Toby
+    if sample == 'vertico':
+        from astropy.io import fits
+        import numpy as np
+        table = fits.open('/home/nikki/Documents/Data/VERTICO/VERTICO_basic.fits')[1]
+        inclination = int(np.round(table.data['inclination'][table.data['Galaxy'] == galaxy][0]))
+        angle = int(np.round(table.data['pa'][table.data['Galaxy'] == galaxy][0]))
+
     return name, vrange, vrange_2, cliplevel, stokes, sysvel_offset, angle, \
            full_width, distance, nchan_low, cliplevel_low, nchan_high, cliplevel_high, prune_by_npix, \
            prune_by_fracbeam, expand_by_fracbeam, expand_by_npix, expand_by_nchan, inclination, eccentricity, \

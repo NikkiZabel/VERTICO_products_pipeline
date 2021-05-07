@@ -19,8 +19,13 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Made axis labels overview plots smaller.">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Small bug fix PB on overview plots">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clip_cube.py" beforeDir="false" afterPath="$PROJECT_DIR$/clip_cube.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config_figs.py" beforeDir="false" afterPath="$PROJECT_DIR$/config_figs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_moments.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plots_overview_paper.py" beforeDir="false" afterPath="$PROJECT_DIR$/plots_overview_paper.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -67,13 +72,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00058" summary="Some tweaks to the plots">
-      <created>1592736912815</created>
-      <option name="number" value="00058" />
-      <option name="presentableId" value="LOCAL-00058" />
-      <option name="project" value="LOCAL" />
-      <updated>1592736912815</updated>
     </task>
     <task id="LOCAL-00059" summary="Some more tweaks to the plots">
       <created>1592739365357</created>
@@ -411,7 +409,14 @@
       <option name="project" value="LOCAL" />
       <updated>1616773509210</updated>
     </task>
-    <option name="localTasksCounter" value="107" />
+    <task id="LOCAL-00107" summary="Small bug fix PB on overview plots">
+      <created>1619181747199</created>
+      <option name="number" value="00107" />
+      <option name="presentableId" value="LOCAL-00107" />
+      <option name="project" value="LOCAL" />
+      <updated>1619181747199</updated>
+    </task>
+    <option name="localTasksCounter" value="108" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -427,7 +432,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updated paths and additional resolution products in overview plots script" />
     <MESSAGE value="Bug in converting frequency to velocity" />
     <MESSAGE value="Made some changes to make it work with the HERACLES data products, and made a script to import those data and put them through the pipeline. Distances still need to be implemented." />
     <MESSAGE value="Implement code to read heracles distances from csv file" />
@@ -452,6 +456,7 @@
     <MESSAGE value="Minor tweaks + added a script to push THINGS through." />
     <MESSAGE value="Typos in axes/headers rad. prof." />
     <MESSAGE value="Made axis labels overview plots smaller." />
-    <option name="LAST_COMMIT_MESSAGE" value="Made axis labels overview plots smaller." />
+    <MESSAGE value="Small bug fix PB on overview plots" />
+    <option name="LAST_COMMIT_MESSAGE" value="Small bug fix PB on overview plots" />
   </component>
 </project>

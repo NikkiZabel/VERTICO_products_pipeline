@@ -503,6 +503,8 @@ class ClipCube:
         if self.galaxy.expand_by_nchan:
             mask = self.expand_along_spectral(mask)
 
+        #mask = np.ones(emiscube.shape)
+
         return mask
 
     def smooth_mask(self, cube, noisecube, return_rms=False):
