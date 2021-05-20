@@ -48,6 +48,7 @@ for file in data:
         if os.path.exists(savepath + galaxy):
             continue
 
+        '''
         # Moment maps
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
@@ -65,15 +66,7 @@ for file in data:
                      sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).mom0_noise_maps()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                      sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).mom1_2_noise_maps()
-
-        # PVDs
-        if not galaxy == 'ngc4579':
-            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                         sun=sun, tosave=tosave, sample=sample).PVD(axis='major', find_angle=False, check_slit=False)
-        if not galaxy == 'ngc4450' or galaxy == 'ngc4536':
-            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                         sun=sun, tosave=tosave, sample=sample).PVD(axis='minor', check_slit=False)
-
+                     
         # Spectra
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).spectrum(x_axis='vel_offset')
@@ -81,6 +74,14 @@ for file in data:
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).spectrum(x_axis='velocity')
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).spectrum(x_axis='frequency')
+        '''
+        # PVDs
+        if not galaxy == 'ngc4579':
+            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                         sun=sun, tosave=tosave, sample=sample).PVD(axis='major', find_angle=False, check_slit=False)
+        if not galaxy == 'ngc4450' or galaxy == 'ngc4536':
+            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                         sun=sun, tosave=tosave, sample=sample).PVD(axis='minor', check_slit=False)
 
         # Radial profiles
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,

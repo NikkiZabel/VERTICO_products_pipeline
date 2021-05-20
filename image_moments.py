@@ -386,12 +386,12 @@ class CreateImages:
 
         velocity = np.flip(velocity) - sysvel
 
-        levels = list(np.linspace(np.amax(PV.data) * 0.2, np.amax(PV.data), 20))
+        levels = list(np.linspace(np.amax(PV.data) * 0.2, np.amax(PV.data), 10))
 
         # Contours in black
         C2 = ax.contour(PV.data,
                    extent=[np.amax(offset), np.amin(offset), np.amax(velocity), np.amin(velocity)],
-                   colors='k', levels=levels, linewidths=1)
+                   colors='k', levels=levels, linewidths=0.05)
 
         # Filling with coloured contours
         C1 = ax.contourf(PV.data,
@@ -399,7 +399,7 @@ class CreateImages:
                     cmap=self.custom_cmap(), levels=levels)
 
         # Add a colourbar
-        cbar = fig.colorbar(C1, pad=0.1, format='%.2f')
+        cbar = fig.colorbar(C1, pad=0.12, format='%.2f')
         cbar.add_lines(C2)
         if self.sample == 'viva' or self.sample == 'things' or self.sample == None:
             cbar.set_label('Brightness temperature [Jy b${-1}$]')
@@ -415,9 +415,10 @@ class CreateImages:
         ax.set_xlabel('Offset [arcsec]')
         ax_kpc.set_xlabel('Offset [kpc]')
         ax.set_ylabel(r'Relative velocity [km s$^{-1}$]')
-        ax_rel.set_ylabel(r'Velocity [km s$^{-1}$]')
+        ax_rel.set_ylabel(r'Velocity [km s$^{-1}$]', labelpad=0)
         x1, x2 = ax.get_xlim()
         y1, y2 = ax.get_ylim()
+        #plt.gca().tick_params(pad=8)
         ax.errorbar(0.8 * x2, 0.7 * y2, xerr=clipped_cube.header['BMAJ'] * 3600 / 2., yerr=vres / 2., ecolor='k', capsize=2.5)
         ax.annotate('PA = ' + str(self.galaxy.angle) + '$^o$', xy=(-0.8 * x2, -0.7 * y2), fontsize=25)
 

@@ -5,7 +5,7 @@ import os
 from matplotlib import pyplot as plt
 
 # Set some parameters to apply to all images below
-redo_clip = True
+redo_clip = False
 refresh = True
 overwrite = True
 sun = True
@@ -194,9 +194,8 @@ for i in range(len(galaxies)):
         pass
 
     #if galaxy == 'NGC4561': continue
-
-    # PVDs
     '''
+    # PVDs
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).\
        PVD(axis='major', find_angle=False, check_slit=True)
@@ -205,16 +204,14 @@ for i in range(len(galaxies)):
         PVD(axis='minor', check_slit=False)
     '''
     # Spectra
-
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).spectrum(x_axis='vel_offset')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).spectrum(x_axis='velocity')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).spectrum(x_axis='frequency')
-
+    '''
     # Radial profiles
-
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
                                     alpha_co=5.4, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
@@ -231,4 +228,4 @@ for i in range(len(galaxies)):
                 sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).radial_profile(y_units='K km/s', x_units='arcsec',
                                    alpha_co=5.4, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits',
                                                                             check_aperture=False)
-    '''
+    #'''

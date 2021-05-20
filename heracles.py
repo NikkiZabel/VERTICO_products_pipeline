@@ -12,7 +12,7 @@ refresh = True
 overwrite = True
 sun = True
 tosave = True
-resolution = 720
+resolution = 'native'
 
 if resolution == 'native':
     data = [f for f in glob(path + 'cubes_10kms/native/' + '*hans.fits')]
@@ -33,8 +33,11 @@ for file in data:
         galaxy = long_str.split('_')[0]
         print(galaxy)
 
-        #if not galaxy == 'NGC4579':
-        #    continue
+        if galaxy == 'NGC2903':
+            continue
+
+        if not ((galaxy == 'NGC4579') or (galaxy == 'NGC4569') or (galaxy == 'NGC4536') or (galaxy == 'NGC4321') or (galaxy == 'NGC4254')):
+            continue
 
         file_pbcorr = file
         file_uncorr = file
@@ -52,8 +55,8 @@ for file in data:
         galaxy = long_str.split('_')[0]
         print(galaxy)
 
-        if (galaxy == 'ngc4536') | (galaxy == 'NGC4536'):
-            continue
+        #if (galaxy == 'ngc4536') | (galaxy == 'NGC4536'):
+        #    continue
 
         if (galaxy == 'ngc2903') | (galaxy == 'NGC2903'):
             continue
@@ -69,8 +72,8 @@ for file in data:
         else:
             savepath = path + 'products_v' + version + '/' + str(resolution) + 'pc/' + galaxy + '/' + galaxy + '_exact_720pc_'
 
-        if os.path.exists(savepath + 'mom0_Kkms-1.fits'):
-            continue
+        #if os.path.exists(savepath + 'mom0_Kkms-1.fits'):
+        #    continue
 
     elif resolution == 'nearest_720' or resolution == 'nearest_1200':
 
@@ -78,10 +81,10 @@ for file in data:
         galaxy = long_str.split('_')[0]
         print(galaxy)
 
-        if galaxy == 'ngc4536':
-            continue
+        #if galaxy == 'ngc4536':
+        #    continue
 
-        if galaxy == 'ngc2903':
+        if galaxy == 'NGC2903':
             continue
 
         file_pbcorr = file
@@ -97,10 +100,10 @@ for file in data:
             savepath = path + 'products_v' + version + '/nearest_aniano_720pc/' + galaxy + \
                        '/' + long_str + '_'
 
-        if os.path.exists(savepath + 'mom0_Kkms-1.fits'):
-            continue
+        #if os.path.exists(savepath + 'mom0_Kkms-1.fits'):
+        #    continue
 
-
+    '''
     # Moment maps
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, sample=sample).moment_zero(units='K km/s')
@@ -120,14 +123,14 @@ for file in data:
                  sun=sun, tosave=tosave, sample=sample).mom1_2_noise_maps()
 
     # PVDs
-    try:
+    #try:
+    if not galaxy == 'NGC2841':
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                      sun=sun, tosave=tosave, sample=sample).PVD(axis='major', find_angle=False, check_slit=False)
-        if not galaxy == 'ngc2841':
-            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                          sun=sun, tosave=tosave, sample=sample).PVD(axis='minor', check_slit=False)
-    except:
-        pass
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, sample=sample).PVD(axis='minor', check_slit=False)
+    #except:
+    #    pass
 
     # Spectra
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -136,22 +139,22 @@ for file in data:
                  sun=sun, tosave=tosave, sample=sample).spectrum(x_axis='velocity')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, sample=sample).spectrum(x_axis='frequency')
-
+    '''
     # Radial profiles
-    try:
-        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                    sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
-                                        alpha_co=5.4, table_path=None, check_aperture=False)
-        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                    sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
-                                       alpha_co=5.4, table_path=None, check_aperture=False)
-        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                    sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='kpc',
-                                       alpha_co=5.4, table_path=None, check_aperture=False)
-        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                    sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='arcsec',
-                                       alpha_co=5.4, table_path=None, check_aperture=False)
-    except:
-        pass
+    #try:
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
+                                    alpha_co=5.4, table_path=None, check_aperture=False)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
+                                   alpha_co=5.4, table_path=None, check_aperture=False)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='kpc',
+                                   alpha_co=5.4, table_path=None, check_aperture=False)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='arcsec',
+                                   alpha_co=5.4, table_path=None, check_aperture=False)
+    #except:
+    #    pass
 
     #break

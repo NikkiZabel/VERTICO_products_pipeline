@@ -2,10 +2,10 @@ import matplotlib
 
 #matplotlib.rcParams['text.usetex'] = True
 matplotlib.rcParams['font.family'] = 'Latin Modern Roman'
-matplotlib.rcParams.update({'font.size': 20})
+matplotlib.rcParams.update({'font.size': 30})
 matplotlib.rcParams['legend.fontsize'] = 17.5
 matplotlib.rcParams['axes.linewidth'] = 1.5
-matplotlib.rcParams['xtick.labelsize'] = 25; matplotlib.rcParams['ytick.labelsize'] = 25
+matplotlib.rcParams['xtick.labelsize'] = 30; matplotlib.rcParams['ytick.labelsize'] = 30
 matplotlib.rcParams['xtick.major.size'] = 10; matplotlib.rcParams['ytick.major.size'] = 10
 matplotlib.rcParams['xtick.major.width'] = 2; matplotlib.rcParams['ytick.major.width'] = 2
 matplotlib.rcParams['xtick.minor.size'] = 5; matplotlib.rcParams['ytick.minor.size'] = 5

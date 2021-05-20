@@ -786,7 +786,7 @@ class MomentMaps:
             radius.append(a_out)
 
         #if ((len(radius) < 5) & (e > 0.7)) or ((len(np.array(rad_prof_K)[np.log10(np.array(rad_prof_K)) < 0]) > 2) & (e > 0.7)):
-        if ((len(radius) < 15) & (e > 0.7)):
+        if (e > 0.9):
 
             hi_inc = True
 
