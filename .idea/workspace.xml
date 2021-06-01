@@ -19,12 +19,11 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Bug fix">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Changed main to include nyquist sampled cubes.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/heracles.py" beforeDir="false" afterPath="$PROJECT_DIR$/heracles.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots_overview_paper.py" beforeDir="false" afterPath="$PROJECT_DIR$/plots_overview_paper.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,13 +69,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00061" summary="Plots in offset, manually add in beam information">
-      <created>1592909550404</created>
-      <option name="number" value="00061" />
-      <option name="presentableId" value="LOCAL-00061" />
-      <option name="project" value="LOCAL" />
-      <updated>1592909550404</updated>
     </task>
     <task id="LOCAL-00062" summary="Small tweaks to the figures">
       <created>1592986104294</created>
@@ -414,7 +406,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621523647558</updated>
     </task>
-    <option name="localTasksCounter" value="110" />
+    <task id="LOCAL-00110" summary="Changed main to include nyquist sampled cubes.">
+      <created>1622528744534</created>
+      <option name="number" value="00110" />
+      <option name="presentableId" value="LOCAL-00110" />
+      <option name="project" value="LOCAL" />
+      <updated>1622528744535</updated>
+    </task>
+    <option name="localTasksCounter" value="111" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -430,7 +429,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Implement code to read heracles distances from csv file" />
     <MESSAGE value="Added a function to make all moment maps come out square" />
     <MESSAGE value="Changed the directory structures so that the &quot;smoothed_cubes_nearest&quot; files are included and processed." />
     <MESSAGE value="Fixed bug in &quot;make_square&quot; function" />
@@ -455,6 +453,7 @@
     <MESSAGE value="Small bug fix PB on overview plots" />
     <MESSAGE value="Updated inclination and position angle" />
     <MESSAGE value="Bug fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="Bug fix" />
+    <MESSAGE value="Changed main to include nyquist sampled cubes." />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed main to include nyquist sampled cubes." />
   </component>
 </project>

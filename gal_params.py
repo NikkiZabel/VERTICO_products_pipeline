@@ -53,8 +53,8 @@ def parameters(galaxy, sample=None):
         eccentricity = None
 
     elif galaxy == 'NGC4501':
-        #vrange = 250
-        #vrange_2 = 20
+        vrange = 380
+        vrange_2 = 100
         cliplevel = 1.5
         stokes = False
         sysvel_offset = 0

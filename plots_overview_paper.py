@@ -245,24 +245,24 @@ def image_mom1_2(hdu, galaxy, sysvel, moment=1, show_beam=True, show_scalebar=Tr
     if sun:
         if resolution == 9:
             try:
-                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_1/9arcsec/' + galaxy + '/' + galaxy +
+                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_2/9arcsec/' + galaxy + '/' + galaxy +
                                           '_7m+tp_co21_pbcorr_round_k_9_arcsec_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
             except:
-                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_1/9arcsec/' + galaxy + '/' + galaxy +
+                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_2/9arcsec/' + galaxy + '/' + galaxy +
                                           '_7m_co21_pbcorr_round_k_9_arcsec_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
         elif resolution == 15:
             try:
-                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_1/15arcsec/' + galaxy + '/' + galaxy +
+                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_2/15arcsec/' + galaxy + '/' + galaxy +
                                           '_7m+tp_co21_pbcorr_round_k_15_arcsec_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
             except:
-                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_1/15arcsec/' + galaxy + '/' + galaxy +
+                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_2/15arcsec/' + galaxy + '/' + galaxy +
                                           '_7m_co21_pbcorr_round_k_15_arcsec_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
         else:
             try:
-                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_1/native/' + galaxy + '/' + galaxy +
+                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_2/native/' + galaxy + '/' + galaxy +
                                           '_7m+tp_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
             except:
-                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_1/native/' + galaxy + '/' + galaxy +
+                vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_2/native/' + galaxy + '/' + galaxy +
                                           '_7m_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
 
     sysvel = (sysvel + 5) // 10 * 10
@@ -389,7 +389,7 @@ def contour_plot(image, contours, galaxy, number=3):
 
     # Show FoV
     try:
-        pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/v1_1/native/' + galaxy + '/' + galaxy + '_7m_co21_pb_rebin.fits')[0]
+        pb = fits.open('/home/nikki/Documents/Data/VERTICO/ReducedData/v1_2/native/' + galaxy + '/' + galaxy + '_7m_co21_pb_rebin.fits')[0]
 
         # If there is a Stokes axis, remove it.
         if len(pb.shape) == 4:
@@ -449,16 +449,16 @@ def contour_plot(image, contours, galaxy, number=3):
 set_rc_params()
 
 sun = True
-resolution = 15
+resolution = 0
 
 galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NGC4294', 'NGC4299', 'NGC4302',
             'NGC4330', 'NGC4351', 'NGC4380', 'NGC4383', 'NGC4388', 'NGC4394', 'NGC4405', 'NGC4419', 'NGC4522',
             'NGC4532', 'NGC4533', 'NGC4568', 'NGC4606', 'NGC4607', 'NGC4651', 'NGC4713', 'NGC4808', 'NGC4396',
             'NGC4567', 'NGC4772', 'NGC4580', 'NGC4450', 'NGC4254', 'NGC4293', 'NGC4298', 'NGC4321', 'NGC4402',
             'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689',
-            'NGC4698', 'NGC4694']
+            'NGC4698', 'NGC4694', 'NGC4501', 'NGC4561', 'NGC4691']
 
-galaxies = ['NGC4694']
+galaxies = ['NGC4501', 'NGC4561', 'NGC4691']
 
 for i in range(len(galaxies)):
 
@@ -469,11 +469,11 @@ for i in range(len(galaxies)):
         if resolution == 9:
             if galaxies[i] == 'NGC4321':
                 continue
-            path = '/home/nikki/Documents/Data/VERTICO/products_v1_1/9arcsec/' + galaxies[i] + '/'
+            path = '/home/nikki/Documents/Data/VERTICO/products_v1_2/9arcsec/' + galaxies[i] + '/'
         elif resolution == 15:
-            path = '/home/nikki/Documents/Data/VERTICO/products_v1_1/15arcsec/' + galaxies[i] + '/'
+            path = '/home/nikki/Documents/Data/VERTICO/products_v1_2/15arcsec/' + galaxies[i] + '/'
         else:
-            path = '/home/nikki/Documents/Data/VERTICO/products_v1_1/native/' + galaxies[i] + '/'
+            path = '/home/nikki/Documents/Data/VERTICO/products_v1_2/native/' + galaxies[i] + '/'
 
     if resolution == 9:
         try:
@@ -553,11 +553,11 @@ for i in range(len(galaxies)):
 
     if sun:
         if resolution == 9:
-            plt.savefig('/home/nikki/Documents/Data/VERTICO/Overview_plots/v1_1/9arcsec/' + galaxies[i] + '.pdf',
+            plt.savefig('/home/nikki/Documents/Data/VERTICO/Overview_plots/v1_2/9arcsec/' + galaxies[i] + '.pdf',
                     bbox_inches='tight')
         elif resolution == 15:
-            plt.savefig('/home/nikki/Documents/Data/VERTICO/Overview_plots/v1_1/15arcsec/' + galaxies[i] + '.pdf',
+            plt.savefig('/home/nikki/Documents/Data/VERTICO/Overview_plots/v1_2/15arcsec/' + galaxies[i] + '.pdf',
                     bbox_inches='tight')
         else:
-            plt.savefig('/home/nikki/Documents/Data/VERTICO/Overview_plots/v1_1/native/' + galaxies[i] + '.pdf',
+            plt.savefig('/home/nikki/Documents/Data/VERTICO/Overview_plots/v1_2/native/' + galaxies[i] + '.pdf',
                     bbox_inches='tight')
