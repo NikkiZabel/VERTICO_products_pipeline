@@ -52,9 +52,9 @@ def parameters(galaxy, sample=None):
         inclination = 47
         eccentricity = None
 
-    elif galaxy == 'NGC4698':
-        vrange = 250
-        vrange_2 = 20
+    elif galaxy == 'NGC4501':
+        #vrange = 250
+        #vrange_2 = 20
         cliplevel = 1.5
         stokes = False
         sysvel_offset = 0
@@ -65,6 +65,28 @@ def parameters(galaxy, sample=None):
         cliplevel_low = 2
         nchan_high = 1
         cliplevel_high = 2.5
+        prune_by_npix = None
+        prune_by_fracbeam = 1
+        expand_by_fracbeam = None
+        expand_by_npix = None
+        expand_by_nchan = 2
+        inclination = None
+        eccentricity = None
+        figsize = (7, 10)
+
+    elif galaxy == 'NGC4698':
+        vrange = 250
+        vrange_2 = 20
+        cliplevel = 1.5
+        stokes = False
+        sysvel_offset = 0
+        angle = 165
+        full_width = True
+        distance = 16.5
+        nchan_low = 2
+        cliplevel_low = 2
+        nchan_high = 3
+        cliplevel_high = 3.5
         prune_by_npix = None
         prune_by_fracbeam = 1
         expand_by_fracbeam = None

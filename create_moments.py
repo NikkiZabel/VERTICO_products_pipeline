@@ -645,21 +645,18 @@ class MomentMaps:
             clip_rms = self.uncertainty_maps(calc_rms=True)
             if self.sun:
                 if self.sample == 'viva' or self.sample == 'things':
-                    csv_header = 'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' Jy/b km/s \n \n '
-                    'Spectrum (Jy/b), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)'
+                    csv_header = 'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' Jy/b km/s \n \n Spectrum (Jy/b), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)'
                 else:
-                    csv_header = 'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n '
-                    'Spectrum (K), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)'
+                    csv_header = 'Clipping method = Sun+18; rms = ' + str(clip_rms) + ' K km/s \n \n Spectrum (K), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)'
+
                 np.savetxt(self.savepath + 'spectrum.csv',
                            np.column_stack((spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies)),
                            delimiter=',', header=csv_header)
             else:
                 if self.sample == 'viva' or self.sample == 'things':
-                    csv_header = 'Clipping method = Dame11; rms = ' + str(clip_rms) + ' Jy/b km/s \n \n '
-                    'Spectrum (Jy/b), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)'
+                    csv_header = 'Clipping method = Dame11; rms = ' + str(clip_rms) + ' Jy/b km/s \n \n Spectrum (Jy/b), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)'
                 else:
-                    csv_header = 'Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n '
-                    'Spectrum (K), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)'
+                    csv_header = 'Clipping method = Dame11; rms = ' + str(clip_rms) + ' K km/s \n \n Spectrum (K), Velocity (km/s), Velocity offset (km/s), Frequency (GHz)'
                 np.savetxt(self.savepath + 'spectrum.csv',
                            np.column_stack((spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies)),
                            delimiter=',', header=csv_header)
@@ -757,6 +754,9 @@ class MomentMaps:
             if hires:
                 b_in += 1
                 b_out += 1
+            elif count == 1:
+                b_in += beam_pix / 2
+                b_out += beam_pix / 2
             else:
                 b_in += beam_pix
                 b_out += beam_pix
@@ -786,7 +786,7 @@ class MomentMaps:
             radius.append(a_out)
 
         #if ((len(radius) < 5) & (e > 0.7)) or ((len(np.array(rad_prof_K)[np.log10(np.array(rad_prof_K)) < 0]) > 2) & (e > 0.7)):
-        if (e > 0.9):
+        if (e > 0.9848):  # Corresponding to an inclination of 80 degrees
 
             hi_inc = True
 
@@ -864,6 +864,9 @@ class MomentMaps:
         centre_sky = wcs.utils.pixel_to_skycoord(mom0_hdu_K.shape[0] / 2, mom0_hdu_K.shape[1] / 2, wcs=w)
 
         clip_rms = self.uncertainty_maps(calc_rms=True)
+
+        if check_aperture:
+            plt.savefig('/home/nikki/Documents/Data/VERTICO/apertures/' + self.galaxy.name + '.png')
 
         if hi_inc:
             if self.sun:

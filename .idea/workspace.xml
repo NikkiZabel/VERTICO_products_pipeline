@@ -19,15 +19,12 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Updated inclination and position angle">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Bug fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config_figs.py" beforeDir="false" afterPath="$PROJECT_DIR$/config_figs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/heracles.py" beforeDir="false" afterPath="$PROJECT_DIR$/heracles.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/image_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_moments.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/viva.py" beforeDir="false" afterPath="$PROJECT_DIR$/viva.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,13 +70,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00060" summary="Some small tweaks">
-      <created>1592840660212</created>
-      <option name="number" value="00060" />
-      <option name="presentableId" value="LOCAL-00060" />
-      <option name="project" value="LOCAL" />
-      <updated>1592840660212</updated>
     </task>
     <task id="LOCAL-00061" summary="Plots in offset, manually add in beam information">
       <created>1592909550404</created>
@@ -417,7 +407,14 @@
       <option name="project" value="LOCAL" />
       <updated>1620375436564</updated>
     </task>
-    <option name="localTasksCounter" value="109" />
+    <task id="LOCAL-00109" summary="Bug fix">
+      <created>1621523647558</created>
+      <option name="number" value="00109" />
+      <option name="presentableId" value="LOCAL-00109" />
+      <option name="project" value="LOCAL" />
+      <updated>1621523647558</updated>
+    </task>
+    <option name="localTasksCounter" value="110" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -433,7 +430,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Made some changes to make it work with the HERACLES data products, and made a script to import those data and put them through the pipeline. Distances still need to be implemented." />
     <MESSAGE value="Implement code to read heracles distances from csv file" />
     <MESSAGE value="Added a function to make all moment maps come out square" />
     <MESSAGE value="Changed the directory structures so that the &quot;smoothed_cubes_nearest&quot; files are included and processed." />
@@ -458,6 +454,7 @@
     <MESSAGE value="Made axis labels overview plots smaller." />
     <MESSAGE value="Small bug fix PB on overview plots" />
     <MESSAGE value="Updated inclination and position angle" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated inclination and position angle" />
+    <MESSAGE value="Bug fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Bug fix" />
   </component>
 </project>
