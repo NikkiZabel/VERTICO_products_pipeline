@@ -19,11 +19,13 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Changed main to include nyquist sampled cubes.">
+    <list default="true" id="edf05807-70e5-47e6-b6d1-2ca7c73d4b52" name="Default Changelist" comment="Changes in paths plots_overview_paper">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gal_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/gal_params.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/create_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/create_moments.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/heracles.py" beforeDir="false" afterPath="$PROJECT_DIR$/heracles.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots_overview_paper.py" beforeDir="false" afterPath="$PROJECT_DIR$/plots_overview_paper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/things.py" beforeDir="false" afterPath="$PROJECT_DIR$/things.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/viva.py" beforeDir="false" afterPath="$PROJECT_DIR$/viva.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,13 +71,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1577109655434</updated>
-    </task>
-    <task id="LOCAL-00062" summary="Small tweaks to the figures">
-      <created>1592986104294</created>
-      <option name="number" value="00062" />
-      <option name="presentableId" value="LOCAL-00062" />
-      <option name="project" value="LOCAL" />
-      <updated>1592986104294</updated>
     </task>
     <task id="LOCAL-00063" summary="Correction bug in mom0 when 3rd axis is given in frequency.">
       <created>1592988357280</created>
@@ -413,7 +408,14 @@
       <option name="project" value="LOCAL" />
       <updated>1622528744535</updated>
     </task>
-    <option name="localTasksCounter" value="111" />
+    <task id="LOCAL-00111" summary="Changes in paths plots_overview_paper">
+      <created>1622535121675</created>
+      <option name="number" value="00111" />
+      <option name="presentableId" value="LOCAL-00111" />
+      <option name="project" value="LOCAL" />
+      <updated>1622535121676</updated>
+    </task>
+    <option name="localTasksCounter" value="112" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -429,7 +431,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added a function to make all moment maps come out square" />
     <MESSAGE value="Changed the directory structures so that the &quot;smoothed_cubes_nearest&quot; files are included and processed." />
     <MESSAGE value="Fixed bug in &quot;make_square&quot; function" />
     <MESSAGE value="Added a script to push VIVA data through" />
@@ -454,6 +455,7 @@
     <MESSAGE value="Updated inclination and position angle" />
     <MESSAGE value="Bug fix" />
     <MESSAGE value="Changed main to include nyquist sampled cubes." />
-    <option name="LAST_COMMIT_MESSAGE" value="Changed main to include nyquist sampled cubes." />
+    <MESSAGE value="Changes in paths plots_overview_paper" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changes in paths plots_overview_paper" />
   </component>
 </project>

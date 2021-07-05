@@ -12,7 +12,7 @@ refresh = True
 overwrite = True
 sun = True
 tosave = True
-resolution = 'nearest_1200'
+resolution = 'native'
 
 if resolution == 'native':
     data = [f for f in glob(path + 'cubes_10kms/native/' + '*hans.fits')]
@@ -143,15 +143,15 @@ for file in data:
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
                                     alpha_co=5.4, table_path=None, check_aperture=False)
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #            sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
-    #                               alpha_co=5.4, table_path=None, check_aperture=False)
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #            sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='kpc',
-    #                               alpha_co=5.4, table_path=None, check_aperture=False)
-    #CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-    #            sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='arcsec',
-    #                               alpha_co=5.4, table_path=None, check_aperture=False)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
+                                   alpha_co=5.4, table_path=None, check_aperture=False)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='kpc',
+                                   alpha_co=5.4, table_path=None, check_aperture=False)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='arcsec',
+                                   alpha_co=5.4, table_path=None, check_aperture=False)
     #except:
     #    pass
 
