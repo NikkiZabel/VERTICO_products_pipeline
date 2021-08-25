@@ -1,4 +1,4 @@
-import matplotlib; matplotlib.use('Agg')
+import matplotlib; #matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import aplpy as apl
 from astropy import wcs
@@ -420,7 +420,7 @@ class CreateImages:
         y1, y2 = ax.get_ylim()
         #plt.gca().tick_params(pad=8)
         ax.errorbar(0.8 * x2, 0.7 * y2, xerr=clipped_cube.header['BMAJ'] * 3600 / 2., yerr=vres / 2., ecolor='k', capsize=2.5)
-        ax.annotate('PA = ' + str(self.galaxy.angle) + '$^o$', xy=(-0.8 * x2, -0.7 * y2), fontsize=25)
+        ax.annotate('PA = ' + str(self.galaxy.angle - 180) + '$^o$', xy=(-0.8 * x2, -0.7 * y2), fontsize=25)
 
         plt.tight_layout()
 

@@ -5,8 +5,10 @@ import os
 from glob import glob
 
 sample = 'things'
-version = '1_0'
-path = '/home/nikki/Documents/Data/VERTICO/THINGS/'
+version = '1_1'
+path = '/home/nikki/Documents/Data/VERTICO/THINGS/cubes/'
+
+resolution = '1200pc'
 
 refresh = True
 overwrite = True
@@ -14,12 +16,12 @@ sun = True
 tosave = True
 redo_clip = False
 
-data = [f for f in glob(path + '*.fits')]
+data = [f for f in glob(path + resolution + '/*.fits')]
 
 for file in data:
 
     # Split off the galaxy's name
-    galaxy = file.split('/')[7].split('_')[0]
+    galaxy = file.split('/')[9].split('_')[0]
 
     print(galaxy)
 
@@ -27,14 +29,13 @@ for file in data:
     file_pbcorr = file
     file_uncorr = file
 
-    if not os.path.exists(path + 'products_v' + version + '/' + galaxy + '/'):
-        os.mkdir(path + 'products_v' + version + '/' + galaxy + '/')
-    #else:
-    #    continue
-    savepath = path + 'products_v' + version + '/' + galaxy + '/' + galaxy + '_'
+    if not os.path.exists(path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/'):
+        os.mkdir(path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/')
+    else:
+        continue
+    savepath = path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/' + galaxy + '_'
 
     # Moment maps
-    '''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -65,7 +66,7 @@ for file in data:
                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).spectrum(x_axis='velocity')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).spectrum(x_axis='frequency')
-    '''
+
     # Radial profiles
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',

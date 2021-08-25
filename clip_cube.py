@@ -1,3 +1,4 @@
+import aplpy as apl
 from astropy.io import fits
 import numpy as np
 from scipy import ndimage
@@ -8,6 +9,55 @@ from astropy.coordinates import SkyCoord
 from astropy import units as u
 from astroquery.ned import Ned
 from matplotlib import pyplot as plt
+
+
+def new_header(header):
+    """
+    Remove the velocity axis from a HDU header, so it corresponds to the 2D version of the corresponding data cube.
+    :param header (HDU header): header of the original data cube
+    :return: input header, but with velocity axis related keywords removed.
+    """
+
+    header = header.copy()
+
+    try:
+        header.pop('PC3_1')
+        header.pop('PC3_2')
+        header.pop('PC1_3')
+        header.pop('PC2_3')
+        header.pop('PC3_3')
+    except:
+        try:
+            header.pop('PC03_01')
+            header.pop('PC03_03')
+            header.pop('PC03_02')
+            header.pop('PC01_03')
+            header.pop('PC02_03')
+        except:
+            pass
+
+    header.pop('CTYPE3')
+    header.pop('CRVAL3')
+    header.pop('CDELT3')
+    header.pop('CRPIX3')
+    try:
+        header.pop('CUNIT3')
+    except:
+        pass
+    header.pop('NAXIS3')
+    try:
+        header.pop('OBSGEO-Z')
+    except:
+        pass
+
+    header['NAXIS'] = 2
+    try:
+        if header['WCSAXES'] == 3:
+            header['WCSAXES'] = 2
+    except:
+        pass
+
+    return header
 
 
 class ClipCube:
@@ -300,13 +350,14 @@ class ClipCube:
         new_header = cube.header.copy()
 
         if img.shape[0] > img.shape[1]:
+            print(shape_diff)
             square_cube[:, :, int(shape_diff / 2):int(shape_diff / 2 + img.shape[1])] = cube.data
             square_noisecube[:, :, int(shape_diff / 2):int(shape_diff / 2 + img.shape[1])] = noisecube.data
-            new_header['CRPIX1'] = cube.header['CRPIX1'] + shape_diff / 2
+            new_header['CRPIX1'] = cube.header['CRPIX1'] + int(shape_diff / 2)
         else:
             square_cube[:, int(shape_diff / 2):int(shape_diff / 2 + img.shape[0]), :] = cube.data
             square_noisecube[:, int(shape_diff / 2):int(shape_diff / 2 + img.shape[0]), :] = noisecube.data
-            new_header['CRPIX2'] = cube.header['CRPIX2'] + shape_diff / 2
+            new_header['CRPIX2'] = cube.header['CRPIX2'] + int(shape_diff / 2)
 
         new_header['NAXIS1'] = cube.shape[2]
         new_header['NAXIS2'] = cube.shape[1]
@@ -327,10 +378,32 @@ class ClipCube:
         return square_cube_hdu, noisecube_hdu
 
     def preprocess(self, cube, noisecube=None):
+
+        cubecube = cube.copy()
+        cubecube.data = np.sum(cube.data, axis=0)
+        cubecube.header = new_header(cube.header)
+
+        f = plt.figure()
+        cube_temp = cube.copy()
+        cube_temp.data = np.sum(cube.data, axis=0)
+        cube_temp.header = new_header(cube.header)
+        fig = apl.FITSFigure(cubecube, figure=f)
+        fig.show_grayscale()
+        fig.show_contour(cubecube)
+
         cube, noisecube = self.cut_empty_rows(cube, noisecube)
         cube, noisecube = self.cut_empty_columns(cube, noisecube)
         cube, noisecube = self.centre_data(cube, noisecube)
         cube, noisecube = self.make_square(cube, noisecube)
+
+        f = plt.figure()
+        cube_temp = cube.copy()
+        cube_temp.data = np.sum(cube.data, axis=0)
+        cube_temp.header = new_header(cube.header)
+        fig = apl.FITSFigure(cube_temp, figure=f)
+        fig.show_grayscale()
+        fig.show_contour(cubecube)
+
         return cube, noisecube
 
     def split_cube(self, cube):
@@ -700,6 +773,9 @@ class ClipCube:
 
         emiscube_pbcorr[mask == 0] = 0
         clipped_hdu = fits.PrimaryHDU(emiscube_pbcorr, cube_pbcorr.header)
+
+        # Adjust the header to match the velocity range used
+        clipped_hdu.header['CRVAL3'] += start * clipped_hdu.header['CDELT3']
 
         if self.tosave:
             clipped_hdu.writeto(self.savepath + 'cube_clipped.fits', overwrite=True)

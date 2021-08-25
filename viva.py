@@ -6,7 +6,7 @@ from glob import glob
 
 sample = 'viva'
 version = '1_1'
-path = '/home/nikki/Documents/Data/VERTICO/VIVA/Reprojected_15_arcsec_newer/'
+path = '/home/nikki/Documents/Data/VERTICO/VIVA/Reprojected_15_arcsec_newerer/'
 table_path = '/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits'
 
 refresh = True
@@ -32,6 +32,8 @@ for file in data:
             galaxy = galnames[i]
 
         print(galaxy)
+        if not galaxy == 'NGC4321':
+            continue
 
         if galaxy == 'NGC4293':
             continue
@@ -50,13 +52,14 @@ for file in data:
         #    continue
         savepath = path + 'products_v' + version + '/' + galaxy + '/' + galaxy + '_reprojected_15_arcsec_'
 
-        #if os.path.exists(savepath + galaxy):
+        #if os.path.exists(savepath + 'mom0_Jyb-1.fits'):
         #    continue
 
-        '''
+        #'''
         # Moment maps
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
+        '''
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -79,7 +82,7 @@ for file in data:
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).spectrum(x_axis='velocity')
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).spectrum(x_axis='frequency')
-        '''
+
         # PVDs
         if not galaxy == 'NGC4579':
             CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -87,7 +90,7 @@ for file in data:
         if not galaxy == 'NGC4450' or galaxy == 'NGC4536':
             CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                          sun=sun, tosave=tosave, sample=sample).PVD(axis='minor', check_slit=False)
-        '''
+
         # Radial profiles
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
@@ -102,4 +105,4 @@ for file in data:
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
                                                                            alpha_co=6.25, table_path=table_path,
                                                                            check_aperture=False)
-        #'''
+        '''
