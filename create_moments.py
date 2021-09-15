@@ -328,8 +328,8 @@ class MomentMaps:
         if self.redo_clip:
             cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
                             tosave=self.tosave, sample=self.sample).do_clip()
-        elif os.path.exists(self.savepath + 'cube_clipped_trimmed.fits'):
-            cube = fits.open(self.savepath + 'cube_clipped_trimmed.fits')[0]
+        elif os.path.exists(self.savepath + 'subcube_slab.fits'):
+            cube = fits.open(self.savepath + 'subcube_slab.fits')[0]
         else:
             cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip()
@@ -411,10 +411,10 @@ class MomentMaps:
 
         if self.tosave:
             if units == 'M_Sun/pc^2':
-                mom0_hdu.writeto(self.savepath + 'mom0_Msun.fits', overwrite=True)
+                mom0_hdu.writeto(self.savepath + 'mom0_Msolpc-2.fits', overwrite=True)
             if units == 'K km/s':
                 if self.sample == 'viva' or self.sample == 'things':
-                    mom0_hdu.writeto(self.savepath + 'mom0_Jyb-1.fits', overwrite=True)
+                    mom0_hdu.writeto(self.savepath + 'mom0_Jyb-1kms-1.fits', overwrite=True)
                 else:
                     mom0_hdu.writeto(self.savepath + 'mom0_Kkms-1.fits', overwrite=True)
             mom1_hdu.writeto(self.savepath + 'mom1.fits', overwrite=True)
@@ -581,9 +581,9 @@ class MomentMaps:
 
         if self.tosave:
             if axis == 'major':
-                pvd_hdu.writeto(self.savepath + 'PVD_major.fits', overwrite=True)
+                pvd_hdu.writeto(self.savepath + 'pvd_major.fits', overwrite=True)
             if axis == 'minor':
-                pvd_hdu.writeto(self.savepath + 'PVD_minor.fits', overwrite=True)
+                pvd_hdu.writeto(self.savepath + 'pvd_minor.fits', overwrite=True)
 
         return pvd_hdu
 
@@ -598,7 +598,7 @@ class MomentMaps:
                         tosave=self.tosave, sample=self.sample).readfits()
 
         if useclipped:
-            cutout = fits.open(self.savepath + 'unclipped_trimmed.fits')[0]
+            cutout = fits.open(self.savepath + 'unclipped_subcube.fits')[0]
 
         clipped_cube, _, _, _, sysvel = self.calc_moms()
 
@@ -966,7 +966,7 @@ class MomentMaps:
                                         savepath=self.savepath, tosave=self.tosave, sample=self.sample).\
                 do_clip(clip_also=mask, clip_also_nat='mask')
         elif os.path.exists(self.savepath + 'mask_clipped_trimmed.fits'):
-            mask_trimmed = fits.open(self.savepath + 'mask_clipped_trimmed.fits')[0]
+            mask_trimmed = fits.open(self.savepath + 'mask_subcube_slab.fits')[0]
         else:
             _, mask_trimmed = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                        savepath=self.savepath, tosave=self.tosave, sample=self.sample). \
@@ -1002,7 +1002,7 @@ class MomentMaps:
                                             savepath=self.savepath, tosave=self.tosave, sample=self.sample).\
                     do_clip(clip_also=pb_hdu, clip_also_nat='pb')
             elif os.path.exists(self.savepath + 'pb_clipped_trimmed.fits'):
-                pb_cube = fits.open(self.savepath + 'pb_clipped_trimmed.fits')[0]
+                pb_cube = fits.open(self.savepath + 'pb_subcube_slab.fits')[0]
             else:
                 _, pb_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                         savepath=self.savepath, tosave=self.tosave, sample=self.sample).\
@@ -1050,8 +1050,8 @@ class MomentMaps:
         if self.redo_clip:
             cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
                             tosave=self.tosave, sample=self.sample).do_clip()
-        elif os.path.exists(self.savepath + 'cube_clipped_trimmed.fits'):
-            cube = fits.open(self.savepath + 'cube_clipped_trimmed.fits')[0]
+        elif os.path.exists(self.savepath + 'subcube_slab.fits'):
+            cube = fits.open(self.savepath + 'subcube_slab.fits')[0]
         else:
             cube, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
                             tosave=self.tosave, sample=self.sample).do_clip()
@@ -1064,6 +1064,6 @@ class MomentMaps:
         self.add_clipping_keywords(peak_temp_hdu.header)
 
         if self.tosave:
-            peak_temp_hdu.writeto(self.savepath + 'peak_temp.fits', overwrite=True)
+            peak_temp_hdu.writeto(self.savepath + 'peakT.fits', overwrite=True)
 
         return peak_temp_hdu

@@ -32,8 +32,6 @@ for file in data:
             galaxy = galnames[i]
 
         print(galaxy)
-        if not galaxy == 'NGC4321':
-            continue
 
         if galaxy == 'NGC4293':
             continue

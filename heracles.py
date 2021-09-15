@@ -12,7 +12,7 @@ refresh = True
 overwrite = True
 sun = True
 tosave = True
-resolution = '1200pc'
+resolution = 'native'
 
 data = [f for f in glob(path + 'cubes_10kms/' + resolution + '/*.fits')]
 
@@ -32,7 +32,10 @@ for file in data:
         os.mkdir(path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/')
     else:
         continue
-    savepath = path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/' + galaxy + '_'
+    if resolution == 'native':
+        savepath = path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/' + galaxy + '_heracles_co21_round_'
+    else:
+        savepath = path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/' + galaxy + '_heracles_co21_' + resolution + '_np_round_'
 
     #if os.path.exists(savepath + 'mom0_Kkms-1.pdf'):
     #    continue

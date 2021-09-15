@@ -1,4 +1,4 @@
-import matplotlib; #matplotlib.use('Agg')
+import matplotlib; matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import aplpy as apl
 from astropy import wcs
@@ -57,7 +57,7 @@ class CreateImages:
                                                     tosave=False, sample=self.sample, redo_clip=self.redo_clip).\
                         peak_temperature()
             else:
-                image = fits.open(path + 'peak_temp.fits')[0]
+                image = fits.open(path + 'peakT.fits')[0]
 
         elif self.refresh:
             if units == 'M_Sun/pc^2':
@@ -81,7 +81,7 @@ class CreateImages:
             else:
                 raise AttributeError('Please choose between "K km/s" and "M_Sun/pc^2"')
         elif units == 'M_Sun/pc^2':
-            image = fits.open(self.savepath + '_mom0_Msun.fits')[0]
+            image = fits.open(self.savepath + '_mom0_Msolpc-2.fits')[0]
         else:
             image = fits.open(self.savepath + '_mom0_Kkms-1.fits')[0]
 
@@ -167,14 +167,14 @@ class CreateImages:
 
         if self.tosave:
             if peak:
-                plt.savefig(self.savepath + 'peak_temp.pdf', bbox_inches='tight')
+                plt.savefig(self.savepath + 'peakT.pdf', bbox_inches='tight')
             elif units == 'K km/s':
                 if self.sample == 'viva' or self.sample == 'things' or self.sample == None:
                     plt.savefig(self.savepath + 'mom0_Jyb-1kms-1.pdf', bbox_inches='tight')
                 else:
                     plt.savefig(self.savepath + 'mom0_Kkms-1.pdf', bbox_inches='tight')
             elif units == 'M_Sun/pc^2':
-                plt.savefig(self.savepath + 'mom0_Msun.pdf', bbox_inches='tight')
+                plt.savefig(self.savepath + 'mom0_Msolpc-2.pdf', bbox_inches='tight')
         return
 
     def moment_1_2(self, moment=1):
@@ -321,7 +321,7 @@ class CreateImages:
                                 sample=self.sample, redo_clip=self.redo_clip).\
                     PVD(axis=axis, find_angle=find_angle, check_slit=check_slit)
         else:
-            PV = fits.open(self.path + 'PVD.fits')[0]
+            PV = fits.open(self.path + 'pvd.fits')[0]
 
         clipped_cube, _, _, _, sysvel = MomentMaps(self.galaxy.name, self.path_pbcorr, self.path_uncorr,
                                                sun=self.sun, tosave=False, savepath=self.savepath, sample=self.sample,
@@ -426,9 +426,9 @@ class CreateImages:
 
         if self.tosave:
             if axis == 'major':
-                plt.savefig(self.savepath + 'PVD_major.pdf', bbox_inches='tight')
+                plt.savefig(self.savepath + 'pvd_major.pdf', bbox_inches='tight')
             if axis == 'minor':
-                plt.savefig(self.savepath + 'PVD_minor.pdf', bbox_inches='tight')
+                plt.savefig(self.savepath + 'pvd_minor.pdf', bbox_inches='tight')
 
     def spectrum(self, x_axis='velocity', useclipped=False):
 
@@ -568,7 +568,7 @@ class CreateImages:
                     else:
                         plt.savefig(self.savepath + 'rad_prof_kpc_Kkms-1.pdf', bbox_inches='tight')
                 else:
-                    plt.savefig(self.savepath + 'radi_prof_kpc_Msun_pc-2.pdf', bbox_inches='tight')
+                    plt.savefig(self.savepath + 'radi_prof_kpc_Msolpc-2.pdf', bbox_inches='tight')
             if x_units == 'arcsec':
                 if y_units == 'K km/s':
                     if self.sample == 'viva' or self.sample == 'things' or self.sample == None:
@@ -576,7 +576,7 @@ class CreateImages:
                     else:
                         plt.savefig(self.savepath + 'rad_prof_arcsec_Kkms-1.pdf', bbox_inches='tight')
                 else:
-                    plt.savefig(self.savepath + 'rad_prof_arcsec_Msun_pc-2.pdf', bbox_inches='tight')
+                    plt.savefig(self.savepath + 'rad_prof_arcsec_Msolpc-2.pdf', bbox_inches='tight')
 
     def mom0_noise_maps(self, path=''):
 

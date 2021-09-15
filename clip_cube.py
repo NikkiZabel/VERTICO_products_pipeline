@@ -11,55 +11,6 @@ from astroquery.ned import Ned
 from matplotlib import pyplot as plt
 
 
-def new_header(header):
-    """
-    Remove the velocity axis from a HDU header, so it corresponds to the 2D version of the corresponding data cube.
-    :param header (HDU header): header of the original data cube
-    :return: input header, but with velocity axis related keywords removed.
-    """
-
-    header = header.copy()
-
-    try:
-        header.pop('PC3_1')
-        header.pop('PC3_2')
-        header.pop('PC1_3')
-        header.pop('PC2_3')
-        header.pop('PC3_3')
-    except:
-        try:
-            header.pop('PC03_01')
-            header.pop('PC03_03')
-            header.pop('PC03_02')
-            header.pop('PC01_03')
-            header.pop('PC02_03')
-        except:
-            pass
-
-    header.pop('CTYPE3')
-    header.pop('CRVAL3')
-    header.pop('CDELT3')
-    header.pop('CRPIX3')
-    try:
-        header.pop('CUNIT3')
-    except:
-        pass
-    header.pop('NAXIS3')
-    try:
-        header.pop('OBSGEO-Z')
-    except:
-        pass
-
-    header['NAXIS'] = 2
-    try:
-        if header['WCSAXES'] == 3:
-            header['WCSAXES'] = 2
-    except:
-        pass
-
-    return header
-
-
 class ClipCube:
 
     def __init__(self, galname, path_pbcorr, path_uncorr, savepath=None, sun=True, tosave=True, sample=None):
@@ -350,7 +301,6 @@ class ClipCube:
         new_header = cube.header.copy()
 
         if img.shape[0] > img.shape[1]:
-            print(shape_diff)
             square_cube[:, :, int(shape_diff / 2):int(shape_diff / 2 + img.shape[1])] = cube.data
             square_noisecube[:, :, int(shape_diff / 2):int(shape_diff / 2 + img.shape[1])] = noisecube.data
             new_header['CRPIX1'] = cube.header['CRPIX1'] + int(shape_diff / 2)
@@ -378,32 +328,10 @@ class ClipCube:
         return square_cube_hdu, noisecube_hdu
 
     def preprocess(self, cube, noisecube=None):
-
-        cubecube = cube.copy()
-        cubecube.data = np.sum(cube.data, axis=0)
-        cubecube.header = new_header(cube.header)
-
-        f = plt.figure()
-        cube_temp = cube.copy()
-        cube_temp.data = np.sum(cube.data, axis=0)
-        cube_temp.header = new_header(cube.header)
-        fig = apl.FITSFigure(cubecube, figure=f)
-        fig.show_grayscale()
-        fig.show_contour(cubecube)
-
         cube, noisecube = self.cut_empty_rows(cube, noisecube)
         cube, noisecube = self.cut_empty_columns(cube, noisecube)
         cube, noisecube = self.centre_data(cube, noisecube)
         cube, noisecube = self.make_square(cube, noisecube)
-
-        f = plt.figure()
-        cube_temp = cube.copy()
-        cube_temp.data = np.sum(cube.data, axis=0)
-        cube_temp.header = new_header(cube.header)
-        fig = apl.FITSFigure(cube_temp, figure=f)
-        fig.show_grayscale()
-        fig.show_contour(cubecube)
-
         return cube, noisecube
 
     def split_cube(self, cube):
@@ -778,22 +706,22 @@ class ClipCube:
         clipped_hdu.header['CRVAL3'] += start * clipped_hdu.header['CDELT3']
 
         if self.tosave:
-            clipped_hdu.writeto(self.savepath + 'cube_clipped.fits', overwrite=True)
+            clipped_hdu.writeto(self.savepath + 'subcube.fits', overwrite=True)
 
         # Do some pre-processing to make the creation of the moments easier
         clipped_hdu_temp, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=clip_also)
         temp1, unclipped_trimmed_hdu = self.cut_empty_columns(mask_hdu, noisecube=cube_pbcorr)
         temp2, unclipped_trimmed_hdu = self.cut_empty_rows(temp1, noisecube=unclipped_trimmed_hdu)
-        unclipped_trimmed_hdu.writeto(self.savepath + 'unclipped_trimmed.fits', overwrite=True)
+        unclipped_trimmed_hdu.writeto(self.savepath + 'unclipped_subcube.fits', overwrite=True)
         clipped_hdu = clipped_hdu_temp
 
         if self.tosave:
-            clipped_hdu.writeto(self.savepath + 'cube_clipped_trimmed.fits', overwrite=True)
+            clipped_hdu.writeto(self.savepath + 'subcube_slab.fits', overwrite=True)
             if clip_also_nat == 'noise':
-                noisecube_hdu.writeto(self.savepath + 'noisecube_clipped_trimmed.fits', overwrite=True)
+                noisecube_hdu.writeto(self.savepath + 'noise_subcube_slab.fits', overwrite=True)
             elif clip_also_nat == 'mask':
-                noisecube_hdu.writeto(self.savepath + 'mask_clipped_trimmed.fits', overwrite=True)
+                noisecube_hdu.writeto(self.savepath + 'mask_subcube_slab.fits', overwrite=True)
             elif clip_also_nat == 'pb':
-                noisecube_hdu.writeto(self.savepath + 'pb_clipped_trimmed.fits', overwrite=True)
+                noisecube_hdu.writeto(self.savepath + 'pb_subcube_slab.fits', overwrite=True)
 
         return clipped_hdu, noisecube_hdu
