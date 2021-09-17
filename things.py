@@ -14,7 +14,7 @@ refresh = True
 overwrite = True
 sun = True
 tosave = True
-redo_clip = False
+redo_clip = True
 
 data = [f for f in glob(path + resolution + '/*.fits')]
 
@@ -33,11 +33,13 @@ for file in data:
         os.mkdir(path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/')
     else:
         continue
-    savepath = path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/' + galaxy + '_'
+    savepath = path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/' + galaxy + '_things_hi_' + \
+               resolution + '_np_round_reproj_'
 
     # Moment maps
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
+    redo_clip = False
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero()
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,

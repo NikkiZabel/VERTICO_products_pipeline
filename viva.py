@@ -6,14 +6,14 @@ from glob import glob
 
 sample = 'viva'
 version = '1_1'
-path = '/home/nikki/Documents/Data/VERTICO/VIVA/Reprojected_15_arcsec_newerer/'
+path = '/home/nikki/Documents/Data/VERTICO/VIVA/Reprojected_15_arcsec_latest/'
 table_path = '/home/nikki/Documents/Data/VERTICO/VERTICO_master.fits'
 
 refresh = True
 overwrite = True
 sun = True
 tosave = True
-redo_clip = False
+redo_clip = True
 
 data = [f for f in glob(path + '*.fits')]
 
@@ -27,18 +27,20 @@ for file in data:
 
         # Add 'ngc' in front of the second galaxy name, as it is only listed as a number
         if i > 0:
+            if galnames[i] == 'viva':
+                break
             galaxy = 'NGC' + galnames[i]
         else:
             galaxy = galnames[i]
 
         print(galaxy)
 
-        if galaxy == 'NGC4293':
-            continue
+        #if galaxy == 'NGC4293':
+        #    continue
         #if galaxy == 'NGC4533':
         #    continue
-        if galaxy == 'NGC4606':
-            continue
+        #if galaxy == 'NGC4606':
+        #    continue
 
         # There is only one cube, so pb un/corrected files are the same
         file_pbcorr = file
@@ -46,9 +48,9 @@ for file in data:
 
         if not os.path.exists(path + 'products_v' + version + '/' + galaxy + '/'):
             os.mkdir(path + 'products_v' + version + '/' + galaxy + '/')
-        #else:
-        #    continue
-        savepath = path + 'products_v' + version + '/' + galaxy + '/' + galaxy + '_reprojected_15_arcsec_'
+        else:
+            continue
+        savepath = path + 'products_v' + version + '/' + galaxy + '/' + galaxy + 'viva_hi_15as_np_round_reproj_'
 
         #if os.path.exists(savepath + 'mom0_Jyb-1.fits'):
         #    continue
@@ -57,7 +59,7 @@ for file in data:
         # Moment maps
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
-        '''
+        redo_clip = False
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -103,4 +105,3 @@ for file in data:
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
                                                                            alpha_co=6.25, table_path=table_path,
                                                                            check_aperture=False)
-        '''

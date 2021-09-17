@@ -1175,7 +1175,7 @@ def parameters(galaxy, sample=None):
     figsize = (10, 8.5)
 
     if sample == 'things':
-        stokes = True
+        stokes = False
 
     # Overwrite PA and inclination with new ones calculated by Toby
     if sample == 'vertico' or sample == 'viva':

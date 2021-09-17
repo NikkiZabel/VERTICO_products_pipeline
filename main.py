@@ -11,7 +11,7 @@ overwrite = True
 sun = True
 tosave = True
 pbcor = True
-resolution = 'nyquist15'
+resolution = 'native'
 version = '1_2'
 sample = 'vertico'
 
@@ -40,6 +40,9 @@ for i in range(len(galaxies)):
     redo_clip = True
 
     galaxy = galaxies[i]
+
+    if galaxy == 'NGC4321':
+        continue
 
     print(galaxy)
 
