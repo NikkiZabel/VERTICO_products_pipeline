@@ -14,7 +14,14 @@ sun = True
 tosave = True
 resolution = 'native'
 
-data = [f for f in glob(path + 'cubes_10kms/' + resolution + '/*.fits')]
+if resolution == '1200_nyquist':
+    data = [f for f in glob(path + 'cubes_10kms/1200pc/*_np_round_k.fits')]
+elif resolution == '720_nyquist':
+    data = [f for f in glob(path + 'cubes_10kms/720pc/*_np_round_k.fits')]
+elif resolution == 'native':
+    data = [f for f in glob(path + 'cubes_10kms/' + resolution + '/*hans.fits')]
+else:
+    data = [f for f in glob(path + 'cubes_10kms/' + resolution + '/*' + resolution + '_round_k.fits')]
 
 for file in data:
 
@@ -22,24 +29,35 @@ for file in data:
     galaxy = long_str.split('_')[0]
     print(galaxy)
 
-    if (galaxy == 'NGC2903') or (galaxy == 'NGC5474') or (galaxy == 'NGC4236'):
+    if (galaxy == 'NGC5474') or (galaxy == 'NGC4236'):
+        continue
+
+    if not galaxy == 'NGC2903':
         continue
 
     file_pbcorr = file
     file_uncorr = file
 
-    if not os.path.exists(path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/'):
-        os.mkdir(path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/')
-    else:
-        continue
     if resolution == 'native':
+        if not os.path.exists(path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/'):
+            os.mkdir(path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/')
         savepath = path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/' + galaxy + '_heracles_co21_round_'
+    elif resolution == '1200_nyquist':
+        if not os.path.exists(path + 'products_v' + version + '/1200pc/' + galaxy + '/'):
+            os.mkdir(path + 'products_v' + version + '/1200pc/' + galaxy + '/')
+        savepath = path + 'products_v' + version + '/1200pc/' + galaxy + '/' + galaxy + '_heracles_co21_1200pc_np_round_'
+    elif resolution == '720_nyquist':
+        if not os.path.exists(path + 'products_v' + version + '/720pc/' + galaxy + '/'):
+            os.mkdir(path + 'products_v' + version + '/720pc/' + galaxy + '/')
+        savepath = path + 'products_v' + version + '/720pc/' + galaxy + '/' + galaxy + '_heracles_co21_720pc_np_round_'
     else:
-        savepath = path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/' + galaxy + '_heracles_co21_' + resolution + '_np_round_'
+        if not os.path.exists(path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/'):
+            os.mkdir(path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/')
+        savepath = path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/' + galaxy + '_heracles_co21_' + resolution + '_round_'
 
     #if os.path.exists(savepath + 'mom0_Kkms-1.pdf'):
     #    continue
-
+    '''
     # Moment maps
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, sample=sample).moment_zero(units='K km/s')
@@ -75,7 +93,7 @@ for file in data:
                  sun=sun, tosave=tosave, sample=sample).spectrum(x_axis='velocity')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, sample=sample).spectrum(x_axis='frequency')
-
+    '''
     # Radial profiles
     #try:
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,

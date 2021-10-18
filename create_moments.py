@@ -786,9 +786,11 @@ class MomentMaps:
             radius.append(np.average((a_in, a_out)))
 
         #if ((len(radius) < 5) & (e > 0.7)) or ((len(np.array(rad_prof_K)[np.log10(np.array(rad_prof_K)) < 0]) > 2) & (e > 0.7)):
-        if (e > 0.9848):  # Corresponding to an inclination of 80 degrees
+        if (e > 0.984807753012208):  # Corresponding to an inclination of 80 degrees
 
             hi_inc = True
+
+            print('HI_INC')
 
             rad_prof_K = []
             rad_prof_Msun = []
@@ -838,13 +840,13 @@ class MomentMaps:
 
                 rad_prof_K.append(emission_K)
                 rad_prof_Msun.append(emission_Msun)
-                radius.append(inner + 1 - 0.5 * beam_pix)
-
                 area.append(len(slice1_K[slice1_K > 0]) + len(slice2_K[slice2_K > 0]))
 
                 if hires:
+                    radius.append(inner + 0.5)
                     inner += 1
                 else:
+                    radius.append(inner + 0.5 * beam_pix)
                     inner += beam_pix
 
         rad_prof_K = rad_prof_K[:-1]

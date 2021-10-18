@@ -13,7 +13,7 @@ refresh = True
 overwrite = True
 sun = True
 tosave = True
-redo_clip = True
+redo_clip = False
 
 data = [f for f in glob(path + '*.fits')]
 
@@ -48,14 +48,14 @@ for file in data:
 
         if not os.path.exists(path + 'products_v' + version + '/' + galaxy + '/'):
             os.mkdir(path + 'products_v' + version + '/' + galaxy + '/')
-        else:
-            continue
-        savepath = path + 'products_v' + version + '/' + galaxy + '/' + galaxy + 'viva_hi_15as_np_round_reproj_'
+        #else:
+        #    continue
+        savepath = path + 'products_v' + version + '/' + galaxy + '/' + galaxy + '_viva_hi_15as_np_round_reproj_'
 
         #if os.path.exists(savepath + 'mom0_Jyb-1.fits'):
         #    continue
 
-        #'''
+        '''
         # Moment maps
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
@@ -90,18 +90,21 @@ for file in data:
         if not galaxy == 'NGC4450' or galaxy == 'NGC4536':
             CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                          sun=sun, tosave=tosave, sample=sample).PVD(axis='minor', check_slit=False)
-
+        '''
         # Radial profiles
-        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                    sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
-                                        alpha_co=6.25, table_path=table_path, check_aperture=False)
-        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                    sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
-                                       alpha_co=6.25, table_path=table_path, check_aperture=False)
-        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                    sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='kpc',
-                                       alpha_co=6.25, table_path=table_path, check_aperture=False)
-        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
-                                                                           alpha_co=6.25, table_path=table_path,
-                                                                           check_aperture=False)
+        try:
+            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                        sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
+                                            alpha_co=6.25, table_path=table_path, check_aperture=False)
+            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                        sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
+                                           alpha_co=6.25, table_path=table_path, check_aperture=False)
+            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                        sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='kpc',
+                                           alpha_co=6.25, table_path=table_path, check_aperture=False)
+            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                         sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
+                                                                               alpha_co=6.25, table_path=table_path,
+                                                                               check_aperture=False)
+        except:
+            continue

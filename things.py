@@ -8,13 +8,13 @@ sample = 'things'
 version = '1_1'
 path = '/home/nikki/Documents/Data/VERTICO/THINGS/cubes/'
 
-resolution = '1200pc'
+resolution = '720pc'
 
 refresh = True
 overwrite = True
 sun = True
 tosave = True
-redo_clip = True
+redo_clip = False
 
 data = [f for f in glob(path + resolution + '/*.fits')]
 
@@ -31,11 +31,11 @@ for file in data:
 
     if not os.path.exists(path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/'):
         os.mkdir(path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/')
-    else:
-        continue
+    #else:
+    #    continue
     savepath = path + 'products_v' + version + '/' + resolution + '/' + galaxy + '/' + galaxy + '_things_hi_' + \
                resolution + '_np_round_reproj_'
-
+    '''
     # Moment maps
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
@@ -68,7 +68,7 @@ for file in data:
                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).spectrum(x_axis='velocity')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).spectrum(x_axis='frequency')
-
+    '''
     # Radial profiles
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
