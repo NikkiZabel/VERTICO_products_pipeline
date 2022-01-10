@@ -13,7 +13,7 @@ refresh = True
 overwrite = True
 sun = True
 tosave = True
-redo_clip = False
+redo_clip = True
 
 data = [f for f in glob(path + '*.fits')]
 
@@ -35,8 +35,8 @@ for file in data:
 
         print(galaxy)
 
-        #if galaxy == 'NGC4293':
-        #    continue
+        if galaxy == 'NGC4293':
+            continue
         #if galaxy == 'NGC4533':
         #    continue
         #if galaxy == 'NGC4606':
@@ -55,11 +55,13 @@ for file in data:
         #if os.path.exists(savepath + 'mom0_Jyb-1.fits'):
         #    continue
 
-        '''
+
         # Moment maps
+        #redo_clip = True
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
-        redo_clip = False
+        #redo_clip = False
+        '''
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -68,13 +70,13 @@ for file in data:
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_1_2()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_1_2(moment=2)
-        
+        '''
         # Uncertainty maps
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                      sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).mom0_noise_maps()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                      sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).mom1_2_noise_maps()
-                     
+        '''
         # Spectra
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).spectrum(x_axis='vel_offset')
@@ -90,21 +92,19 @@ for file in data:
         if not galaxy == 'NGC4450' or galaxy == 'NGC4536':
             CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                          sun=sun, tosave=tosave, sample=sample).PVD(axis='minor', check_slit=False)
-        '''
+        
         # Radial profiles
-        try:
-            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                        sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
-                                            alpha_co=6.25, table_path=table_path, check_aperture=False)
-            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                        sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
-                                           alpha_co=6.25, table_path=table_path, check_aperture=False)
-            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                        sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='kpc',
-                                           alpha_co=6.25, table_path=table_path, check_aperture=False)
-            CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                         sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
-                                                                               alpha_co=6.25, table_path=table_path,
-                                                                               check_aperture=False)
-        except:
-            continue
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                    sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
+                                        alpha_co=6.25, table_path=table_path, check_aperture=False)
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                    sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
+                                       alpha_co=6.25, table_path=table_path, check_aperture=False)
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                    sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='kpc',
+                                       alpha_co=6.25, table_path=table_path, check_aperture=False)
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
+                                                                           alpha_co=6.25, table_path=table_path,
+                                                                           check_aperture=False)
+        '''

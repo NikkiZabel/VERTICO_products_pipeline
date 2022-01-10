@@ -1167,9 +1167,14 @@ def parameters(galaxy, sample=None):
         angle = pa
 
     if sample == 'viva':
-        if galaxy == 'NGC4580' or galaxy == 'NGC4654':
+        if galaxy == 'NGC4580' or galaxy == 'NGC4654' :
             nchan_low = 1
             nchan_high = 2
+        elif galaxy == 'NGC4694' or galaxy == 'NGC4606' or galaxy == 'NGC4533':
+            nchan_low = 1
+            nchan_high = 2
+            cliplevel_low = 1
+            cliplevel_high = 2
 
     name = galaxy
     figsize = (10, 8.5)

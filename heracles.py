@@ -32,9 +32,6 @@ for file in data:
     if (galaxy == 'NGC5474') or (galaxy == 'NGC4236'):
         continue
 
-    if not galaxy == 'NGC2903':
-        continue
-
     file_pbcorr = file
     file_uncorr = file
 
@@ -93,7 +90,7 @@ for file in data:
                  sun=sun, tosave=tosave, sample=sample).spectrum(x_axis='velocity')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, sample=sample).spectrum(x_axis='frequency')
-    '''
+    
     # Radial profiles
     #try:
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -107,4 +104,9 @@ for file in data:
                                    alpha_co=5.4, table_path=None, check_aperture=False)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='arcsec',
+                                   alpha_co=5.4, table_path=None, check_aperture=False)
+    '''
+
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
                                    alpha_co=5.4, table_path=None, check_aperture=False)

@@ -86,14 +86,14 @@ class MomentMaps:
 
         # Centre and clip empty rows and columns to get it in the same shape as the other products
         if not self.redo_clip:
-            if os.path.exists(self.savepath + 'noisecube_clipped_trimmed.fits'):
-                noisecube = fits.read(self.savepath + 'noisecube_clipped_trimmed.fits')[0]
+            if os.path.exists(self.savepath + 'noise_subcube_slab.fits'):
+                noisecube = fits.read(self.savepath + 'noise_subcube_slab.fits')[0]
             else:
                 _, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                        savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip()
+                                        savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(clip_also_nat='noise')
         else:
             _, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip()
+                                    savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(clip_also_nat='noise')
 
         # extract negative values (only needed if masking_scheme='simple')
         if masking_scheme == 'simple':
@@ -703,7 +703,7 @@ class MomentMaps:
             rms_Msun = rms * alpha_co
 
         if hires:
-            limit = 0
+            limit = 0 * rms_Msun
         else:
             limit = 2 * rms_Msun
 
@@ -746,7 +746,7 @@ class MomentMaps:
             plt.figure()
             plt.imshow(mom0_hdu_K.data)
 
-        while (emission_Msun / area_temp > limit) | (count < 4):
+        while (emission_Msun / area_temp > limit) | (count < 10):
 
             # The second condition was added to deal better with galaxies that have a "hole" in the centre.
             count += 1
@@ -807,7 +807,7 @@ class MomentMaps:
             emission_Msun = 2112
             count = 0
 
-            while (emission_Msun > limit) | (count < 4):
+            while (emission_Msun > limit) | (count < 10):
 
                 count += 1
 
@@ -974,6 +974,7 @@ class MomentMaps:
                                        savepath=self.savepath, tosave=self.tosave, sample=self.sample). \
                 do_clip(clip_also=mask, clip_also_nat='mask')
 
+        mask_trimmed = fits.open(self.savepath + 'mask_subcube_slab.fits')[0]
         N_map = np.sum(mask_trimmed.data, axis=0)
 
         # Read in the cubes, split into cubes containing line and line-free channels, take the inner cube and calculate
@@ -981,13 +982,15 @@ class MomentMaps:
         cube_pbcorr, cube_uncorr = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                             savepath=self.savepath,
                                             tosave=self.tosave, sample=self.sample).readfits()
-        emiscube, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                            savepath=self.savepath,
-                                            tosave=self.tosave, sample=self.sample).split_cube(cube_uncorr)
-        inner = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
-                                            savepath=self.savepath,
-                                            tosave=self.tosave, sample=self.sample).innersquare(noisecube.data)
-        rms = np.nanstd(inner)
+        #emiscube, noisecube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+        #                                    savepath=self.savepath,
+        #                                    tosave=self.tosave, sample=self.sample).split_cube(cube_uncorr)
+        #noisecube = fits.open(self.savepath + 'noise_subcube_slab.fits')[0]
+        #inner = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
+        #                                    savepath=self.savepath,
+        #                                    tosave=self.tosave, sample=self.sample).innersquare(noisecube.data)
+
+        rms = mask.header['CLIP_RMS']
 
         if calc_rms:
             return rms
@@ -1003,7 +1006,7 @@ class MomentMaps:
                 _, pb_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                             savepath=self.savepath, tosave=self.tosave, sample=self.sample).\
                     do_clip(clip_also=pb_hdu, clip_also_nat='pb')
-            elif os.path.exists(self.savepath + 'pb_clipped_trimmed.fits'):
+            elif os.path.exists(self.savepath + 'pb_subcube_slab.fits'):
                 pb_cube = fits.open(self.savepath + 'pb_subcube_slab.fits')[0]
             else:
                 _, pb_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
@@ -1018,22 +1021,40 @@ class MomentMaps:
         # Total noise map is the rms divided by the PB map
         noise_map = rms / pb_map
 
-        mom0_uncertainty = noise_map * np.sqrt(N_map) * abs(noisecube.header['CDELT3'] / 1000)
-        mom0_uncertainty = np.where(mom0_hdu.data > 0, mom0_uncertainty, np.nan)
-        mom0_uncertainty = fits.PrimaryHDU(mom0_uncertainty, mom0_hdu.header)
+        if cube.header['CTYPE3'] == 'FREQ':
+            if self.sample == 'viva' or self.sample == 'things':
+                v_val = 299792.458 * (1 - (cube.header['CRVAL3'] / 1e9) / 1.420405752)
+                v_shift = 299792.458 * (1 - ((cube.header['CRVAL3'] + cube.header['CDELT3']) / 1e9) / 1.420405752)
+                v_step = - (v_val - v_shift)
+            else:
+                v_val = 299792.458 * (1 - (cube.header['CRVAL3'] / 1e9) / 230.538000)
+                v_shift = 299792.458 * (1 - ((cube.header['CRVAL3'] + cube.header['CDELT3']) / 1e9) / 230.538000)
+                v_step = - (v_val - v_shift)
+
+            mom0_uncertainty = noise_map * np.sqrt(N_map) * abs(v_step)
+            mom0_uncertainty = np.where(mom0_hdu.data > 0, mom0_uncertainty, np.nan)
+            mom0_uncertainty = fits.PrimaryHDU(mom0_uncertainty, mom0_hdu.header)
+            mom1_uncertainty = (N_map * abs(v_step) / (2 * np.sqrt(3))) * \
+                               (mom0_uncertainty.data / mom0_hdu.data)  # Eqn 15 doc. Chris.
+            mom2_uncertainty = ((N_map * abs(v_step)) ** 2 / (8 * np.sqrt(5))) * \
+                               (mom0_uncertainty.data / mom0_hdu.data) * (mom2_hdu.data) ** -1  # Eqn 30 doc. Chris.
+
+        else:
+            mom0_uncertainty = noise_map * np.sqrt(N_map) * abs(cube.header['CDELT3'] / 1000)
+            mom0_uncertainty = np.where(mom0_hdu.data > 0, mom0_uncertainty, np.nan)
+            mom0_uncertainty = fits.PrimaryHDU(mom0_uncertainty, mom0_hdu.header)
+            mom1_uncertainty = (N_map * abs(cube.header['CDELT3'] / 1000) / (2 * np.sqrt(3))) * \
+                               (mom0_uncertainty.data / mom0_hdu.data)  # Eqn 15 doc. Chris.
+
+            mom2_uncertainty = ((N_map * abs(cube.header['CDELT3'] / 1000)) ** 2 / (8 * np.sqrt(5))) * \
+                               (mom0_uncertainty.data / mom0_hdu.data) * (mom2_hdu.data) ** -1  # Eqn 30 doc. Chris.
+
+        mom1_uncertainty = fits.PrimaryHDU(mom1_uncertainty, mom1_hdu.header)
+        mom2_uncertainty = fits.PrimaryHDU(mom2_uncertainty, mom2_hdu.header)
 
         SN = mom0_hdu.data / mom0_uncertainty.data
         SN_hdu = fits.PrimaryHDU(SN, mom0_hdu.header)
         SN_hdu.header.pop('BUNIT')
-
-        mom1_uncertainty = (N_map * abs(cube.header['CDELT3'] / 1000) / (2 * np.sqrt(3))) * \
-                           (mom0_uncertainty.data / mom0_hdu.data)  # Eqn 15 doc. Chris.
-
-        mom2_uncertainty = ((N_map * abs(cube.header['CDELT3'] / 1000)) ** 2 / (8 * np.sqrt(5))) * \
-                           (mom0_uncertainty.data / mom0_hdu.data) * (mom2_hdu.data) ** -1  # Eqn 30 doc. Chris.
-
-        mom1_uncertainty = fits.PrimaryHDU(mom1_uncertainty, mom1_hdu.header)
-        mom2_uncertainty = fits.PrimaryHDU(mom2_uncertainty, mom2_hdu.header)
 
         self.add_clipping_keywords(mom0_uncertainty.header)
         self.add_clipping_keywords(SN_hdu.header)

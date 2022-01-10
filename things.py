@@ -14,7 +14,7 @@ refresh = True
 overwrite = True
 sun = True
 tosave = True
-redo_clip = False
+redo_clip = True
 
 data = [f for f in glob(path + resolution + '/*.fits')]
 

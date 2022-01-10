@@ -5,13 +5,13 @@ import os
 from matplotlib import pyplot as plt
 
 # Set some parameters to apply to all images below
-redo_clip = True
+redo_clip = False
 refresh = True
 overwrite = True
 sun = True
 tosave = True
 pbcor = True
-resolution = 'native'
+resolution = 'nyquist9'
 version = '1_2'
 sample = 'vertico'
 
@@ -33,16 +33,14 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
 #galaxies = ['NGC4064', 'NGC4222', 'NGC4294', 'NGC4330', 'NGC4388', 'NGC4394', 'NGC4402', 'NGC4405', 'NGC4419',
 #            'NGC4522', 'NGC4533', 'NGC4567', 'NGC4606', 'NGC4607', 'NGC4772']  # These are the 7m only detections
 
-#galaxies = ['NGC4402']
+#galaxies = ['IC3392']
 
 for i in range(len(galaxies)):
 
-    redo_clip = True
-
     galaxy = galaxies[i]
 
-    #if galaxy == 'NGC4321':
-    #    continue
+    if galaxy == 'NGC4321':
+        continue
 
     print(galaxy)
 
@@ -239,7 +237,7 @@ for i in range(len(galaxies)):
         pass
 
     #if galaxy == 'NGC4561': continue
-
+    '''
     # PVDs
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).\
@@ -255,7 +253,7 @@ for i in range(len(galaxies)):
                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).spectrum(x_axis='velocity')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).spectrum(x_axis='frequency')
-    '''
+    
     # Radial profiles
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',

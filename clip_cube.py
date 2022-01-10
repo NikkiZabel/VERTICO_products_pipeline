@@ -68,10 +68,10 @@ class ClipCube:
         """
 
         if len(cube.shape) == 3:
-            start_x = int(cube.shape[1] / 2 - 20)
-            stop_x = int(cube.shape[1] / 2 + 20)
-            start_y = int(cube.shape[2] / 2 - 20)
-            stop_y = int(cube.shape[2] / 2 + 20)
+            start_x = int(cube.shape[1] / 2 - cube.shape[1] / 8)
+            stop_x = int(cube.shape[1] / 2 + cube.shape[1] / 8)
+            start_y = int(cube.shape[2] / 2 - cube.shape[1] / 8)
+            stop_y = int(cube.shape[2] / 2 + cube.shape[1] / 8)
             inner_square = cube[:, start_x:stop_x, start_y:stop_y]
             if (inner_square == inner_square).any():
                 return inner_square
@@ -590,14 +590,26 @@ class ClipCube:
             stop = mask_idx[-1]
 
             if self.galaxy.name == 'NGC4533':
-                start = 43
-                stop = 55
+                if self.sample == 'vertico':
+                    start = 43
+                    stop = 55
+                elif self.sample == 'viva':
+                    start = 24
+                    stop = 46
             elif self.galaxy.name == 'NGC4694':
-                start = 27
-                stop = 41
+                if self.sample == 'vertico':
+                    start = 27
+                    stop = 41
+                elif self.sample == 'viva':
+                    start = 19
+                    stop = 35
             elif self.galaxy.name == 'NGC4606':
-                start = 42
-                stop = 58
+                if self.sample == 'vertico':
+                    start = 42
+                    stop = 58
+                elif self.sample == 'viva':
+                    start = 11
+                    stop = 26
 
             if get_chans:
                 return start, stop
@@ -613,6 +625,7 @@ class ClipCube:
 
             emiscube_uncorr_hdu = fits.PrimaryHDU(emiscube_uncorr, cube_uncorr_copy.header)
             noisecube_uncorr_hdu = fits.PrimaryHDU(noisecube_uncorr, cube_uncorr_copy.header)
+            noisecube_pbcorr_hdu = fits.PrimaryHDU(noisecube_pbcorr, cube_uncorr_copy.header)
 
             mask = self.sun_method(emiscube_uncorr_hdu, noisecube_uncorr_hdu)
 
@@ -709,7 +722,10 @@ class ClipCube:
             clipped_hdu.writeto(self.savepath + 'subcube.fits', overwrite=True)
 
         # Do some pre-processing to make the creation of the moments easier
-        clipped_hdu_temp, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=clip_also)
+        if not clip_also:
+            clipped_hdu_temp, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=noisecube_pbcorr_hdu)
+        else:
+            clipped_hdu_temp, noisecube_hdu = self.preprocess(clipped_hdu, noisecube=clip_also)
         temp1, unclipped_trimmed_hdu = self.cut_empty_columns(mask_hdu, noisecube=cube_pbcorr)
         temp2, unclipped_trimmed_hdu = self.cut_empty_rows(temp1, noisecube=unclipped_trimmed_hdu)
         unclipped_trimmed_hdu.writeto(self.savepath + 'unclipped_subcube.fits', overwrite=True)
