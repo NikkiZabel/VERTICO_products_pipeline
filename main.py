@@ -5,13 +5,13 @@ import os
 from matplotlib import pyplot as plt
 
 # Set some parameters to apply to all images below
-redo_clip = False
+redo_clip = True
 refresh = True
 overwrite = True
 sun = True
 tosave = True
 pbcor = True
-resolution = 'nyquist9'
+resolution = 'native'
 version = '1_2'
 sample = 'vertico'
 
@@ -33,8 +33,6 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
 #galaxies = ['NGC4064', 'NGC4222', 'NGC4294', 'NGC4330', 'NGC4388', 'NGC4394', 'NGC4402', 'NGC4405', 'NGC4419',
 #            'NGC4522', 'NGC4533', 'NGC4567', 'NGC4606', 'NGC4607', 'NGC4772']  # These are the 7m only detections
 
-#galaxies = ['IC3392']
-
 for i in range(len(galaxies)):
 
     galaxy = galaxies[i]
@@ -44,7 +42,7 @@ for i in range(len(galaxies)):
 
     print(galaxy)
 
-    path = '/home/nikki/Documents/Data/VERTICO/'
+    path = '/media/nikki/6719190437AE6F5C/Work/Data/VERTICO/'
 
     if resolution == 'nyquist9':
         readpath = path + 'ReducedData/v' + version + '/nyquistPix/9arcsec/' + galaxy + '/'
@@ -214,9 +212,9 @@ for i in range(len(galaxies)):
 
 
     # Moment maps
-    '''
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).moment_zero(units='K km/s')
+    '''
     redo_clip = False
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).moment_zero()
@@ -237,7 +235,7 @@ for i in range(len(galaxies)):
         pass
 
     #if galaxy == 'NGC4561': continue
-    '''
+
     # PVDs
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                  sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).\
@@ -271,3 +269,4 @@ for i in range(len(galaxies)):
                 sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).radial_profile(y_units='K km/s', x_units='arcsec',
                                    alpha_co=5.4, table_path='/home/nikki/Documents/Data/VERTICO/VERTICO_basic.fits',
                                                                             check_aperture=False)
+    '''

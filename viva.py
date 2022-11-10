@@ -33,9 +33,14 @@ for file in data:
         else:
             galaxy = galnames[i]
 
+        if not galaxy == 'NGC4606':
+            continue
+
         print(galaxy)
 
         if galaxy == 'NGC4293':
+            continue
+        if galaxy == 'NGC4419':
             continue
         #if galaxy == 'NGC4533':
         #    continue
@@ -52,16 +57,14 @@ for file in data:
         #    continue
         savepath = path + 'products_v' + version + '/' + galaxy + '/' + galaxy + '_viva_hi_15as_np_round_reproj_'
 
-        #if os.path.exists(savepath + 'mom0_Jyb-1.fits'):
+        #if os.path.exists(savepath + 'mom0_Jyb-1kms-1.pdf'):
         #    continue
-
 
         # Moment maps
         #redo_clip = True
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
-        #redo_clip = False
-        '''
+        redo_clip = False
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -70,13 +73,13 @@ for file in data:
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_1_2()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_1_2(moment=2)
-        '''
+
         # Uncertainty maps
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                      sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).mom0_noise_maps()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                      sun=sun, tosave=tosave, redo_clip=redo_clip, sample=sample).mom1_2_noise_maps()
-        '''
+
         # Spectra
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).spectrum(x_axis='vel_offset')
@@ -107,4 +110,3 @@ for file in data:
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
                                                                            alpha_co=6.25, table_path=table_path,
                                                                            check_aperture=False)
-        '''

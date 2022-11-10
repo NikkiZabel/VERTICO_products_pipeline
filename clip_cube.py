@@ -112,6 +112,11 @@ class ClipCube:
         spectrum_uncorr = np.nansum(cube_uncorr.data, axis=(1, 2))
         cube_uncorr.data = cube_uncorr.data[spectrum_uncorr != 0, :, :]
 
+        # Count the number of empty channels at the start of the cube, so the header can be corrected
+        firstzero = np.nonzero(spectrum_pbcorr)[0][0]
+        cube_pbcorr.header['CRVAL3'] += cube_pbcorr.header['CDELT3'] * firstzero
+        cube_uncorr.header['CRVAL3'] += cube_uncorr.header['CDELT3'] * firstzero
+
         # Get rid of nans
         cube_pbcorr.data[~np.isfinite(cube_pbcorr.data)] = 0
         cube_uncorr.data[~np.isfinite(cube_uncorr.data)] = 0
@@ -610,6 +615,10 @@ class ClipCube:
                 elif self.sample == 'viva':
                     start = 11
                     stop = 26
+            elif self.galaxy.name == 'NGC2841':
+                if self.sample == 'heracles':
+                    start = 15
+                    stop = 50
 
             if get_chans:
                 return start, stop

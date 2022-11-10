@@ -6,7 +6,7 @@ from glob import glob
 
 sample = 'heracles'
 version = '1_1'
-path = '/home/nikki/Documents/Data/VERTICO/heracles/'
+path = '/media/nikki/6719190437AE6F5C/Work/Data/VERTICO/heracles/'
 
 refresh = True
 overwrite = True
@@ -27,6 +27,10 @@ for file in data:
 
     long_str = file.split('/')[-1].split('hans.fits')[0]
     galaxy = long_str.split('_')[0]
+    
+    if not galaxy == 'NGC2841':
+        continue
+    
     print(galaxy)
 
     if (galaxy == 'NGC5474') or (galaxy == 'NGC4236'):
@@ -54,7 +58,7 @@ for file in data:
 
     #if os.path.exists(savepath + 'mom0_Kkms-1.pdf'):
     #    continue
-    '''
+
     # Moment maps
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                   sun=sun, tosave=tosave, sample=sample).moment_zero(units='K km/s')
@@ -75,11 +79,10 @@ for file in data:
 
     # PVDs
     #try:
-    if not galaxy == 'NGC2841':
-        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                     sun=sun, tosave=tosave, sample=sample).PVD(axis='major', find_angle=False, check_slit=False)
-        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                     sun=sun, tosave=tosave, sample=sample).PVD(axis='minor', check_slit=False)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                 sun=sun, tosave=tosave, sample=sample).PVD(axis='major', find_angle=False, check_slit=False)
+    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                 sun=sun, tosave=tosave, sample=sample).PVD(axis='minor', check_slit=False)
     #except:
     #    pass
     
@@ -104,9 +107,4 @@ for file in data:
                                    alpha_co=5.4, table_path=None, check_aperture=False)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                 sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='arcsec',
-                                   alpha_co=5.4, table_path=None, check_aperture=False)
-    '''
-
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
                                    alpha_co=5.4, table_path=None, check_aperture=False)

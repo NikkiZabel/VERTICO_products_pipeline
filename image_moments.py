@@ -92,7 +92,7 @@ class CreateImages:
         fig.set_theme('publication')
 
         # add the galaxy name in the upper right corner
-        fig.add_label(0.8, 0.9, self.galaxy.name, relative=True, fontsize=20)
+        fig.add_label(0.8, 0.9, self.galaxy.name, relative=True, size=20)
 
         fig.show_contour(image, cmap='magma_r', levels=np.linspace(np.amax(image.data)*1e-9, np.amax(image.data), 20),
                          filled=True, overlap=True)
@@ -512,7 +512,7 @@ class CreateImages:
             else:
                 rad_prof_K, rad_prof_K_err, rad_prof_Msun, rad_prof_Msun_err, radii_arcsec, radii_kpc = MomentMaps(self.galaxy.name, self.path_pbcorr,
                         self.path_uncorr, sun=self.sun, savepath=self.savepath, tosave=False, sample=self.sample, redo_clip=self.redo_clip).\
-                    radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture, hires=True)
+                    radial_profile(alpha_co=alpha_co, table_path=table_path, check_aperture=check_aperture, hires=False)
         else:
             temp = np.loadtxt(self.savepath + 'rad_prof.csv', delimiter=',')
             rad_prof_K = temp[:, 0]

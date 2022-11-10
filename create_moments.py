@@ -265,18 +265,21 @@ class MomentMaps:
         velocity array corresponding to the entire velocity axis of the cube (including line-free channels)
         """
 
-        v_ref = cube.header['CRPIX3']  # Location of the reference channel
-        if cube.header['CTYPE3'] == 'VRAD' or cube.header['CTYPE3'] == 'VELOCITY':
-            v_val = cube.header['CRVAL3'] / 1000  # Velocity in the reference channel, m/s to km/s
-            v_step = cube.header['CDELT3'] / 1000  # Velocity step in each channel, m/s to km/s
-        elif cube.header['CTYPE3'] == 'FREQ':
+        cube_orig, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
+                        tosave=self.tosave, sample=self.sample).readfits()
+
+        v_ref = cube_orig.header['CRPIX3']  # Location of the reference channel
+        if cube_orig.header['CTYPE3'] == 'VRAD' or cube_orig.header['CTYPE3'] == 'VELOCITY':
+            v_val = cube_orig.header['CRVAL3'] / 1000  # Velocity in the reference channel, m/s to km/s
+            v_step = cube_orig.header['CDELT3'] / 1000  # Velocity step in each channel, m/s to km/s
+        elif cube_orig.header['CTYPE3'] == 'FREQ':
             if self.sample == 'viva' or self.sample == 'things':
-                v_val = 299792.458 * (1 - (cube.header['CRVAL3'] / 1e9) / 1.420405752)
-                v_shift = 299792.458 * (1 - ((cube.header['CRVAL3'] + cube.header['CDELT3']) / 1e9) / 1.420405752)
+                v_val = 299792.458 * (1 - (cube_orig.header['CRVAL3'] / 1e9) / 1.420405752)
+                v_shift = 299792.458 * (1 - ((cube_orig.header['CRVAL3'] + cube_orig.header['CDELT3']) / 1e9) / 1.420405752)
                 v_step = - (v_val - v_shift)
             else:
-                v_val = 299792.458 * (1 - (cube.header['CRVAL3'] / 1e9) / 230.538000)
-                v_shift = 299792.458 * (1 - ((cube.header['CRVAL3'] + cube.header['CDELT3']) / 1e9) / 230.538000)
+                v_val = 299792.458 * (1 - (cube_orig.header['CRVAL3'] / 1e9) / 230.538000)
+                v_shift = 299792.458 * (1 - ((cube_orig.header['CRVAL3'] + cube_orig.header['CDELT3']) / 1e9) / 230.538000)
                 v_step = - (v_val - v_shift)
         else:
             raise KeyError('Pipeline cannot deal with these units yet.')
@@ -378,6 +381,9 @@ class MomentMaps:
         # Calculate the systemic velocity from the spatial inner part of the cube (to avoid PB effects)
         inner_cube = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, savepath=self.savepath,
                               tosave=self.tosave, sample=self.sample).innersquare(mom1)
+
+        from matplotlib import pyplot as plt
+        plt.imshow(inner_cube)
 
         sysvel = np.nanmean(inner_cube)# + self.galaxy.sysvel_offset
         mom1 -= sysvel

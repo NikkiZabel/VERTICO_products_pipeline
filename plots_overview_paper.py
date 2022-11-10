@@ -260,10 +260,10 @@ def image_mom1_2(hdu, galaxy, sysvel, moment=1, show_beam=True, show_scalebar=Tr
         else:
             try:
                 vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_2/native/' + galaxy + '/' + galaxy +
-                                          '_7m+tp_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
+                                          '_7m+tp_co21_pbcorr_round_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
             except:
                 vel_array = np.genfromtxt('/home/nikki/Documents/Data/VERTICO/products_v1_2/native/' + galaxy + '/' + galaxy +
-                                          '_7m_co21_pbcorr_round_k_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
+                                          '_7m_co21_pbcorr_round_spectrum.csv', delimiter=',', skip_header=3)[:, 1]
 
     sysvel = (sysvel + 5) // 10 * 10
 
@@ -458,7 +458,7 @@ galaxies = ['IC3392', 'NGC4064', 'NGC4189', 'NGC4192', 'NGC4216', 'NGC4222', 'NG
             'NGC4424', 'NGC4457', 'NGC4535', 'NGC4536', 'NGC4548', 'NGC4569', 'NGC4579', 'NGC4654', 'NGC4689',
             'NGC4698', 'NGC4694', 'NGC4501', 'NGC4561', 'NGC4691']
 
-galaxies = ['NGC4501', 'NGC4561', 'NGC4691']
+galaxies = ['NGC4330']
 
 for i in range(len(galaxies)):
 
@@ -499,15 +499,15 @@ for i in range(len(galaxies)):
             peak = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_15_arcsec_peak_temp.fits')[0]
     else:
         try:
-            mom0 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_mom0_Kkms-1.fits')[0]
-            mom1 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_mom1.fits')[0]
-            mom2 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_mom2.fits')[0]
-            peak = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_k_peak_temp.fits')[0]
+            mom0 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_mom0_Kkms-1.fits')[0]
+            mom1 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_mom1.fits')[0]
+            mom2 = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_mom2.fits')[0]
+            peak = fits.open(path + galaxies[i] + '_7m+tp_co21_pbcorr_round_peakT.fits')[0]
         except:
-            mom0 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_mom0_Kkms-1.fits')[0]
-            mom1 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_mom1.fits')[0]
-            mom2 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_mom2.fits')[0]
-            peak = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_k_peak_temp.fits')[0]
+            mom0 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_mom0_Kkms-1.fits')[0]
+            mom1 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_mom1.fits')[0]
+            mom2 = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_mom2.fits')[0]
+            peak = fits.open(path + galaxies[i] + '_7m_co21_pbcorr_round_peakT.fits')[0]
 
     # Set zeros to nans
     mom0.data[mom0.data == 0] = np.nan
