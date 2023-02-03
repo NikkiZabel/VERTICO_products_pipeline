@@ -8,11 +8,12 @@ sample = 'heracles'
 version = '1_1'
 path = '/media/nikki/6719190437AE6F5C/Work/Data/VERTICO/heracles/'
 
+redo_clip = True
 refresh = True
 overwrite = True
 sun = True
 tosave = True
-resolution = 'native'
+resolution = '720_nyquist'
 
 if resolution == '1200_nyquist':
     data = [f for f in glob(path + 'cubes_10kms/1200pc/*_np_round_k.fits')]
@@ -59,52 +60,53 @@ for file in data:
     #if os.path.exists(savepath + 'mom0_Kkms-1.pdf'):
     #    continue
 
+    
     # Moment maps
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave, sample=sample).moment_zero(units='K km/s')
+                  sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
+    redo_clip = False
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave, sample=sample).moment_zero(units='M_Sun/pc^2', alpha_co=5.4)
+                  sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='M_Sun/pc^2', alpha_co=5.4)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave, sample=sample).moment_zero(peak=True)
+                  sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(peak=True)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave, sample=sample).moment_1_2()
+                 sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_1_2()
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave, sample=sample).moment_1_2(moment=2)
+                 sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_1_2(moment=2)
 
     # Uncertainty maps
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave, sample=sample).mom0_noise_maps()
+                 sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).mom0_noise_maps()
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave, sample=sample).mom1_2_noise_maps()
+                 sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).mom1_2_noise_maps()
 
     # PVDs
     #try:
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave, sample=sample).PVD(axis='major', find_angle=False, check_slit=False)
-    CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave, sample=sample).PVD(axis='minor', check_slit=False)
+                 sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).PVD(axis='major', find_angle=False, check_slit=False)
+    if not galaxy == 'NGC2841':
+        CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
+                     sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).PVD(axis='minor', check_slit=False)
     #except:
     #    pass
     
     # Spectra
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                  sun=sun, tosave=tosave, sample=sample).spectrum(x_axis='vel_offset')
+                  sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).spectrum(x_axis='vel_offset')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave, sample=sample).spectrum(x_axis='velocity')
+                 sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).spectrum(x_axis='velocity')
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                 sun=sun, tosave=tosave, sample=sample).spectrum(x_axis='frequency')
-    
+                 sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).spectrum(x_axis='frequency')
     # Radial profiles
-    #try:
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
+                sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='arcsec', y_units='M_Sun pc^-2',
                                     alpha_co=5.4, table_path=None, check_aperture=False)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave, sample=sample).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
+                sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(x_units='kpc', y_units='M_Sun pc^-2',
                                    alpha_co=5.4, table_path=None, check_aperture=False)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='kpc',
+                sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='kpc',
                                    alpha_co=5.4, table_path=None, check_aperture=False)
     CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
-                sun=sun, tosave=tosave, sample=sample).radial_profile(y_units='K km/s', x_units='arcsec',
+                sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
                                    alpha_co=5.4, table_path=None, check_aperture=False)

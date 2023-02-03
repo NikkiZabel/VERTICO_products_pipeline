@@ -42,6 +42,8 @@ class ClipCube:
             cube.header.pop('PC04_02')
             cube.header.pop('PC04_03')
         except:
+            pass
+        try:
             cube.header.pop('PC1_4')
             cube.header.pop('PC2_4')
             cube.header.pop('PC3_4')
@@ -49,12 +51,20 @@ class ClipCube:
             cube.header.pop('PC4_1')
             cube.header.pop('PC4_2')
             cube.header.pop('PC4_3')
-
+        except:
+            pass
         cube.header.pop('CTYPE4')
         cube.header.pop('CRVAL4')
         cube.header.pop('CRPIX4')
-        cube.header.pop('CUNIT4')
+        try:
+            cube.header.pop('CUNIT4')
+        except:
+            pass
         cube.header.pop('CDELT4')
+        try:
+            cube.header.pop('CROTA4')
+        except:
+            pass
 
         return cube
 
@@ -619,6 +629,10 @@ class ClipCube:
                 if self.sample == 'heracles':
                     start = 15
                     stop = 50
+            elif self.galaxy.name == 'NGC4424':
+                if self.sample == 'viva':
+                    start = 25
+                    stop = 41
 
             if get_chans:
                 return start, stop

@@ -33,7 +33,7 @@ for file in data:
         else:
             galaxy = galnames[i]
 
-        if not galaxy == 'NGC4606':
+        if not galaxy == 'NGC4424':
             continue
 
         print(galaxy)
@@ -65,6 +65,7 @@ for file in data:
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
         redo_clip = False
+
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,

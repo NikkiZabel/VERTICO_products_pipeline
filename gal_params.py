@@ -305,10 +305,10 @@ def parameters(galaxy, sample=None):
         angle = 95
         full_width = False
         distance = 16.5
-        nchan_low = 2
-        cliplevel_low = 2
-        nchan_high = 3
-        cliplevel_high = 3.5
+        nchan_low = 1
+        cliplevel_low = 1
+        nchan_high = 2
+        cliplevel_high = 3
         prune_by_npix = None
         prune_by_fracbeam = 1
         expand_by_fracbeam = None
@@ -1139,9 +1139,8 @@ def parameters(galaxy, sample=None):
         
         if sample == 'heracles':
             if galaxy == 'NGC2841':
-                pass
-                #cliplevel_low = 1
-                #cliplevel_high = 1.5
+                cliplevel_low = 1
+                cliplevel_high = 1.5
 
         def get_inc_pa(galaxy):
             from astropy.io import fits
