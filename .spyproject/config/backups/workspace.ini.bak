@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['heracles.py', 'create_moments.py']
+recent_files = ['gal_params.py', 'clip_cube.py', 'viva.py']
 
 [main]
 version = 0.2.0

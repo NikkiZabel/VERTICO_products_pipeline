@@ -1160,7 +1160,7 @@ def parameters(galaxy, sample=None):
 
         def get_dist(galaxy):
             from astropy.io import fits
-            dist_table = fits.open('/media/nikki/6719190437AE6F5C/Work/Data/VERTICO/heracles/heracles_basic.fits')[1]
+            dist_table = fits.open('/media/nikki/6719190437AE6F5C1/Work/Data/VERTICO/heracles/heracles_basic.fits')[1]
             try:
                 return float(dist_table.data['dist_L19'][dist_table.data['Galaxy'] == galaxy])
             except:
@@ -1173,15 +1173,39 @@ def parameters(galaxy, sample=None):
         angle = pa
 
     if sample == 'viva':
-        if galaxy == 'NGC4580' or galaxy == 'NGC4654' :
+        if galaxy == 'NGC4580' or galaxy == 'NGC4654':
             nchan_low = 1
             nchan_high = 2
-        elif galaxy == 'NGC4694' or galaxy == 'NGC4606' or galaxy == 'NGC4533':
+        elif galaxy == 'NGC4694' or galaxy == 'NGC4606' or galaxy == 'NGC4533' \
+            or galaxy == 'NGC4254' or galaxy == 'NGC4561' or galaxy == 'NGC4579':
             nchan_low = 1
             nchan_high = 2
             cliplevel_low = 1
             cliplevel_high = 2
-
+        elif galaxy == 'NGC4419' or galaxy == 'NGC4450' or galaxy == 'NGC4501' or galaxy == 'NGC4569':
+            nchan_low = 1
+            nchan_high = 2
+            cliplevel_low = 1
+            cliplevel_high = 2.5
+        elif galaxy == 'NGC4713' or galaxy == 'NGC4772' or galaxy == 'NGC4808' \
+            or galaxy == 'NGC4222' or galaxy == 'NGC4298' or galaxy == 'NGC4380' \
+            or galaxy == 'NGC4522':
+            nchan_low = 1
+            nchan_high = 3
+            cliplevel_low = 1
+            cliplevel_high = 2.5
+        elif galaxy == 'NGC4189' or galaxy == 'NGC4330':
+            cliplevel_low = 1
+            cliplevel_high = 2
+        elif galaxy == 'NGC4351':
+            cliplevel_low = 1.5
+            cliplevel_high = 2
+        elif galaxy == 'NGC4548':
+            nchan_low = 2
+            nchan_high = 3
+            cliplevel_low = 1
+            cliplevel_high = 2
+            
     name = galaxy
     figsize = (10, 8.5)
 
@@ -1192,7 +1216,7 @@ def parameters(galaxy, sample=None):
     if sample == 'vertico' or sample == 'viva':
         from astropy.io import fits
         import numpy as np
-        table = fits.open('/media/nikki/6719190437AE6F5C/Work/Data/VERTICO/VERTICO_basic.fits')[1]
+        table = fits.open('/media/nikki/6719190437AE6F5C1/Work/Data/VERTICO/VERTICO_basic.fits')[1]
         inclination = int(np.round(table.data['inclination'][table.data['Galaxy'] == galaxy][0]))
         angle = int(np.round(table.data['pa'][table.data['Galaxy'] == galaxy][0]))
 

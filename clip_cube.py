@@ -623,8 +623,8 @@ class ClipCube:
                     start = 42
                     stop = 58
                 elif self.sample == 'viva':
-                    start = 11
-                    stop = 26
+                    start = 43
+                    stop = 53
             elif self.galaxy.name == 'NGC2841':
                 if self.sample == 'heracles':
                     start = 15
@@ -633,6 +633,36 @@ class ClipCube:
                 if self.sample == 'viva':
                     start = 25
                     stop = 41
+            #elif self.galaxy.name == 'NGC4192':
+            #    if self.sample == 'viva':
+            #        start = 3
+            #        stop = 62
+            elif self.galaxy.name == 'NGC4254':
+                if self.sample == 'viva':
+                    start = 15
+                    stop = 49
+            elif self.galaxy.name == 'NGC4419':
+                if self.sample == 'viva':
+                    start = 8
+                    stop = 45
+            elif self.galaxy.name == 'NGC4450':
+                if self.sample == 'viva':
+                    start = 16
+                    stop = 49
+            elif self.galaxy.name == 'NGC4561':
+                if self.sample == 'viva':
+                    start = 22
+                    stop = 42
+            elif self.galaxy.name == 'NGC4222':
+                if self.sample == 'viva':
+                    start = 9
+                    stop = 34
+            elif self.galaxy.name == 'NGC4569':
+                if self.sample == 'viva':
+                    start = 11
+                    stop = 52
+                    
+            print(start, stop)
 
             if get_chans:
                 return start, stop
