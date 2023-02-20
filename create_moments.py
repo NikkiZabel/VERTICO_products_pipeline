@@ -3,8 +3,8 @@ import numpy as np
 import scipy.ndimage as ndimage
 from targets import galaxies
 from clip_cube import ClipCube
-#from photutils import EllipticalAnnulus
-#from photutils import aperture_photometry
+from photutils import EllipticalAnnulus
+from photutils import aperture_photometry
 from astropy import wcs
 from astropy.stats import mad_std
 import os

@@ -1160,7 +1160,7 @@ def parameters(galaxy, sample=None):
 
         def get_dist(galaxy):
             from astropy.io import fits
-            dist_table = fits.open('/media/nikki/6719190437AE6F5C1/Work/Data/VERTICO/heracles/heracles_basic.fits')[1]
+            dist_table = fits.open('/media/nikki/6719190437AE6F5C/Work/Data/VERTICO/heracles/heracles_basic.fits')[1]
             try:
                 return float(dist_table.data['dist_L19'][dist_table.data['Galaxy'] == galaxy])
             except:
@@ -1177,12 +1177,12 @@ def parameters(galaxy, sample=None):
             nchan_low = 1
             nchan_high = 2
         elif galaxy == 'NGC4694' or galaxy == 'NGC4606' or galaxy == 'NGC4533' \
-            or galaxy == 'NGC4254' or galaxy == 'NGC4561' or galaxy == 'NGC4579':
+            or galaxy == 'NGC4254' or galaxy == 'NGC4561' or galaxy == 'NGC4579' or galaxy == 'NGC4192':
             nchan_low = 1
             nchan_high = 2
             cliplevel_low = 1
             cliplevel_high = 2
-        elif galaxy == 'NGC4419' or galaxy == 'NGC4450' or galaxy == 'NGC4501' or galaxy == 'NGC4569':
+        elif galaxy == 'NGC4450' or galaxy == 'NGC4501' or galaxy == 'NGC4569':
             nchan_low = 1
             nchan_high = 2
             cliplevel_low = 1
@@ -1197,7 +1197,7 @@ def parameters(galaxy, sample=None):
         elif galaxy == 'NGC4189' or galaxy == 'NGC4330':
             cliplevel_low = 1
             cliplevel_high = 2
-        elif galaxy == 'NGC4351':
+        elif galaxy == 'NGC4351' or galaxy == 'NGC4419':
             cliplevel_low = 1.5
             cliplevel_high = 2
         elif galaxy == 'NGC4548':
@@ -1216,7 +1216,7 @@ def parameters(galaxy, sample=None):
     if sample == 'vertico' or sample == 'viva':
         from astropy.io import fits
         import numpy as np
-        table = fits.open('/media/nikki/6719190437AE6F5C1/Work/Data/VERTICO/VERTICO_basic.fits')[1]
+        table = fits.open('/media/nikki/6719190437AE6F5C/Work/Data/VERTICO/VERTICO_basic.fits')[1]
         inclination = int(np.round(table.data['inclination'][table.data['Galaxy'] == galaxy][0]))
         angle = int(np.round(table.data['pa'][table.data['Galaxy'] == galaxy][0]))
 

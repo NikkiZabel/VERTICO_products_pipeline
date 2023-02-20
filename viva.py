@@ -5,15 +5,15 @@ import os
 from glob import glob
 
 sample = 'viva'
-version = '1_1'
-path = '/media/nikki/6719190437AE6F5C1/Work/Data/VERTICO/VIVA/Reprojected_15_arcsec_latest/'
-table_path = '/media/nikki/6719190437AE6F5C1/Work/Data/VERTICO/VERTICO_master.fits'
+version = '1-2'
+path = '/media/nikki/6719190437AE6F5C/Work/Data/VERTICO/VIVA/Reprojected_15_arcsec_latest/'
+table_path = '/media/nikki/6719190437AE6F5C/Work/Data/VERTICO/VERTICO_master.fits'
 
 refresh = True
 overwrite = True
 sun = True
 tosave = True
-redo_clip = True
+redo_clip = False
 
 data = [f for f in glob(path + '*.fits')]
 
@@ -32,8 +32,8 @@ for file in data:
             galaxy = 'NGC' + galnames[i]
         else:
             galaxy = galnames[i]
-        
-        if not galaxy == 'NGC4569':
+
+        if galaxy != 'NGC4419':
             continue
         
         print(galaxy)
@@ -52,11 +52,10 @@ for file in data:
         #    continue
 
         # Moment maps
-        redo_clip = True
+        #redo_clip = True
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero(units='K km/s')
         redo_clip = False
-        '''
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
                       sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).moment_zero()
         CreateImages(galaxy, file_pbcorr, file_uncorr, savepath=savepath, refresh=refresh, overwrite=overwrite,
@@ -102,4 +101,3 @@ for file in data:
                      sun=sun, tosave=tosave, sample=sample, redo_clip=redo_clip).radial_profile(y_units='K km/s', x_units='arcsec',
                                                                            alpha_co=6.25, table_path=table_path,
                                                                            check_aperture=False)
-        '''

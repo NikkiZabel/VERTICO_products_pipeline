@@ -661,8 +661,6 @@ class ClipCube:
                 if self.sample == 'viva':
                     start = 11
                     stop = 52
-                    
-            print(start, stop)
 
             if get_chans:
                 return start, stop
