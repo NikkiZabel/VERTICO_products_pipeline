@@ -22,6 +22,7 @@ class ClipCube:
         self.tosave = tosave
         self.sample = sample
 
+
     @staticmethod
     def remove_stokes(cube):
         """
@@ -68,6 +69,7 @@ class ClipCube:
 
         return cube
 
+
     def innersquare(self, cube):
         """
         Get the central square (in spatial directions) of the spectral cube (useful for calculating the rms in a PB
@@ -101,6 +103,7 @@ class ClipCube:
         else:
             raise AttributeError('Please provide a 2D or 3D array.')
 
+
     def readfits(self):
         """
         Read in the fits files containing the primary beam corrected and uncorrected specral cubes.
@@ -132,6 +135,7 @@ class ClipCube:
         cube_uncorr.data[~np.isfinite(cube_uncorr.data)] = 0
 
         return cube_pbcorr, cube_uncorr
+
 
     def cut_empty_rows(self, cube, noisecube=None):
         """
@@ -204,6 +208,7 @@ class ClipCube:
 
         return cube, noisecube
 
+
     def cut_empty_columns(self, cube, noisecube=None):
         """
         Finds columns with no data and trims them from the cube. Leaves an empty
@@ -267,6 +272,7 @@ class ClipCube:
             noisecube = np.array([0])
 
         return cube, noisecube
+
 
     def centre_data(self, cube, noisecube=None):
         """
@@ -345,7 +351,28 @@ class ClipCube:
 
         return cube_hdu, noisecube_hdu
 
+
     def make_square(self, cube, noisecube=None):
+        """
+        Pad the cube in such a way that its spatial dimensions become square.
+
+        Parameters
+        ----------
+        cube : FITS file
+            The 3D spectral line cube.
+        noisecube : FITS file, optional
+            The 3D line-free cube. The default is None.
+
+        Returns
+        -------
+        square_cube_hdu : FITS file
+            Input spectral line cube with extra rows/columns so that 
+            NAXIS1 = NAXIS2.
+        noisecube_hdu : TYPE
+            Input line-free cube with extra rows/columns so that 
+            NAXIS1 = NAXIS2.
+
+        """
 
         img = np.sum(cube.data, axis=0)
 
@@ -382,20 +409,53 @@ class ClipCube:
 
         return square_cube_hdu, noisecube_hdu
 
+
     def preprocess(self, cube, noisecube=None):
+        """
+        Perform all the steps to create the (spatially) smallest, square 
+        version of the cube, with padding around the edges corresponding to 
+        one beam size.
+
+        Parameters
+        ----------
+        cube : TYPE
+            DESCRIPTION.
+        noisecube : TYPE, optional
+            DESCRIPTION. The default is None.
+
+        Returns
+        -------
+        cube : TYPE
+            DESCRIPTION.
+        noisecube : TYPE
+            DESCRIPTION.
+
+        """
         cube, noisecube = self.cut_empty_rows(cube, noisecube)
         cube, noisecube = self.cut_empty_columns(cube, noisecube)
         cube, noisecube = self.centre_data(cube, noisecube)
         cube, noisecube = self.make_square(cube, noisecube)
         return cube, noisecube
 
+
     def split_cube(self, cube):
         """
-        Split a cube into a cube containing the channels with emission and a cube containing the channels without.
-        :param cube (HDU file): input HDU file containing the spectral cube and its header
-        :return: two HDU files containing the cube channels with emission and the line-free channels, respectively
-        """
+        Split a cube into a cube containing the emission line and a cube 
+        containing the line-free channels.
 
+        Parameters
+        ----------
+        cube : FITS file
+            FITS file containing the ALMA cube.
+
+        Returns
+        -------
+        emiscube_hdu : FITS file
+            FITS file containing the emission line cube.
+        noisecube_hdu : FITS file
+            FITS file containing a cube of the line-free channels.
+
+        """
         start, stop = self.do_clip(get_chans=True)
 
         emiscube = cube.data[start:stop, :, :]
@@ -409,12 +469,30 @@ class ClipCube:
 
         return emiscube_hdu, noisecube_hdu
 
+
     def create_smooth_mask(self, emiscube_smooth, noisecube, return_rms=False):
         """
-        Creates a mask of the input cube where spaxels above the desired SNR are 1 and spaxels below the desired SNR
-        are 0.
-        :param cube (HDU file): spectral cube with which to create the mask
-        :return: boolean mask with the spaxels above the provided level set to 1 and the spaxels below to 0
+        Creates a mask of the input cube where spaxels above the desired SNR 
+        are set to 1 and spaxels below the desired SNR are set to 0.
+
+        Parameters
+        ----------
+        emiscube_smooth : FITS file
+            3D cube containing the spectral line and smoothed in both spatial
+            directions and the spectral direction, which forms the base of the
+            mask.
+        noisecube : FITS file
+            3D cube containing the line-free channels, which will be used to
+            measure the RMS.
+        return_rms : bool, optional
+            If set to 'True' the function will only return the RMS without 
+            carrying on to making the mask. The default is False.
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
         """
 
         #cube_pbcorr, cube_uncorr = self.readfits()
@@ -433,13 +511,26 @@ class ClipCube:
 
         return emiscube_smooth.data.astype(bool)
 
+
     def prune_small_detections(self, cube, mask):
         """
-        Mask structures in the spectral cube that are smaller than the desired size specified by "prune_by_npix" or
-        "prune_by_fracbeam" in the galaxy parameters.
-        :param cube (HDU file): the cube we are working on, to extract relevant information about the beam
-        :param mask (3D array): the mask we have created thus far using the Sun clipping method
-        :return: updated mask with the small detections masked out
+        Mask structures in the spectral cube that are smaller than the desired 
+        size specified by "prune_by_npix" or "prune_by_fracbeam" in the galaxy 
+        parameters. Based on the function designed by Jiayi Sun.
+
+        Parameters
+        ----------
+        cube : FITS file
+            The ALMA cube, used to extract the relevant beam information from 
+            the header.
+        mask : 3D numpy array
+            The mask that we previously created from the smoothed data cube.
+
+        Returns
+        -------
+        mask : 3D numpy array
+            Updated mask with the small detections set to 0.
+
         """
 
         if self.galaxy.prune_by_npix:
@@ -458,13 +549,26 @@ class ClipCube:
 
         return mask
 
+
     def expand_along_spatial(self, cube, mask):
         """
-        Expand the mask along spatial dimensions by an amount provided by either "expand_by_npix" or
-        "expand_by_fracbeam" in the galaxy parameters.
-        :param cube (HDU file): cube that we are working on, to extract the relevant information from its header
-        :param mask (3D array): mask that we have created so far with the Sun clipping method
-        :return: updated, expanded mask
+        Expand the mask along spatial dimensions by an amount provided by 
+        either "expand_by_npix" or "expand_by_fracbeam" in the galaxy 
+        parameters.
+
+        Parameters
+        ----------
+        cube : FITS file
+            The ALMA cube, used to extract the relevant beam information from 
+            the header.
+        mask : 3D numpy array
+            The mask that we previously created from the smoothed data cube.
+
+        Returns
+        -------
+        mask : 3D numpy array
+            Updated, expanded mask with the additional pixels set to 1.
+
         """
 
         if self.galaxy.expand_by_npix:
@@ -484,11 +588,21 @@ class ClipCube:
 
         return mask
 
+
     def expand_along_spectral(self, mask):
         """
-        Expand the mask along the velocity direction as provided by "expand_by_nchan" in the galaxy parameters.
-        :param mask: mask that we have created so far with the Sun clipping method
-        :return: updated, expanded mask
+        Expand the mask along the velocity direction as provided by 
+        "expand_by_nchan" in the galaxy parameters.
+
+        Parameters
+        mask : 3D numpy array
+            The mask that we previously created from the smoothed data cube.
+
+        Returns
+        -------
+        mask : 3D numpy array
+            Updated, expanded mask with the additional pixels set to 1.
+
         """
         for i in range(self.galaxy.expand_by_nchan):
             tempmask = np.roll(mask, shift=1, axis=0)
@@ -500,16 +614,35 @@ class ClipCube:
 
         return mask
 
+
     def sun_method(self, emiscube, noisecube, calc_rms=False):
         """
-        Apply the clipping method from Sun, possibly prune detections with small areas on the sky and/or expand the
-        mask in the spatial/velocity directions.
-        :param emiscube (HDU file): HDU containing the cube with only the channels with emission in them, from which
-        the mask will be created
-        :param noisecube (HDU file): HDU containing the cube with line-free channels, from which the rms will be
-        estimated
-        :return: mask with the same shape as "emiscube" where spaxels with a too low SNR are set to 0 according to the
-        Sun method, and spaxels with a high enough SNR are set to 1.
+        Apply Jiayi Sun's clipping method', including options to prune 
+        detections with small areas on the sky, or expand the mask in the mask
+        along the spatial axes or spectral axis.
+
+        Parameters
+        ----------
+        emiscube : FITS file
+            3D cube containing the spectral line.
+        noisecube : FITS file
+            3D cube containing the line-free channels.
+        calc_rms : bool, optional
+            If set to "True" this function will only return the RMS estimate 
+            for the data cube. The default is False.
+
+        Raises
+        ------
+        AttributeError
+            Will raise an AttributeError if some of the required parameters
+            are not set (nchan_low, cliplevel_low, nchan_high, and 
+                         cliplevel_high).
+
+        Returns
+        -------
+        mask : FITS file
+            The final mask, which will be used for clipping the original cube.
+
         """
 
         # Check if the necessary parameters are provided
@@ -563,11 +696,32 @@ class ClipCube:
 
         return mask
 
+
     def smooth_mask(self, cube, noisecube, return_rms=False):
         """
-        Apply a Gaussian blur, using sigma = 4 in the velocity direction (seems to work best), to the uncorrected cube.
+        Apply a Gaussian blur, using sigma = 4 in the velocity direction 
+        (from past experience this value works best), to the non-pb-corrected 
+        cube, for use of the simple smooth + clip strategy. 
         The mode 'nearest' seems to give the best results.
-        :return: (ndarray) mask to apply to the un-clipped cube
+
+        Parameters
+        ----------
+        cube : FITS file
+            The non-pb-corrected part of the ALMA cube containing the spectral
+            line.
+        noisecube : FITS file
+            The non-pb-corrected part of the ALMA cube containing the line-free
+            channels.
+        return_rms : bool, optional
+            If set to "True", the function will return the RMS estimate and not
+            continue with the smoothing. The default is False.
+
+        Returns
+        -------
+        mask : FITS file
+            A mask with the dimensions of the input cube, based on the smoothed
+            version of this cube.
+
         """
 
         beam = np.array([cube.header['BMAJ'], cube.header['BMIN']]) / cube.header['CDELT2']
@@ -607,15 +761,34 @@ class ClipCube:
 
         return mask
 
+
     def do_clip(self, clip_also=None, clip_also_nat='noise', get_chans=False):
         """
-        Clip the array, either according to the Sun method (if self.sun == True, which is default) or the smooth
-        clipping method from Dame.
-        :param cube_pbcorr (HDU file): primary beam corrected spectral cube, which we want to clip
-        :param cube_uncorr (HDU file): primary beam UNcorrected spectral cube, from which we want to make the mask
-        :return: HDU file with the clipped, primary beam corrected spectral cube
-        """
+        Perform the clipping of the data cube, either using the method adopted
+        and optimised by Jiayi Sun, or the simpler method from Dame+11.
 
+        Parameters
+        ----------
+        clip_also : FITS file, optional
+            A cube with the same dimensions as the input ALMA cube, which will 
+            be trimmed in the same way as the data cube, so it will end up 
+            having the same dimensions. The default is None.
+        clip_also_nat : str, optional
+            The nature of "clip_also", 'noise', 'mask', or 'pb'. 
+            The default is 'noise'.
+        get_chans : bool, optional
+            If set to true, this function will only return the first and last 
+            channels containing the emission line. The default is False.
+
+        Returns
+        -------
+        FITS file
+            The clipped and trimmed version of the input data cube.
+        FITS file
+            The corresponding noise cube, of the same dimensions as the output
+            data cube.
+
+        """
         cube_pbcorr, cube_uncorr = self.readfits()
         cube_uncorr_copy = cube_uncorr.copy()
 
