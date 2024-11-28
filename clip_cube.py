@@ -134,6 +134,26 @@ class ClipCube:
         return cube_pbcorr, cube_uncorr
 
     def cut_empty_rows(self, cube, noisecube=None):
+        """
+        Finds rows with no data and trims them from the cube. Leaves an empty
+        border of one beam size around the edges.
+
+        Parameters
+        ----------
+        cube : FITS file.
+            3D cube containing the spectral line data.
+            
+        noisecube : FITS file, optional
+            3D cube containing the line-free channels. The default is None.
+
+        Returns
+        -------
+        cube : FITS file
+            3D input cube with empty rows trimmed.
+        noisecube : TYPE
+            3D line-free input cube with empty rows trimmed.
+
+        """
 
         w = wcs.WCS(cube.header, naxis=2)
         #try:
@@ -185,6 +205,26 @@ class ClipCube:
         return cube, noisecube
 
     def cut_empty_columns(self, cube, noisecube=None):
+        """
+        Finds columns with no data and trims them from the cube. Leaves an empty
+        border of one beam size around the edges.
+
+        Parameters
+        ----------
+        cube : FITS file.
+            3D cube containing the spectral line data.
+            
+        noisecube : FITS file, optional
+            3D cube containing the line-free channels. The default is None.
+
+        Returns
+        -------
+        cube : FITS file
+            3D input cube with empty columns trimmed.
+        noisecube : TYPE
+            3D line-free input cube with empty columns trimmed.
+
+        """
 
         if len(noisecube.shape) == 1:
             noisecube = None
