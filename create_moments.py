@@ -24,8 +24,36 @@ class MomentMaps:
         self.galaxy.start, self.galaxy.stop = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun,
                                     savepath=self.savepath, tosave=self.tosave, sample=self.sample).do_clip(get_chans=True)
 
+
     def pixel_size_check(self, header, key="CDELT1", expected_pix_size=2, raise_exception=True):
-        # check the pixel size is what's expected modulo some floating point error
+        """
+        Check if the pixel size is what is expected (modulo some floating point 
+                                                     error).
+
+        Parameters
+        ----------
+        header : FITS header
+            Of the spectral cube of the galaxy in question.
+        key : header keyword, optional
+            Keyword containing the pixel size information. The default is 
+            "CDELT1".
+        expected_pix_size : float or int, optional
+            The size the pixel should have. The default is 2.
+        raise_exception : bool, optional
+            Whether to raise an exception if the pixel size is incorrect. The 
+            default is True.
+
+        Raises
+        ------
+        Exception
+            Raised if the pixel size of the data is not as expected.
+
+        Returns
+        -------
+        None.
+
+        """
+
         pixel_size_arcsec = abs(header[key] * 3600)
         pixel_size_error_message = self.galaxy.name + ": " + key + " = " + str(pixel_size_arcsec) + "arcsec" + \
                                    " not " + str(expected_pix_size) + "arcsec"
@@ -36,12 +64,14 @@ class MomentMaps:
                 print(pixel_size_error_message)
                 pass
 
+
     def calc_noise_in_cube(self,
             masking_scheme='simple', mask=None,
             spatial_average_npix=None, spatial_average_nbeam=5.0,
             spectral_average_nchan=5, verbose=False):
         """
-        From Jiayi Sun's script: https://github.com/astrojysun/Sun_Astro_Tools/blob/master/sun_astro_tools/spectralcube.py
+        From Jiayi Sun's script: 
+            https://github.com/astrojysun/Sun_Astro_Tools/blob/master/sun_astro_tools/spectralcube.py
 
         Estimate rms noise in a (continuum-subtracted) spectral cube.
         Parameters
@@ -162,15 +192,31 @@ class MomentMaps:
 
         return rmscube_hdu
 
+
     def makebeam(self, xpixels, ypixels, header, rot=0, cent=0):
         """
-        Creates the psf from the beam size given a custom location in the image and rotation, assuming a 2D Gaussian.
-        :param xpixels (int or float): number of pixels in the x-axis
-        :param ypixels (int or float): number of pixels in the y-axis
-        :param header (fits-header): fits header of the corresponding spectral cube
-        :param rot (int or float, optional): degrees over which the psf should be rotated
-        :param cent (list or ndarray of length 2, optional): custom centre of the psf
-        :return (2D array): psf of the beam
+        Creates the psf from the beam size given a custom location in the image 
+        and rotation, assuming a 2D Gaussian.
+
+        Parameters
+        ----------
+        xpixels : float or int
+            number of pixels in the x-axis.
+        ypixels : float or int
+            number of pixels in the y-axis.
+        header : FITS header
+            FITS header of the corresponding spectral cube.
+        rot : float or int, optional
+            Number of degrees over which the psf should be rotated. 
+            The default is 0.
+        cent : list or ndarray of length 2, optional
+            Alternative centre of the psf. The default is 0.
+
+        Returns
+        -------
+        psf : 2D numpy array
+            psf of the image
+
         """
 
         # Extract relevant information from header
@@ -207,11 +253,21 @@ class MomentMaps:
 
         return psf
 
+
     def new_header(self, header):
         """
-        Remove the velocity axis from a HDU header, so it corresponds to the 2D version of the corresponding data cube.
-        :param header (HDU header): header of the original data cube
-        :return: input header, but with velocity axis related keywords removed.
+        Change the 3D header to the corresponding 2D one.
+
+        Parameters
+        ----------
+        header : FITS header
+            Corresponding to the data cube.
+
+        Returns
+        -------
+        header : FITS header
+            Corresponding to the 2D image created from the 3D data cube.
+
         """
 
         header = header.copy()
@@ -259,14 +315,34 @@ class MomentMaps:
 
         return header
 
+
     def create_vel_array(self, cube):
         """
-        From the relevant header keywords, create an array with the velocities in km/s corresponding to the spectral
-        axis of the spectral cube
-        :param cube (HDU file): HDU file of the spectral cube for which we want to make the velocity array
-        :return: three arrays: the velocity array in one dimension, the length equals the numbers of channels that
-        contain emission, the same velocity array but in the shape off the spectral cube, and the one-dimensional
-        velocity array corresponding to the entire velocity axis of the cube (including line-free channels)
+        Creates the velocity array corresponding to the spectral axis
+        of the cube in km/s.
+
+        Parameters
+        ----------
+        cube : FITS file
+            The spectral cube from which we will make the velocity array.
+
+        Raises
+        ------
+        KeyError
+            Raised if the units are something other than velocity or frequency.
+
+        Returns
+        -------
+        vel_array : 1D numpy array
+            Contains the velocities corresponding to the cube spectral axis.
+            Only contains values from the velocity corresponding to the start of the 
+        spectral line data onwards
+        vel_narray : 3D numpy array
+            Same as vel_array but in the shape of the data cube (i.e. tiled in
+                                                    the spatial dimensions).
+        vel_array_full : 1D numpy array
+            Same as vel_array but for the entire spectral axis.
+
         """
 
         cube_orig, _ = ClipCube(self.galaxy.name, self.path_pbcorr, self.path_uncorr, sun=self.sun, savepath=self.savepath,
@@ -295,7 +371,22 @@ class MomentMaps:
 
         return vel_array, vel_narray, vel_array_full
 
+
     def add_clipping_keywords(self, header):
+        """
+        Add information to the header specifying details about the clipping.
+
+        Parameters
+        ----------
+        header : FITS header
+            Header of the cube that was clipped.
+
+        Returns
+        -------
+        header : FITS header
+            Header of the cube with clipping-related keywords added.
+
+        """
         if self.sun:
             try:
                 header.add_comment('Cube was clipped using the Sun+18 masking method', before='BUNIT')
@@ -322,14 +413,44 @@ class MomentMaps:
 
         return header
 
+
     def calc_moms(self, units='M_Sun/pc^2', alpha_co=5.4):
         """
-        Clip the spectral cube according to the desired method, and create moment 0, 1, and 2 maps. Save them as fits
-        files if so desired. Also calculate the systemic velocity from the moment 1 map.
-        :param units (string): desired units for the moment 0 map. Default is M_Sun/pc^2, the alternative is K km/s.
-        :param alpha_co (float): in case units == 'M_Sun/pc^2', multiply by alpha_co to obtain these units. Default
-        value for CO(2-1) from https://arxiv.org/pdf/1805.00937.pdf.
-        :return: clipped spectral cube, HDUs of the moment 0, 1, and 2 maps, and the systemic velocity in km/s
+        Clip the spectral cube according to the desired method (either the 
+        method Pythonified by Jiayi Sun or the more basic smooth + clip 
+        strategy from Dame+11), and create moment 0, 1, and 2 maps. Saves maps 
+        as fits files if so desired. Also calculate the systemic velocity from 
+        the moment 1 map.
+
+        Parameters
+        ----------
+        units : str, optional
+            Preferred units (either 'K km/s' or 'M_Sun/pc^2'). The default is 
+                             'M_Sun/pc^2'.
+        alpha_co : float, optional
+            In case units == 'M_Sun/pc^2', multiply the moment 0 map by this 
+            factor to obtain these units. The default is 5.4, which is the 
+            value for CO(2-1) quoted in https://arxiv.org/pdf/1805.00937.pdf.
+
+        Raises
+        ------
+        AttributeError
+            Raised if units is set to anything other than 'K km/s' or 
+            'M_Sun/pc^2'.
+
+        Returns
+        -------
+        cube : FITS file
+            3D spectral line cube for which the moment maps will be calculated.
+        mom0_hdu : FITS file
+            Contains the moment 0 map + corresponding header.
+        mom1_hdu : FITS file
+            Contains the moment 1 map + corresponding header.
+        mom2_hdu : FITS file
+            Contains the moment 2 map + corresponding header.
+        sysvel : float
+            Systemic velocity of the gas in the system in km/s.
+
         """
 
         if self.redo_clip:
@@ -432,7 +553,36 @@ class MomentMaps:
 
         return cube, mom0_hdu, mom1_hdu, mom2_hdu, sysvel
 
+
     def PVD(self, axis='major', find_angle=False, check_slit=False):
+        """
+        Creates a position-velocity diagram from the clipped data cube.
+
+        Parameters
+        ----------
+        axis : str, optional
+            Specifies whether the PVD will be taken along the minor or major 
+            axis. The default is 'major'.
+        find_angle : bool, optional
+            If True, display 2D image of the data rotated by "rot_angle" 
+            degrees, for quick visual determination of the position angle. The 
+            default is False.
+        check_slit : bool, optional
+            If True, shows a 2D image of the data with the area chosen for PVD
+            calculation overplotted. The default is False.
+
+        Raises
+        ------
+        AttributeError
+            Raised if anything other than 'major' or 'minor' is provided for 
+            "axis".
+
+        Returns
+        -------
+        pvd_hdu : FITS file
+            contains the PVD and corresponding header.
+
+        """
 
         clipped_cube, _, _, _, sysvel = self.calc_moms()
 
@@ -597,6 +747,7 @@ class MomentMaps:
 
         return pvd_hdu
 
+
     def spectrum(self, useclipped=False):
         """
         Calculate the spectrum from the spectral cube.
@@ -681,6 +832,7 @@ class MomentMaps:
         #spectrum /= beamsize
 
         return spectrum, spectrum_velocities, spectrum_vel_offset, spectrum_frequencies # / beamsize
+
 
     def radial_profile(self, alpha_co=5.4, table_path=None, check_aperture=False, hires=False):
 
@@ -965,6 +1117,7 @@ class MomentMaps:
 
         return rad_prof_K, rms, rad_prof_Msun, rms_Msun, radii_deg * 3600, radii_kpc
 
+
     def uncertainty_maps(self, calc_rms=False):
 
         #rmscube = self.calc_noise_in_cube()
@@ -1078,6 +1231,7 @@ class MomentMaps:
             mom2_uncertainty.writeto(self.savepath + 'mom2_unc.fits', overwrite=True)
 
         return mom0_uncertainty, SN_hdu, mom1_uncertainty, mom2_uncertainty
+
 
     def peak_temperature(self):
         if self.redo_clip:
